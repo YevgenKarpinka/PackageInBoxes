@@ -33,6 +33,16 @@ table 50051 "Box Header"
         {
             DataClassification = ToBeClassified;
         }
+        field(8; "Status"; Enum BoxStatus)
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(9; Weight; Decimal)
+        {
+            DataClassification = ToBeClassified;
+            DecimalPlaces = 0 : 5;
+            NotBlank = true;
+        }
     }
 
     keys
@@ -117,4 +127,18 @@ table 50051 "Box Header"
         WhseSetup.Get();
         WhseSetupGetted := true;
     end;
+}
+
+enum 50050 BoxStatus
+{
+    Extensible = true;
+
+    value(0; Open)
+    {
+        CaptionML = ENU = 'Open', RUS = 'Открыта';
+    }
+    value(1; Closed)
+    {
+        CaptionML = ENU = 'Closed', RUS = 'Закрыта';
+    }
 }

@@ -25,27 +25,23 @@ table 50050 "Package Header"
         {
             DataClassification = ToBeClassified;
         }
-        field(6; "Packing Date"; code[20])
+        field(6; "Warehouse Shipment No."; code[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(7; "Warehouse Shipment No."; code[20])
+        field(7; "Warehouse Pick No."; code[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(8; "Warehouse Pick No."; code[20])
+        field(8; "Create User Security ID"; Guid)
         {
             DataClassification = ToBeClassified;
         }
-        field(9; "Create User Security ID"; Guid)
+        field(9; "Last Modified User Security ID"; Guid)
         {
             DataClassification = ToBeClassified;
         }
-        field(10; "Last Modified User Security ID"; Guid)
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(11; "No. Series"; Code[20])
+        field(10; "No. Series"; Code[20])
         {
             DataClassification = ToBeClassified;
         }

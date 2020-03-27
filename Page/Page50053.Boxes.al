@@ -9,7 +9,7 @@ page 50053 "Boxes"
     {
         area(Content)
         {
-            group(GroupName)
+            group(General)
             {
                 field(Code; Code)
                 {

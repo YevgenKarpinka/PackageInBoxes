@@ -43,6 +43,20 @@ table 50051 "Box Header"
             DecimalPlaces = 0 : 5;
             NotBlank = true;
         }
+        field(10; "Remaining Quantity"; Decimal)
+        {
+            FieldClass = FlowField;
+            CalcFormula = sum ("Box Line"."Remaining Quantity" where("Box No." = field("No."),
+            "Warehouse Pick No." = field("Warehouse Pick No."),
+            "Warehouse Shipment No." = field("Warehouse Shipment No.")));
+        }
+        field(11; "Quantity in Box"; Decimal)
+        {
+            FieldClass = FlowField;
+            CalcFormula = sum ("Box Line"."Quantity in Box" where("Box No." = field("No."),
+            "Warehouse Pick No." = field("Warehouse Pick No."),
+            "Warehouse Shipment No." = field("Warehouse Shipment No.")));
+        }
     }
 
     keys

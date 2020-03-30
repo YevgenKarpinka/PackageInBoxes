@@ -1,11 +1,10 @@
 page 50051 "Boxes Subpage"
 {
-    CaptionML = ENU = 'Boxes Subpage';
-    PageType = ListPart;
+    CaptionML = ENU = 'Boxes', RUS = 'Коробки';
+    PageType = ListPlus;
     ApplicationArea = All;
     UsageCategory = Administration;
     SourceTable = "Box Header";
-    // SourceTableView = where("Shipment Cost" = filter('<>0'));
     AccessByPermission = tabledata "Box Header" = rimd;
 
     layout
@@ -36,7 +35,22 @@ page 50051 "Boxes Subpage"
                     ApplicationArea = All;
                     Editable = false;
                 }
-
+                field("Remaining Quantity"; "Remaining Quantity")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field("Quantity in Box"; "Quantity in Box")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+            }
+            part(BoxLinesSubPage; "Box Lines Subpage")
+            {
+                ApplicationArea = All;
+                SubPageLink = "Box No." = field("No."), "Warehouse Shipment No." = field("Warehouse Shipment No."), "Warehouse Pick No." = field("Warehouse Pick No.");
+                // UpdatePropagation = Both;
             }
         }
     }

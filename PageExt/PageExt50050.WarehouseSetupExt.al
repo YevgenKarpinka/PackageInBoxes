@@ -1,4 +1,4 @@
-pageextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup"
+pageextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5775
 {
     layout
     {

@@ -1,4 +1,4 @@
-pageextension 50051 "Warehouse Pick Ext." extends "Warehouse Pick" //5779
+pageextension 50051 "Warehouse Shipment Ext." extends "Warehouse Shipment" //7335
 {
     layout
     {
@@ -7,12 +7,12 @@ pageextension 50051 "Warehouse Pick Ext." extends "Warehouse Pick" //5779
 
     actions
     {
-        addafter("Delete Qty. to Handle")
+        addafter("Create Pick")
         {
-            action(PackageInBox)
+            action(CreatePackage)
             {
                 ApplicationArea = All;
-                CaptionML = ENU = 'Package In Box', RUS = 'Упаковка в коробки';
+                CaptionML = ENU = 'Create Package', RUS = 'Создать Упаковку';
                 Image = InventoryPick;
 
                 trigger OnAction()
@@ -20,7 +20,7 @@ pageextension 50051 "Warehouse Pick Ext." extends "Warehouse Pick" //5779
                     PackageHeader: Record "Package Header";
                 begin
                     if not PackageBoxMgt.CreateNewPackageFromWarehousePick(PackageHeader, Rec) then exit;
-                    Page.RunModal(Page::"Package In Boxes", PackageHeader);
+                    Page.RunModal(Page::"Package Card", PackageHeader);
                 end;
             }
         }

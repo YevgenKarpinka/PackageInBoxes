@@ -16,11 +16,11 @@ table 50052 "Box Line"
         field(3; "Item No."; Code[20])
         {
             DataClassification = ToBeClassified;
-            TableRelation = "Warehouse Activity Line" WHERE("Activity Type" = const(Pick),
-                                                            "Whse. Document Type" = const(Shipment),
-                                                            "Whse. Document No." = field("Warehouse Shipment No."),
-                                                            "Action Type" = const(Place)
-            );
+            // TableRelation = "Warehouse Activity Line" WHERE("Activity Type" = const(Pick),
+            //                                                 "Whse. Document Type" = const(Shipment),
+            //                                                 "Whse. Document No." = field("Warehouse Shipment No."),
+            //                                                 "Action Type" = const(Place)
+            // );
         }
         field(4; "Remaining Quantity"; Decimal)
         {
@@ -33,14 +33,20 @@ table 50052 "Box Line"
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
         }
-        field(6; "Warehouse Shipment No."; code[20])
+        // fields No. 6 and 7 reserved for to do
+        field(8; "Sales Order No."; code[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(7; "Warehouse Pick No."; code[20])
+        field(9; "Warehouse Shipment No."; code[20])
         {
             DataClassification = ToBeClassified;
         }
+        field(10; "Reg. Warehouse Pick No."; code[20])
+        {
+            DataClassification = ToBeClassified;
+        }
+
     }
 
     keys

@@ -1,9 +1,9 @@
 page 50051 "Boxes Subpage"
 {
     CaptionML = ENU = 'Boxes', RUS = 'Коробки';
-    PageType = ListPlus;
+    PageType = ListPart;
     ApplicationArea = All;
-    UsageCategory = Administration;
+    UsageCategory = Documents;
     SourceTable = "Box Header";
     AccessByPermission = tabledata "Box Header" = rimd;
 
@@ -46,12 +46,7 @@ page 50051 "Boxes Subpage"
                     Editable = false;
                 }
             }
-            part(BoxLinesSubPage; "Box Lines Subpage")
-            {
-                ApplicationArea = All;
-                SubPageLink = "Box No." = field("No."), "Warehouse Shipment No." = field("Warehouse Shipment No."), "Warehouse Pick No." = field("Warehouse Pick No.");
-                // UpdatePropagation = Both;
-            }
+
         }
     }
 

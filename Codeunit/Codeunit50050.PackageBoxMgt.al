@@ -8,21 +8,28 @@ codeunit 50050 "Package Box Mgt."
     var
         myInt: Integer;
 
-    procedure CreateNewPackageFromWarehousePick(var PackageHeader: Record "Package Header"; WhseActHeader: Record "Warehouse Activity Header"): Boolean
+    procedure CreateNewPackageFromWarehousePick(var PackageHeader: Record "Package Header"; WhseShipmentHeader: Record "Warehouse Shipment Header"): Boolean
     var
-        WhseActLine: Record "Warehouse Activity Line";
+        WhseShipmentLine: Record "Warehouse Shipment Line";
+        RegWhseActLine: Record "Registered Whse. Activity Line";
     begin
-        with WhseActLine do begin
-            SetRange("Activity Type", WhseActHeader.Type);
-            SetRange("No.", WhseActHeader."No.");
+        with WhseShipmentHeader do begin
+
+        end;
+
+        with RegWhseActLine do begin
+            SetRange("Source Document", "Source Document"::"Sales Order");
+            SetRange("Source No.", WhseShipmentLine."Source No.");
             if not FindFirst() then exit(false);
         end;
 
         with PackageHeader do begin
             Init();
-            "Warehouse Pick No." := WhseActLine."No.";
-            "Warehouse Shipment No." := WhseActLine."Whse. Document No.";
-            Insert(true);
+            "Reg. Whse Pick No." := RegWhseActLine."No.";
+            "Warehouse Shipment No." := WhseShipmentLine."No.";
+            "Sales Order No." := WhseShipmentLine."Source No.";
+            if Insert(true) then;
         end;
+        exit(true);
     end;
 }

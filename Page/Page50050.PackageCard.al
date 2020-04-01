@@ -1,6 +1,6 @@
-page 50050 "Package In Boxes"
+page 50050 "Package Card"
 {
-    CaptionML = ENU = 'Package In Boxes', RUS = 'Упаковка в коробки';
+    CaptionML = ENU = 'Package Card', RUS = 'Карточка Упаковки';
     PageType = Card;
     ApplicationArea = All;
     UsageCategory = Documents;
@@ -32,7 +32,7 @@ page 50050 "Package In Boxes"
                 {
                     ApplicationArea = All;
                 }
-                field("Warehouse Pick No."; "Warehouse Pick No.")
+                field("Reg. Whse Pick No."; "Reg. Whse Pick No.")
                 {
                     ApplicationArea = All;
                 }
@@ -44,7 +44,16 @@ page 50050 "Package In Boxes"
             part(BoxesSubPage; "Boxes Subpage")
             {
                 ApplicationArea = All;
-                SubPageLink = "Package No." = field("No."), "Warehouse Shipment No." = field("Warehouse Shipment No."), "Warehouse Pick No." = field("Warehouse Pick No.");
+                SubPageLink = "Package No." = field("No."),
+                                "Sales Order No." = field("Sales Order No.");
+                // UpdatePropagation = Both;
+            }
+            part(BoxLinesSubPage; "Box Lines Subpage")
+            {
+                ApplicationArea = All;
+                Provider = BoxesSubPage;
+                SubPageLink = "Box No." = field("No."),
+                                "Sales Order No." = field("Sales Order No.");
                 // UpdatePropagation = Both;
             }
         }

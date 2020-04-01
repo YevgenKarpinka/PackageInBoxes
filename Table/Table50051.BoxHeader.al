@@ -17,45 +17,49 @@ table 50051 "Box Header"
             DataClassification = ToBeClassified;
             TableRelation = Box;
         }
-        field(4; "No. Series"; Code[20])
+        field(4; "Create Date"; Date)
         {
             DataClassification = ToBeClassified;
         }
-        field(5; "Create Date"; Date)
+        field(5; "Remaining Quantity"; Decimal)
         {
-            DataClassification = ToBeClassified;
+            FieldClass = FlowField;
+            CalcFormula = sum ("Box Line"."Remaining Quantity"
+            where("Box No." = field("No."),
+            "Sales Order No." = field("Sales Order No.")));
         }
-        field(6; "Warehouse Shipment No."; code[20])
+        field(6; "Quantity in Box"; Decimal)
         {
-            DataClassification = ToBeClassified;
+            FieldClass = FlowField;
+            CalcFormula = sum ("Box Line"."Quantity in Box"
+            where("Box No." = field("No."),
+            "Sales Order No." = field("Sales Order No.")));
         }
-        field(7; "Warehouse Pick No."; code[20])
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(8; "Status"; Enum BoxStatus)
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(9; Weight; Decimal)
+        field(7; Weight; Decimal)
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
             NotBlank = true;
         }
-        field(10; "Remaining Quantity"; Decimal)
+        field(8; "Sales Order No."; code[20])
         {
-            FieldClass = FlowField;
-            CalcFormula = sum ("Box Line"."Remaining Quantity" where("Box No." = field("No."),
-            "Warehouse Pick No." = field("Warehouse Pick No."),
-            "Warehouse Shipment No." = field("Warehouse Shipment No.")));
+            DataClassification = ToBeClassified;
         }
-        field(11; "Quantity in Box"; Decimal)
+        field(9; "Warehouse Shipment No."; code[20])
         {
-            FieldClass = FlowField;
-            CalcFormula = sum ("Box Line"."Quantity in Box" where("Box No." = field("No."),
-            "Warehouse Pick No." = field("Warehouse Pick No."),
-            "Warehouse Shipment No." = field("Warehouse Shipment No.")));
+            DataClassification = ToBeClassified;
+        }
+        field(10; "Reg. Warehouse Pick No."; code[20])
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(11; "Status"; Enum BoxStatus)
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(12; "No. Series"; Code[20])
+        {
+            DataClassification = ToBeClassified;
         }
     }
 

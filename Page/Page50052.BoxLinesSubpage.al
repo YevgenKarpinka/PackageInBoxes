@@ -3,7 +3,7 @@ page 50052 "Box Lines Subpage"
     CaptionML = ENU = 'Box Lines Subpage', RUS = 'Содержимое коробки';
     PageType = ListPart;
     ApplicationArea = All;
-    UsageCategory = Administration;
+    UsageCategory = Documents;
     SourceTable = "Box Line";
     AccessByPermission = tabledata "Box Line" = rimd;
 

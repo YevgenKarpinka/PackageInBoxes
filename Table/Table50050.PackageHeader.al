@@ -37,15 +37,7 @@ table 50050 "Package Header"
         {
             DataClassification = ToBeClassified;
         }
-        field(9; "Warehouse Shipment No."; code[20])
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(10; "Reg. Whse Pick No."; code[20])
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(11; "No. Series"; Code[20])
+        field(9; "No. Series"; Code[20])
         {
             DataClassification = ToBeClassified;
         }
@@ -53,7 +45,7 @@ table 50050 "Package Header"
 
     keys
     {
-        key(PK; "No.", "Create Date")
+        key(PK; "No.")
         {
             Clustered = true;
         }
@@ -107,8 +99,6 @@ table 50050 "Package Header"
     end;
 
     local procedure TestNoSeries()
-    var
-        WhseSetup: Record "Warehouse Setup";
     begin
         GetWhseSetup();
         with WhseSetup do
@@ -120,7 +110,7 @@ table 50050 "Package Header"
         NoSeriesCode: Code[20];
     begin
         GetWhseSetup();
-        NoSeriesCode := WhseSetup."Box No. Series";
+        NoSeriesCode := WhseSetup."Package No. Series";
         exit(NoSeriesMgt.GetNoSeriesWithCheck(NoSeriesCode, false, "No. Series"))
     end;
 

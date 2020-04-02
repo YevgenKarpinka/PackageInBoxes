@@ -1,5 +1,6 @@
 page 50053 "Boxes"
 {
+    CaptionML = ENU = 'Boxes', RUS = 'Коробки';
     PageType = List;
     ApplicationArea = All;
     UsageCategory = Lists;
@@ -9,7 +10,7 @@ page 50053 "Boxes"
     {
         area(Content)
         {
-            group(General)
+            repeater(repeaterName)
             {
                 field(Code; Code)
                 {

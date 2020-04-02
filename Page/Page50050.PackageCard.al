@@ -2,7 +2,7 @@ page 50050 "Package Card"
 {
     CaptionML = ENU = 'Package Card', RUS = 'Карточка Упаковки';
     PageType = Card;
-    ApplicationArea = All;
+    ApplicationArea = Warehouse;
     UsageCategory = Documents;
     SourceTable = "Package Header";
 
@@ -14,47 +14,44 @@ page 50050 "Package Card"
             {
                 field("No."; "No.")
                 {
-                    ApplicationArea = All;
-                }
-                field("Create Date"; "Create Date")
-                {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
+                    Editable = false;
                 }
                 field("Create User ID"; "Create User ID")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                 }
-                field("Last Modified Date"; "Last Modified Date")
+                field("Create Date"; "Create Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                 }
                 field("Last Modified User ID"; "Last Modified User ID")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                 }
-                field("Reg. Whse Pick No."; "Reg. Whse Pick No.")
+                field("Last Modified Date"; "Last Modified Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                 }
-                field("Warehouse Shipment No."; "Warehouse Shipment No.")
+                field("Sales Order No."; "Sales Order No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                 }
             }
             part(BoxesSubPage; "Boxes Subpage")
             {
-                ApplicationArea = All;
+                ApplicationArea = Warehouse;
                 SubPageLink = "Package No." = field("No."),
-                                "Sales Order No." = field("Sales Order No.");
-                // UpdatePropagation = Both;
+                              "Sales Order No." = field("Sales Order No.");
+                UpdatePropagation = Both;
             }
             part(BoxLinesSubPage; "Box Lines Subpage")
             {
-                ApplicationArea = All;
+                ApplicationArea = Warehouse;
                 Provider = BoxesSubPage;
                 SubPageLink = "Box No." = field("No."),
-                                "Sales Order No." = field("Sales Order No.");
-                // UpdatePropagation = Both;
+                              "Sales Order No." = field("Sales Order No.");
+                UpdatePropagation = Both;
             }
         }
     }
@@ -65,7 +62,7 @@ page 50050 "Package Card"
         {
             action(ActionName)
             {
-                ApplicationArea = All;
+                ApplicationArea = Warehouse;
 
                 trigger OnAction()
                 begin

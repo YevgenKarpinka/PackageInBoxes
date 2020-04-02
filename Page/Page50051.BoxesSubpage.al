@@ -2,7 +2,7 @@ page 50051 "Boxes Subpage"
 {
     CaptionML = ENU = 'Boxes', RUS = 'Коробки';
     PageType = ListPart;
-    ApplicationArea = All;
+    ApplicationArea = Warehouse;
     UsageCategory = Documents;
     SourceTable = "Box Header";
     AccessByPermission = tabledata "Box Header" = rimd;
@@ -13,36 +13,41 @@ page 50051 "Boxes Subpage"
         {
             repeater(RepeaterName)
             {
+                field("Create Date"; "Create Date")
+                {
+                    ApplicationArea = Warehouse;
+                    Editable = false;
+                }
                 field("No."; "No.")
                 {
-                    ApplicationArea = All;
-                }
-                field(Code; Code)
-                {
-                    ApplicationArea = All;
-                }
-                field(Weight; Weight)
-                {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
+                    Editable = false;
                 }
                 field(Status; Status)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                     Editable = false;
                 }
-                field("Create Date"; "Create Date")
+                field("External Document No."; "External Document No.")
                 {
-                    ApplicationArea = All;
-                    Editable = false;
+                    ApplicationArea = Warehouse;
+                }
+                field(Code; Code)
+                {
+                    ApplicationArea = Warehouse;
+                }
+                field(Weight; Weight)
+                {
+                    ApplicationArea = Warehouse;
                 }
                 field("Remaining Quantity"; "Remaining Quantity")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                     Editable = false;
                 }
                 field("Quantity in Box"; "Quantity in Box")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                     Editable = false;
                 }
             }
@@ -56,7 +61,7 @@ page 50051 "Boxes Subpage"
         {
             action(ActionName)
             {
-                ApplicationArea = All;
+                ApplicationArea = Warehouse;
 
                 trigger OnAction()
                 begin

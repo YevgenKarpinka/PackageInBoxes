@@ -5,53 +5,45 @@ table 50052 "Box Line"
 
     fields
     {
-        field(1; "Box No."; Code[20])
+        field(1; "Sales Order No."; code[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(2; "Line No."; Integer)
+        field(2; "Box No."; Code[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(3; "Item No."; Code[20])
+        field(3; "Line No."; Integer)
         {
             DataClassification = ToBeClassified;
-            // TableRelation = "Warehouse Activity Line" WHERE("Activity Type" = const(Pick),
-            //                                                 "Whse. Document Type" = const(Shipment),
-            //                                                 "Whse. Document No." = field("Warehouse Shipment No."),
-            //                                                 "Action Type" = const(Place)
-            // );
         }
-        field(4; "Remaining Quantity"; Decimal)
+        field(4; "Item No."; Code[20])
+        {
+            DataClassification = ToBeClassified;
+            TableRelation = "Warehouse Shipment Line"."Item No." WHERE("Source Document" = const("Sales Order"),
+                            "Source No." = field("Sales Order No."));
+
+            trigger OnValidate()
+            begin
+                CalcRemainingQuantity();
+            end;
+        }
+        field(5; "Remaining Quantity"; Decimal)
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
-        field(5; "Quantity in Box"; Decimal)
+        field(6; "Quantity in Box"; Decimal)
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
         }
-        // fields No. 6 and 7 reserved for to do
-        field(8; "Sales Order No."; code[20])
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(9; "Warehouse Shipment No."; code[20])
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(10; "Reg. Warehouse Pick No."; code[20])
-        {
-            DataClassification = ToBeClassified;
-        }
-
     }
 
     keys
     {
-        key(PK; "Box No.", "Line No.")
+        key(PK; "Sales Order No.", "Box No.", "Line No.")
         {
             Clustered = true;
         }
@@ -62,11 +54,11 @@ table 50052 "Box Line"
     }
 
     var
-        myInt: Integer;
+        BoxNo: Code[20];
 
     trigger OnInsert()
     begin
-
+        InitInsert();
     end;
 
     trigger OnModify()
@@ -84,4 +76,42 @@ table 50052 "Box Line"
 
     end;
 
+    procedure SetUpNewBoxNo(newBoxNo: Code[20])
+    begin
+        BoxNo := newBoxNo;
+    end;
+
+    local procedure InitInsert()
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        BoxHeader.SetRange("No.", BoxNo);
+        BoxHeader.FindFirst();
+        "Box No." := BoxNo;
+        "Sales Order No." := BoxHeader."Sales Order No.";
+        // "Warehouse Shipment No." := BoxHeader."Warehouse Shipment No.";
+        // "Whse. Pick No." := BoxHeader."Whse. Pick No.";
+    end;
+
+    procedure SetUpNewLine(newBoxNo: Code[20])
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        BoxNo := newBoxNo;
+        BoxHeader.SetRange("No.", BoxNo);
+        BoxHeader.FindFirst();
+        Init();
+        "Box No." := BoxNo;
+        "Line No." := 10000;
+        "Sales Order No." := BoxHeader."Sales Order No.";
+        // "Warehouse Shipment No." := BoxHeader."Warehouse Shipment No.";
+        // "Whse. Pick No." := BoxHeader."Whse. Pick No.";
+        Insert();
+    end;
+
+    local procedure CalcRemainingQuantity()
+    begin
+        // to do
+        // Error('Procedure not implemented.');
+    end;
 }

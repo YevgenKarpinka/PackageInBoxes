@@ -11,25 +11,32 @@ codeunit 50050 "Package Box Mgt."
     procedure CreateNewPackageFromWarehousePick(var PackageHeader: Record "Package Header"; WhseShipmentHeader: Record "Warehouse Shipment Header"): Boolean
     var
         WhseShipmentLine: Record "Warehouse Shipment Line";
-        RegWhseActLine: Record "Registered Whse. Activity Line";
+        WhseActLine: Record "Warehouse Activity Line";
     begin
-        with WhseShipmentHeader do begin
-
+        with WhseShipmentLine do begin
+            SetRange("No.", WhseShipmentHeader."No.");
+            FindFirst();
         end;
 
-        with RegWhseActLine do begin
+        with PackageHeader do begin
+            SetRange("Sales Order No.", WhseShipmentLine."Source No.");
+            if FindFirst() then exit(true);
+        end;
+
+        with WhseActLine do begin
             SetRange("Source Document", "Source Document"::"Sales Order");
             SetRange("Source No.", WhseShipmentLine."Source No.");
-            if not FindFirst() then exit(false);
+            FindFirst();
         end;
 
         with PackageHeader do begin
             Init();
-            "Reg. Whse Pick No." := RegWhseActLine."No.";
-            "Warehouse Shipment No." := WhseShipmentLine."No.";
             "Sales Order No." := WhseShipmentLine."Source No.";
+            // "Warehouse Shipment No." := WhseShipmentLine."No.";
+            // "Whse. Pick No." := WhseActLine."No.";
             if Insert(true) then;
         end;
+
         exit(true);
     end;
 }

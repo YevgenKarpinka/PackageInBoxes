@@ -1,11 +1,14 @@
 page 50052 "Box Lines Subpage"
 {
-    CaptionML = ENU = 'Box Lines Subpage', RUS = 'Содержимое коробки';
+    CaptionML = ENU = 'Items in Box', RUS = 'Товары в коробке';
     PageType = ListPart;
-    ApplicationArea = All;
+    ApplicationArea = Warehouse;
     UsageCategory = Documents;
     SourceTable = "Box Line";
-    AccessByPermission = tabledata "Box Line" = rimd;
+    AutoSplitKey = true;
+    DelayedInsert = true;
+    LinksAllowed = false;
+    MultipleNewLines = true;
 
     layout
     {
@@ -15,15 +18,16 @@ page 50052 "Box Lines Subpage"
             {
                 field("Item No."; "Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                 }
                 field("Remaining Quantity"; "Remaining Quantity")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
+                    Editable = false;
                 }
                 field("Quantity in Box"; "Quantity in Box")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
                 }
             }
         }
@@ -35,7 +39,7 @@ page 50052 "Box Lines Subpage"
         {
             action(ActionName)
             {
-                ApplicationArea = All;
+                ApplicationArea = Warehouse;
 
                 trigger OnAction()
                 begin
@@ -46,5 +50,16 @@ page 50052 "Box Lines Subpage"
     }
 
     var
-        myInt: Integer;
+        SalesOrderNo: Code[20];
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        if xRec."Sales Order No." = '' then
+            "Sales Order No." := SalesOrderNo;
+    end;
+
+    procedure SetUpSalesOrderNo(locSalesOrderNo: Code[20])
+    begin
+        SalesOrderNo := locSalesOrderNo;
+    end;
 }

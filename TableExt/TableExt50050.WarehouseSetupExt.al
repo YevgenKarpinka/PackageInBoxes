@@ -1,4 +1,4 @@
-tableextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup"
+tableextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5769
 {
     fields
     {

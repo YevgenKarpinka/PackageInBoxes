@@ -16,6 +16,16 @@ table 50051 "Box Header"
         {
             DataClassification = ToBeClassified;
             TableRelation = Box;
+
+            trigger OnValidate()
+            var
+                Box: Record Box;
+            begin
+                if xRec.Code <> Rec.Code then begin
+                    Box.Get(Code);
+                    Weight := Box.Weight;
+                end;
+            end;
         }
         field(4; "Create Date"; Date)
         {
@@ -45,19 +55,15 @@ table 50051 "Box Header"
         {
             DataClassification = ToBeClassified;
         }
-        field(9; "Warehouse Shipment No."; code[20])
+        field(9; "External Document No."; Text[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(10; "Reg. Warehouse Pick No."; code[20])
+        field(10; "Status"; Enum BoxStatus)
         {
             DataClassification = ToBeClassified;
         }
-        field(11; "Status"; Enum BoxStatus)
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(12; "No. Series"; Code[20])
+        field(11; "No. Series"; Code[20])
         {
             DataClassification = ToBeClassified;
         }
@@ -82,7 +88,8 @@ table 50051 "Box Header"
 
     trigger OnInsert()
     begin
-
+        InitInsert();
+        // InitInsertBoxLine();
     end;
 
     trigger OnModify()
@@ -119,11 +126,23 @@ table 50051 "Box Header"
             PackageHeader.Get("Package No.");
             NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", DT2Date(PackageHeader."Create Date"), "No.", "No. Series");
         end;
+
+        PackageHeader.SetRange("No.", "Package No.");
+        PackageHeader.FindFirst();
+        "Create Date" := DT2Date(CurrentDateTime);
+        "Sales Order No." := PackageHeader."Sales Order No.";
+        // "Warehouse Shipment No." := PackageHeader."Warehouse Shipment No.";
+        // "Whse. Pick No." := PackageHeader."Whse. Pick No.";
+    end;
+
+    local procedure InitInsertBoxLine()
+    var
+        BoxLine: Record "Box Line";
+    begin
+        BoxLine.SetUpNewLine("No.");
     end;
 
     local procedure TestNoSeries()
-    var
-        WhseSetup: Record "Warehouse Setup";
     begin
         GetWhseSetup();
         with WhseSetup do

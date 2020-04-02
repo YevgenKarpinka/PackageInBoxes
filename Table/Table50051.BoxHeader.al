@@ -35,15 +35,13 @@ table 50051 "Box Header"
         {
             FieldClass = FlowField;
             CalcFormula = sum ("Box Line"."Remaining Quantity"
-            where("Box No." = field("No."),
-            "Sales Order No." = field("Sales Order No.")));
+                where("Sales Order No." = field("Sales Order No."), "Box No." = field("No.")));
         }
         field(6; "Quantity in Box"; Decimal)
         {
             FieldClass = FlowField;
             CalcFormula = sum ("Box Line"."Quantity in Box"
-            where("Box No." = field("No."),
-            "Sales Order No." = field("Sales Order No.")));
+                where("Sales Order No." = field("Sales Order No."), "Box No." = field("No.")));
         }
         field(7; Weight; Decimal)
         {
@@ -135,12 +133,12 @@ table 50051 "Box Header"
         // "Whse. Pick No." := PackageHeader."Whse. Pick No.";
     end;
 
-    local procedure InitInsertBoxLine()
-    var
-        BoxLine: Record "Box Line";
-    begin
-        BoxLine.SetUpNewLine("No.");
-    end;
+    // local procedure InitInsertBoxLine()
+    // var
+    //     BoxLine: Record "Box Line";
+    // begin
+    //     BoxLine.SetUpNewLine("No.");
+    // end;
 
     local procedure TestNoSeries()
     begin

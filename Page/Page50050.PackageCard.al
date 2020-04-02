@@ -12,10 +12,15 @@ page 50050 "Package Card"
         {
             group(General)
             {
+                Editable = false;
+
+                field("Sales Order No."; "Sales Order No.")
+                {
+                    ApplicationArea = Warehouse;
+                }
                 field("No."; "No.")
                 {
                     ApplicationArea = Warehouse;
-                    Editable = false;
                 }
                 field("Create User ID"; "Create User ID")
                 {
@@ -30,10 +35,6 @@ page 50050 "Package Card"
                     ApplicationArea = Warehouse;
                 }
                 field("Last Modified Date"; "Last Modified Date")
-                {
-                    ApplicationArea = Warehouse;
-                }
-                field("Sales Order No."; "Sales Order No.")
                 {
                     ApplicationArea = Warehouse;
                 }
@@ -71,4 +72,9 @@ page 50050 "Package Card"
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        CurrPage.BoxLinesSubPage.Page.SetUpSalesOrderNo("Sales Order No.");
+    end;
 }

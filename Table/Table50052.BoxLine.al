@@ -20,8 +20,31 @@ table 50052 "Box Line"
         field(4; "Item No."; Code[20])
         {
             DataClassification = ToBeClassified;
-            TableRelation = "Warehouse Shipment Line"."Item No." WHERE("Source Document" = const("Sales Order"),
-                            "Source No." = field("Sales Order No."));
+            // TableRelation = "Warehouse Shipment Line"."Item No." WHERE("Source Document" = const("Sales Order"),
+            //                 "Source No." = field("Sales Order No."));
+
+            trigger OnLookup()
+            var
+                WhseShipmentLine: Record "Warehouse Shipment Line";
+                Item: Record Item;
+                tempItem: Record Item temporary;
+            begin
+                with WhseShipmentLine do begin
+                    SetRange("Source Document", "Source Document"::"Sales Order");
+                    SetRange("Source No.", "Sales Order No.");
+                    if FindSet() then
+                        repeat
+                            if Item.Get(WhseShipmentLine."Item No.") then begin
+                                tempItem := Item;
+                                tempItem.Insert();
+                            end;
+                        until Next() = 0;
+                end;
+
+                if Page.RunModal(Page::"Item Lookup", tempItem) = Action::LookupOK then begin
+                    Validate("Item No.", tempItem."No.");
+                end;
+            end;
 
             trigger OnValidate()
             begin
@@ -38,6 +61,11 @@ table 50052 "Box Line"
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
+
+            trigger OnValidate()
+            begin
+                CalcRemainingQuantity();
+            end;
         }
     }
 
@@ -53,12 +81,9 @@ table 50052 "Box Line"
         }
     }
 
-    var
-        BoxNo: Code[20];
-
     trigger OnInsert()
     begin
-        InitInsert();
+
     end;
 
     trigger OnModify()
@@ -76,42 +101,10 @@ table 50052 "Box Line"
 
     end;
 
-    procedure SetUpNewBoxNo(newBoxNo: Code[20])
-    begin
-        BoxNo := newBoxNo;
-    end;
-
-    local procedure InitInsert()
-    var
-        BoxHeader: Record "Box Header";
-    begin
-        BoxHeader.SetRange("No.", BoxNo);
-        BoxHeader.FindFirst();
-        "Box No." := BoxNo;
-        "Sales Order No." := BoxHeader."Sales Order No.";
-        // "Warehouse Shipment No." := BoxHeader."Warehouse Shipment No.";
-        // "Whse. Pick No." := BoxHeader."Whse. Pick No.";
-    end;
-
-    procedure SetUpNewLine(newBoxNo: Code[20])
-    var
-        BoxHeader: Record "Box Header";
-    begin
-        BoxNo := newBoxNo;
-        BoxHeader.SetRange("No.", BoxNo);
-        BoxHeader.FindFirst();
-        Init();
-        "Box No." := BoxNo;
-        "Line No." := 10000;
-        "Sales Order No." := BoxHeader."Sales Order No.";
-        // "Warehouse Shipment No." := BoxHeader."Warehouse Shipment No.";
-        // "Whse. Pick No." := BoxHeader."Whse. Pick No.";
-        Insert();
-    end;
-
     local procedure CalcRemainingQuantity()
     begin
         // to do
         // Error('Procedure not implemented.');
+        "Remaining Quantity" := 11;
     end;
 }

@@ -1,20 +1,28 @@
-page 50051 "Boxes Subpage"
+page 50054 "Box Card"
 {
-    CaptionML = ENU = 'Boxes', RUS = 'Коробки';
-    PageType = ListPart;
+    CaptionML = ENU = 'Box Card', RUS = 'Карточка Коробки';
+    PageType = Card;
     ApplicationArea = Warehouse;
     UsageCategory = Documents;
     SourceTable = "Box Header";
-    CardPageId = "Box Card";
-    InsertAllowed = true;
+    InsertAllowed = false;
+    DeleteAllowed = true;
+
 
     layout
     {
         area(Content)
         {
-            repeater(RepeaterName)
+            group(General)
             {
-                field("No."; "No.")
+                Editable = Status = Status::Open;
+
+                field("No.";
+                "No.")
+                {
+                    ApplicationArea = Warehouse;
+                }
+                field("Sales Order No."; "Sales Order No.")
                 {
                     ApplicationArea = Warehouse;
                     Editable = false;
@@ -46,7 +54,13 @@ page 50051 "Boxes Subpage"
                     ApplicationArea = Warehouse;
                 }
             }
-
+            part(BoxLinesSubPage; "Box Lines Subpage")
+            {
+                ApplicationArea = Warehouse;
+                SubPageLink = "Box No." = field("No.");
+                UpdatePropagation = Both;
+                Editable = Status = Status::Open;
+            }
         }
     }
 
@@ -54,25 +68,6 @@ page 50051 "Boxes Subpage"
     {
         area(Processing)
         {
-            action(Create)
-            {
-                ApplicationArea = Warehouse;
-                CaptionML = ENU = 'Create', RUS = 'Создать';
-                Image = PickLines;
-
-                trigger OnAction()
-                var
-                    BoxHeader: Record "Box Header";
-                begin
-                    with BoxHeader do begin
-                        Init();
-                        "Package No." := Rec."Package No.";
-                        Insert(true);
-                    end;
-                    Commit();
-                    Page.RunModal(Page::"Box Card", BoxHeader);
-                end;
-            }
             action(Close)
             {
                 ApplicationArea = Warehouse;
@@ -80,7 +75,6 @@ page 50051 "Boxes Subpage"
                 Image = ItemLines;
 
                 trigger OnAction()
-                var
                 begin
                     if Status = Status::Open then begin
                         Status := Status::Close;
@@ -91,12 +85,10 @@ page 50051 "Boxes Subpage"
             action(ReOpen)
             {
                 ApplicationArea = Warehouse;
-                CaptionML = ENU = 'ReOpen', RUS = 'Открыть';
-                Enabled = Status = Status::Close;
+                CaptionML = ENU = 'Reopen', RUS = 'Открыть';
                 Image = RefreshLines;
 
                 trigger OnAction()
-                var
                 begin
                     if Status = Status::Close then begin
                         Status := Status::Open;

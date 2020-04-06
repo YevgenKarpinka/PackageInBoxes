@@ -16,6 +16,10 @@ page 50053 "Boxes"
                 {
                     ApplicationArea = All;
                 }
+                field(Description; Description)
+                {
+                    ApplicationArea = All;
+                }
                 field(Weight; Weight)
                 {
                     ApplicationArea = All;

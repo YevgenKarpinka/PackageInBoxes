@@ -5,36 +5,36 @@ table 50052 "Box Line"
 
     fields
     {
-        field(1; "Sales Order No."; code[20])
+
+        field(1; "Box No."; Code[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(2; "Box No."; Code[20])
+        field(2; "Line No."; Integer)
         {
             DataClassification = ToBeClassified;
         }
-        field(3; "Line No."; Integer)
+        field(3; "Item No."; Code[20])
         {
             DataClassification = ToBeClassified;
-        }
-        field(4; "Item No."; Code[20])
-        {
-            DataClassification = ToBeClassified;
-            // TableRelation = "Warehouse Shipment Line"."Item No." WHERE("Source Document" = const("Sales Order"),
-            //                 "Source No." = field("Sales Order No."));
 
             trigger OnLookup()
             var
-                WhseShipmentLine: Record "Warehouse Shipment Line";
+                SalesLine: Record "Sales Line";
                 Item: Record Item;
                 tempItem: Record Item temporary;
             begin
-                with WhseShipmentLine do begin
-                    SetRange("Source Document", "Source Document"::"Sales Order");
-                    SetRange("Source No.", "Sales Order No.");
+                GetSalesOrderNo();
+                with SalesLine do begin
+                    SetCurrentKey(Type);
+                    SetRange("Document Type", "Document Type"::Order);
+                    SetRange("Document No.", "Sales Order No.");
+                    SetRange(Type, Type::Item);
                     if FindSet() then
                         repeat
-                            if Item.Get(WhseShipmentLine."Item No.") then begin
+                            if not tempItem.get("No.")
+                              and (PackageBoxMgt.GetRemainingItemQuantityInOrder("Sales Order No.", "No.") > 0) then begin
+                                Item.Get("No.");
                                 tempItem := Item;
                                 tempItem.Insert();
                             end;
@@ -45,37 +45,36 @@ table 50052 "Box Line"
                     Validate("Item No.", tempItem."No.");
                 end;
             end;
-
-            trigger OnValidate()
-            begin
-                CalcRemainingQuantity();
-            end;
         }
-        field(5; "Remaining Quantity"; Decimal)
-        {
-            DataClassification = ToBeClassified;
-            DecimalPlaces = 0 : 5;
-            Editable = false;
-        }
-        field(6; "Quantity in Box"; Decimal)
+        field(4; "Quantity in Box"; Decimal)
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
+            var
+                RemainingItemQuantity: Decimal;
             begin
-                CalcRemainingQuantity();
+                if xRec."Quantity in Box" = "Quantity in Box" then exit;
+                RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInOrder("Sales Order No.", "Item No.");
+                if xRec."Quantity in Box" < "Quantity in Box" then
+                    if "Quantity in Box" > RemainingItemQuantity then
+                        Error(errAllowedQuantityLess, RemainingItemQuantity);
             end;
+        }
+        field(5; "Sales Order No."; code[20])
+        {
+            DataClassification = ToBeClassified;
         }
     }
 
     keys
     {
-        key(PK; "Sales Order No.", "Box No.", "Line No.")
+        key(PK; "Box No.", "Line No.")
         {
             Clustered = true;
         }
-        key(SK; "Item No.")
+        key(SK; "Sales Order No.", "Item No.")
         {
 
         }
@@ -83,17 +82,18 @@ table 50052 "Box Line"
 
     trigger OnInsert()
     begin
-
+        InitInsert();
+        BoxLineModify();
     end;
 
     trigger OnModify()
     begin
-
+        BoxLineModify();
     end;
 
     trigger OnDelete()
     begin
-
+        BoxLineModify();
     end;
 
     trigger OnRename()
@@ -101,10 +101,39 @@ table 50052 "Box Line"
 
     end;
 
-    local procedure CalcRemainingQuantity()
+    var
+        PackageBoxMgt: Codeunit "Package Box Mgt.";
+        errAllowedQuantityLess: TextConst ENU = 'Maximum Allowed Quantity %1!',
+                                            RUS = 'Количество в Заказе продажи %1!';
+
+    local procedure InitInsert()
+    var
+        BoxHeader: Record "Box Header";
     begin
-        // to do
-        // Error('Procedure not implemented.');
-        "Remaining Quantity" := 11;
+        if "Sales Order No." = '' then
+            GetSalesOrderNo();
+    end;
+
+    local procedure GetSalesOrderNo()
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        if "Sales Order No." <> '' then exit;
+        with BoxHeader do begin
+            SetRange("No.", "Box No.");
+            FindFirst();
+        end;
+        "Sales Order No." := BoxHeader."Sales Order No.";
+    end;
+
+    local procedure BoxLineModify()
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        with BoxHeader do begin
+            SetRange("No.", "Box No.");
+            FindFirst();
+            BoxModify();
+        end;
     end;
 }

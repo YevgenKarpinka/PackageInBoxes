@@ -13,7 +13,6 @@ pageextension 50051 "Warehouse Shipment Ext." extends "Warehouse Shipment" //733
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Create Package', RUS = 'Создать Упаковку';
                 Image = InventoryPick;
-                // Visible = VisibleCreatePackage;
 
                 trigger OnAction()
                 var
@@ -29,12 +28,6 @@ pageextension 50051 "Warehouse Shipment Ext." extends "Warehouse Shipment" //733
             }
         }
     }
-
-    // trigger OnOpenPage()
-    // begin
-    //     GetWhseSetup();
-    //     VisibleCreatePackage := WhseSetup."Enable Box Packaging";
-    // end;
 
     local procedure GetWhseSetup()
     begin

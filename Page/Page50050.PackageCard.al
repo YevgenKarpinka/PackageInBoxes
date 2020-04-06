@@ -5,6 +5,7 @@ page 50050 "Package Card"
     ApplicationArea = Warehouse;
     UsageCategory = Documents;
     SourceTable = "Package Header";
+    RefreshOnActivate = true;
 
     layout
     {
@@ -38,21 +39,25 @@ page 50050 "Package Card"
                 {
                     ApplicationArea = Warehouse;
                 }
+                field(Status; Status)
+                {
+                    ApplicationArea = Warehouse;
+                }
             }
             part(BoxesSubPage; "Boxes Subpage")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "Package No." = field("No."),
-                              "Sales Order No." = field("Sales Order No.");
+                SubPageLink = "Package No." = field("No.");
                 UpdatePropagation = Both;
             }
-            part(BoxLinesSubPage; "Box Lines Subpage")
+        }
+        area(FactBoxes)
+        {
+            part(BoxLineFactBox; "Box Lines FactBox")
             {
                 ApplicationArea = Warehouse;
                 Provider = BoxesSubPage;
-                SubPageLink = "Box No." = field("No."),
-                              "Sales Order No." = field("Sales Order No.");
-                UpdatePropagation = Both;
+                SubPageLink = "Box No." = field("No.");
             }
         }
     }
@@ -61,20 +66,53 @@ page 50050 "Package Card"
     {
         area(Processing)
         {
-            action(ActionName)
+            action(Register)
             {
                 ApplicationArea = Warehouse;
+                CaptionML = ENU = 'Register', RUS = 'Зарегистрировать';
 
                 trigger OnAction()
                 begin
+                    PackageBoxMgt.CloseAllBoxes("No.");
+                    PackageBoxMgt.RegisteredPackage("No.");
+                end;
+            }
+            action(UnRegistered)
+            {
+                ApplicationArea = Warehouse;
+                CaptionML = ENU = 'UnRegister', RUS = 'Отменить регистрацию';
 
+                trigger OnAction()
+                begin
+                    PackageBoxMgt.ReOpenAllBoxes("No.");
+                    PackageBoxMgt.UnRegisteredPackage("No.");
+                end;
+            }
+            action(CloseAll)
+            {
+                ApplicationArea = Warehouse;
+                CaptionML = ENU = 'Close All', RUS = 'Закрыть Все';
+
+                trigger OnAction()
+                var
+                    BoxHeader: Record "Box Header";
+                begin
+                    PackageBoxMgt.CloseAllBoxes("No.");
+                end;
+            }
+            action(ReOpenAll)
+            {
+                ApplicationArea = Warehouse;
+                CaptionML = ENU = 'Reopen All', RUS = 'Открыть Все';
+
+                trigger OnAction()
+                begin
+                    PackageBoxMgt.ReOpenAllBoxes("No.");
                 end;
             }
         }
     }
 
-    trigger OnOpenPage()
-    begin
-        CurrPage.BoxLinesSubPage.Page.SetUpSalesOrderNo("Sales Order No.");
-    end;
+    var
+        PackageBoxMgt: Codeunit "Package Box Mgt.";
 }

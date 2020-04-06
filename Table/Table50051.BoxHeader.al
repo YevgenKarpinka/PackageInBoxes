@@ -31,37 +31,26 @@ table 50051 "Box Header"
         {
             DataClassification = ToBeClassified;
         }
-        field(5; "Remaining Quantity"; Decimal)
-        {
-            FieldClass = FlowField;
-            CalcFormula = sum ("Box Line"."Remaining Quantity"
-                where("Sales Order No." = field("Sales Order No."), "Box No." = field("No.")));
-        }
-        field(6; "Quantity in Box"; Decimal)
-        {
-            FieldClass = FlowField;
-            CalcFormula = sum ("Box Line"."Quantity in Box"
-                where("Sales Order No." = field("Sales Order No."), "Box No." = field("No.")));
-        }
-        field(7; Weight; Decimal)
+        field(5; Weight; Decimal)
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
             NotBlank = true;
         }
-        field(8; "Sales Order No."; code[20])
+        field(6; "Sales Order No."; code[20])
         {
             DataClassification = ToBeClassified;
         }
-        field(9; "External Document No."; Text[20])
+        field(7; "External Document No."; Text[20])
+        {
+            DataClassification = ToBeClassified;
+            NotBlank = true;
+        }
+        field(8; "Status"; Enum BoxStatus)
         {
             DataClassification = ToBeClassified;
         }
-        field(10; "Status"; Enum BoxStatus)
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(11; "No. Series"; Code[20])
+        field(9; "No. Series"; Code[20])
         {
             DataClassification = ToBeClassified;
         }
@@ -87,22 +76,33 @@ table 50051 "Box Header"
     trigger OnInsert()
     begin
         InitInsert();
-        // InitInsertBoxLine();
+        BoxModify();
     end;
 
     trigger OnModify()
     begin
-
+        BoxModify();
     end;
 
     trigger OnDelete()
     begin
         DeleteBoxLine();
+        BoxModify();
     end;
 
     trigger OnRename()
     begin
 
+    end;
+
+    procedure BoxModify()
+    var
+        PackageHeader: Record "Package Header";
+    begin
+        with PackageHeader do begin
+            Get("Package No.");
+            PackageModify();
+        end;
     end;
 
     local procedure DeleteBoxLine();
@@ -119,26 +119,16 @@ table 50051 "Box Header"
     var
         PackageHeader: Record "Package Header";
     begin
+        PackageHeader.Get("Package No.");
+        "Sales Order No." := PackageHeader."Sales Order No.";
+
         if "No." = '' then begin
             TestNoSeries();
-            PackageHeader.Get("Package No.");
             NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", DT2Date(PackageHeader."Create Date"), "No.", "No. Series");
         end;
 
-        PackageHeader.SetRange("No.", "Package No.");
-        PackageHeader.FindFirst();
         "Create Date" := DT2Date(CurrentDateTime);
-        "Sales Order No." := PackageHeader."Sales Order No.";
-        // "Warehouse Shipment No." := PackageHeader."Warehouse Shipment No.";
-        // "Whse. Pick No." := PackageHeader."Whse. Pick No.";
     end;
-
-    // local procedure InitInsertBoxLine()
-    // var
-    //     BoxLine: Record "Box Line";
-    // begin
-    //     BoxLine.SetUpNewLine("No.");
-    // end;
 
     local procedure TestNoSeries()
     begin
@@ -164,7 +154,7 @@ table 50051 "Box Header"
     end;
 }
 
-enum 50050 BoxStatus
+enum 50051 BoxStatus
 {
     Extensible = true;
 
@@ -172,8 +162,8 @@ enum 50050 BoxStatus
     {
         CaptionML = ENU = 'Open', RUS = 'Открыта';
     }
-    value(1; Closed)
+    value(1; Close)
     {
-        CaptionML = ENU = 'Closed', RUS = 'Закрыта';
+        CaptionML = ENU = 'Close', RUS = 'Закрыта';
     }
 }

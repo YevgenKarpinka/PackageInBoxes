@@ -10,33 +10,38 @@ table 50053 "Box"
         {
             DataClassification = ToBeClassified;
         }
-        field(2; Length; Decimal)
+        field(2; Description; Text[50])
         {
             DataClassification = ToBeClassified;
-            DecimalPlaces = 0 : 5;
         }
-        field(3; Width; Decimal)
-        {
-            DataClassification = ToBeClassified;
-            DecimalPlaces = 0 : 5;
-        }
-        field(4; Height; Decimal)
-        {
-            DataClassification = ToBeClassified;
-            DecimalPlaces = 0 : 5;
-        }
-        field(5; Cubage; Decimal)
-        {
-            DataClassification = ToBeClassified;
-            DecimalPlaces = 0 : 5;
-            Editable = false;
-        }
-        field(6; Weight; Decimal)
+        field(3; Weight; Decimal)
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
             NotBlank = true;
         }
+        field(4; Length; Decimal)
+        {
+            DataClassification = ToBeClassified;
+            DecimalPlaces = 0 : 5;
+        }
+        field(5; Width; Decimal)
+        {
+            DataClassification = ToBeClassified;
+            DecimalPlaces = 0 : 5;
+        }
+        field(6; Height; Decimal)
+        {
+            DataClassification = ToBeClassified;
+            DecimalPlaces = 0 : 5;
+        }
+        field(7; Cubage; Decimal)
+        {
+            DataClassification = ToBeClassified;
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+        }
+
     }
 
     keys
@@ -47,6 +52,12 @@ table 50053 "Box"
         }
     }
 
+    fieldgroups
+    {
+        fieldgroup(DropDown; Code, Description, Weight)
+        {
+        }
+    }
     var
         errCantDeleteBoxBecouseHisExistInPackage: TextConst ENU = 'Can''t Delete Box = %1 Becouse His Exist In Package = %2',
                                                             RUS = 'Нельзя удалить коробку = %1 потому что она используется в упаковке = %2';

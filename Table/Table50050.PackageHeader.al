@@ -41,6 +41,10 @@ table 50050 "Package Header"
         {
             DataClassification = ToBeClassified;
         }
+        field(10; Status; Enum PackageStatus)
+        {
+            DataClassification = ToBeClassified;
+        }
     }
 
     keys
@@ -70,7 +74,6 @@ table 50050 "Package Header"
 
     trigger OnDelete()
     begin
-        // Error(errCantDeletePackageNo, "No.");
         DeleteBoxHeader();
     end;
 
@@ -96,6 +99,11 @@ table 50050 "Package Header"
         "Last Modified Date" := CurrentDateTime;
         "Last Modified User ID" := UserId;
         "Last Modified User Security ID" := UserSecurityId();
+    end;
+
+    procedure PackageModify()
+    begin
+        Modify(true);
     end;
 
     local procedure TestNoSeries()
@@ -130,4 +138,18 @@ table 50050 "Package Header"
         WhseSetup.Get();
         WhseSetupGetted := true;
     end;
+}
+
+enum 50050 PackageStatus
+{
+    Extensible = true;
+
+    value(0; UnRegistered)
+    {
+        CaptionML = ENU = 'UnRegistered', RUS = 'Не зарегистрирован';
+    }
+    value(1; Registered)
+    {
+        CaptionML = ENU = 'Registered', RUS = 'Зарегистрирован';
+    }
 }

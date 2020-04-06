@@ -1,14 +1,13 @@
-page 50052 "Box Lines Subpage"
+page 50055 "Box Lines FactBox"
 {
     CaptionML = ENU = 'Items in Box', RUS = 'Товары в коробке';
     PageType = ListPart;
     ApplicationArea = Warehouse;
-    UsageCategory = Documents;
+    UsageCategory = History;
     SourceTable = "Box Line";
-    AutoSplitKey = true;
-    DelayedInsert = true;
-    MultipleNewLines = true;
-
+    InsertAllowed = false;
+    DeleteAllowed = false;
+    Editable = false;
 
     layout
     {
@@ -23,44 +22,15 @@ page 50052 "Box Lines Subpage"
                 field("Quantity in Box"; "Quantity in Box")
                 {
                     ApplicationArea = Warehouse;
-
-                    trigger OnValidate()
-                    begin
-                        CurrPage.Update();
-                    end;
                 }
                 field("Remaining Quantity"; PackageBoxMgt.GetRemainingItemQuantityInOrder("Sales Order No.", "Item No."))
                 {
                     ApplicationArea = Warehouse;
                     CaptionML = ENU = 'Remaining Quantity', RUS = 'Количество для упаковки';
-                    Editable = false;
                 }
             }
         }
     }
-
-    actions
-    {
-        area(Processing)
-        {
-            // action(ActionName)
-            // {
-            //     ApplicationArea = Warehouse;
-
-            //     trigger OnAction()
-            //     begin
-
-            //     end;
-            // }
-        }
-    }
-
-
-    trigger OnDeleteRecord(): Boolean
-    begin
-        CurrPage.Update();
-    end;
-
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";
 }

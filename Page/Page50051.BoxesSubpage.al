@@ -64,6 +64,7 @@ page 50051 "Boxes Subpage"
                 var
                     BoxHeader: Record "Box Header";
                 begin
+                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then exit;
                     with BoxHeader do begin
                         Init();
                         "Package No." := Rec."Package No.";
@@ -98,6 +99,7 @@ page 50051 "Boxes Subpage"
                 trigger OnAction()
                 var
                 begin
+                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then exit;
                     if Status = Status::Close then begin
                         Status := Status::Open;
                         Modify();
@@ -108,10 +110,12 @@ page 50051 "Boxes Subpage"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Assembly', RUS = 'Собрать';
+                Enabled = Status = Status::Open;
                 Image = GetActionMessages;
 
                 trigger OnAction()
                 begin
+                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then exit;
                     PackageBoxMgt.AsemblyBox("Package No.", "No.");
                 end;
             }
@@ -119,5 +123,6 @@ page 50051 "Boxes Subpage"
     }
 
     var
+        PackageHeader: Record "Package Header";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
 }

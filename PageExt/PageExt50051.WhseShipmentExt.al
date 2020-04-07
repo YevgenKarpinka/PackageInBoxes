@@ -21,7 +21,7 @@ pageextension 50051 "Warehouse Shipment Ext." extends "Warehouse Shipment" //733
                     TestField(Status, Status::Released);
                     GetWhseSetup();
                     WhseSetup.TestField("Enable Box Packaging", true);
-                    if not PackageBoxMgt.CreateNewPackageFromWarehousePick(PackageHeader, Rec) then exit;
+                    if not PackageBoxMgt.CreateNewPackageFromWarehouseShipment(PackageHeader, Rec) then exit;
                     Commit();
                     Page.RunModal(Page::"Package Card", PackageHeader);
                 end;

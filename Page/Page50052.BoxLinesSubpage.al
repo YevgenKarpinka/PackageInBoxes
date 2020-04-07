@@ -29,7 +29,7 @@ page 50052 "Box Lines Subpage"
                         CurrPage.Update();
                     end;
                 }
-                field("Remaining Quantity"; PackageBoxMgt.GetRemainingItemQuantityInOrder("Sales Order No.", "Item No."))
+                field("Remaining Quantity"; PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No."))
                 {
                     ApplicationArea = Warehouse;
                     CaptionML = ENU = 'Remaining Quantity', RUS = 'Количество для упаковки';

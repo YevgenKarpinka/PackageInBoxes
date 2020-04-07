@@ -49,7 +49,7 @@ page 50054 "Box Card"
                 {
                     ApplicationArea = Warehouse;
                 }
-                field(QuantityInBox; PackageBoxMgt.GetQuantityInBox("No."))
+                field("Quantity In Box"; PackageBoxMgt.GetQuantityInBox("No."))
                 {
                     ApplicationArea = Warehouse;
                 }
@@ -78,7 +78,7 @@ page 50054 "Box Card"
                 begin
                     if Status = Status::Open then begin
                         Status := Status::Close;
-                        Modify();
+                        Modify(true);
                     end;
                 end;
             }
@@ -86,14 +86,17 @@ page 50054 "Box Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Reopen', RUS = 'Открыть';
+                Enabled = Status = Status::Close;
                 Image = RefreshLines;
 
                 trigger OnAction()
                 begin
-                    if Status = Status::Close then begin
-                        Status := Status::Open;
-                        Modify();
-                    end;
+                    PackageHeader.Get("Package No.");
+                    if PackageHeader.Status = PackageHeader.Status::UnRegistered then
+                        if Status = Status::Close then begin
+                            Status := Status::Open;
+                            Modify(true);
+                        end;
                 end;
             }
             action(AssemblyBox)
@@ -101,6 +104,7 @@ page 50054 "Box Card"
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Assembly', RUS = 'Собрать';
                 Image = GetActionMessages;
+                Enabled = Status = Status::Open;
 
                 trigger OnAction()
                 begin
@@ -111,5 +115,6 @@ page 50054 "Box Card"
     }
 
     var
+        PackageHeader: Record "Package Header";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
 }

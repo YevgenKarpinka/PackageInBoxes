@@ -20,29 +20,30 @@ table 50052 "Box Line"
 
             trigger OnLookup()
             var
-                SalesLine: Record "Sales Line";
-                Item: Record Item;
-                tempItem: Record Item temporary;
+                WhseShipmentLine: Record "Warehouse Shipment Line";
+                tempWhseShipmentLine: Record "Warehouse Shipment Line" temporary;
             begin
                 GetSalesOrderNo();
-                with SalesLine do begin
-                    SetCurrentKey(Type);
-                    SetRange("Document Type", "Document Type"::Order);
-                    SetRange("Document No.", "Sales Order No.");
-                    SetRange(Type, Type::Item);
+                with WhseShipmentLine do begin
+                    SetCurrentKey("Source Document", "Source No.");
+                    SetRange("Source Document", "Source Document"::"Sales Order");
+                    SetRange("Source No.", "Sales Order No.");
                     if FindSet() then
                         repeat
-                            if not tempItem.get("No.")
-                              and (PackageBoxMgt.GetRemainingItemQuantityInOrder("Sales Order No.", "No.") > 0) then begin
-                                Item.Get("No.");
-                                tempItem := Item;
-                                tempItem.Insert();
+                            tempWhseShipmentLine.SetRange("No.", "No.");
+                            tempWhseShipmentLine.SetRange("Item No.", "Item No.");
+                            if tempWhseShipmentLine.IsEmpty
+                              and (PackageBoxMgt.GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No.") > 0) then begin
+                                tempWhseShipmentLine := WhseShipmentLine;
+                                tempWhseShipmentLine.Insert();
                             end;
                         until Next() = 0;
                 end;
 
-                if Page.RunModal(Page::"Item Lookup", tempItem) = Action::LookupOK then begin
-                    Validate("Item No.", tempItem."No.");
+                if Page.RunModal(Page::"Whse. Shipment Item Lookup", tempWhseShipmentLine) = Action::LookupOK then begin
+                    Validate("Item No.", tempWhseShipmentLine."Item No.");
+                    Validate("Shipment No.", tempWhseShipmentLine."No.");
+                    Validate("Shipment Line No.", tempWhseShipmentLine."Line No.");
                 end;
             end;
         }
@@ -56,13 +57,20 @@ table 50052 "Box Line"
                 RemainingItemQuantity: Decimal;
             begin
                 if xRec."Quantity in Box" = "Quantity in Box" then exit;
-                RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInOrder("Sales Order No.", "Item No.");
-                if xRec."Quantity in Box" < "Quantity in Box" then
-                    if "Quantity in Box" > RemainingItemQuantity then
-                        Error(errAllowedQuantityLess, RemainingItemQuantity);
+                RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No.");
+                if "Quantity in Box" > xRec."Quantity in Box" + RemainingItemQuantity then
+                    Error(errPickedQuantityInShipmentLessEntered, xRec."Quantity in Box" + RemainingItemQuantity, "Quantity in Box");
             end;
         }
         field(5; "Sales Order No."; code[20])
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(6; "Shipment No."; code[20])
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(7; "Shipment Line No."; Integer)
         {
             DataClassification = ToBeClassified;
         }
@@ -103,8 +111,8 @@ table 50052 "Box Line"
 
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";
-        errAllowedQuantityLess: TextConst ENU = 'Maximum Allowed Quantity %1!',
-                                            RUS = 'Количество в Заказе продажи %1!';
+        errPickedQuantityInShipmentLessEntered: TextConst ENU = 'Picked Quantity In Shipment %1\Entered Quantity %2\Not Allowed Enter Bigest Picked Quantity!',
+                                            RUS = 'Подобранное количество %1\Ввели %2\Нельзя ввести больше подобранного количества!';
 
     local procedure InitInsert()
     var

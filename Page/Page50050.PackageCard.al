@@ -49,6 +49,7 @@ page 50050 "Package Card"
                 ApplicationArea = Warehouse;
                 SubPageLink = "Package No." = field("No.");
                 UpdatePropagation = Both;
+                Editable = Status = Status::UnRegistered;
             }
         }
         area(FactBoxes)
@@ -73,25 +74,28 @@ page 50050 "Package Card"
 
                 trigger OnAction()
                 begin
+                    PackageBoxMgt.CheckPackageBeforeRegister("No.");
                     PackageBoxMgt.CloseAllBoxes("No.");
-                    PackageBoxMgt.RegisteredPackage("No.");
+                    PackageBoxMgt.RegisterPackage("No.");
                 end;
             }
             action(UnRegistered)
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'UnRegister', RUS = 'Отменить регистрацию';
+                Enabled = Status = Status::Registered;
 
                 trigger OnAction()
                 begin
                     PackageBoxMgt.ReOpenAllBoxes("No.");
-                    PackageBoxMgt.UnRegisteredPackage("No.");
+                    PackageBoxMgt.UnRegisterPackage("No.");
                 end;
             }
             action(CloseAll)
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Close All', RUS = 'Закрыть Все';
+                Enabled = Status = Status::UnRegistered;
 
                 trigger OnAction()
                 var
@@ -104,10 +108,22 @@ page 50050 "Package Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Reopen All', RUS = 'Открыть Все';
+                Enabled = Status = Status::UnRegistered;
 
                 trigger OnAction()
                 begin
                     PackageBoxMgt.ReOpenAllBoxes("No.");
+                end;
+            }
+            action(DeleteEmptyBoxes)
+            {
+                ApplicationArea = Warehouse;
+                CaptionML = ENU = 'Delete Empty Boxes', RUS = 'Удалить пустые коробки';
+                Enabled = Status = Status::UnRegistered;
+
+                trigger OnAction()
+                begin
+                    PackageBoxMgt.DeleteEmptyBoxes("No.");
                 end;
             }
         }

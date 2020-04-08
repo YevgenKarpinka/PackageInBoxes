@@ -8,42 +8,63 @@ table 50050 "Package Header"
         field(1; "No."; code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'No.', RUS = 'Но.';
+            Editable = false;
         }
         field(2; "Create Date"; DateTime)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Create Date', RUS = 'Дата создания';
+            Editable = false;
         }
         field(3; "Create User ID"; code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Create User ID', RUS = 'Создал Пользователь ID';
+            Editable = false;
         }
         field(4; "Create User Security ID"; Guid)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Create User Security ID', RUS = 'Создал Пользователь Security ID';
+            Editable = false;
         }
         field(5; "Last Modified Date"; DateTime)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Last Modified Date', RUS = 'Дата последнего изменение';
+            Editable = false;
         }
         field(6; "Last Modified User ID"; code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Last Modified User ID', RUS = 'Последнее изменение Пользователь ID';
+            Editable = false;
         }
         field(7; "Last Modified User Security ID"; Guid)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Last Modified User Security ID', RUS = 'Последнее изменение Пользователь Security ID';
+            Editable = false;
         }
         field(8; "Sales Order No."; code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Sales Order No.', RUS = 'Заказ продажи Но.';
+            Editable = false;
         }
         field(9; "No. Series"; Code[20])
         {
             DataClassification = ToBeClassified;
+            TableRelation = "No. Series";
+            CaptionML = ENU = 'No. Series', RUS = 'Серия Но.';
+            Editable = false;
         }
         field(10; Status; Enum PackageStatus)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Status', RUS = 'Статус';
+            Editable = false;
         }
     }
 
@@ -59,7 +80,8 @@ table 50050 "Package Header"
         WhseSetup: Record "Warehouse Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         WhseSetupGetted: Boolean;
-        errCantDeletePackageNo: TextConst ENU = 'Can''t Delete Package No. = %1', RUS = 'Нельзя удалить документ Упаковки Но. = %1';
+        errCantDeletePackageNo: TextConst ENU = 'Can''t Delete Package No. = %1',
+                                          RUS = 'Нельзя удалить документ Упаковки Но. = %1';
 
     trigger OnInsert()
     begin

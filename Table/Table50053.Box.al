@@ -6,38 +6,45 @@ table 50053 "Box"
 
     fields
     {
-        field(1; Code; Code[20])
+        field(1; "Box Code"; Code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Box Code', RUS = 'Код коробки';
         }
         field(2; Description; Text[50])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Description', RUS = 'Описание';
         }
         field(3; Weight; Decimal)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Weight', RUS = 'Вес';
             DecimalPlaces = 0 : 5;
             NotBlank = true;
         }
         field(4; Length; Decimal)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Length', RUS = 'Длинна';
             DecimalPlaces = 0 : 5;
         }
         field(5; Width; Decimal)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Width', RUS = 'Ширина';
             DecimalPlaces = 0 : 5;
         }
         field(6; Height; Decimal)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Height', RUS = 'Высота';
             DecimalPlaces = 0 : 5;
         }
         field(7; Cubage; Decimal)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Cubage', RUS = 'Объем';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
@@ -46,7 +53,7 @@ table 50053 "Box"
 
     keys
     {
-        key(PK; Code)
+        key(PK; "Box Code")
         {
             Clustered = true;
         }
@@ -54,7 +61,7 @@ table 50053 "Box"
 
     fieldgroups
     {
-        fieldgroup(DropDown; Code, Description, Weight)
+        fieldgroup(DropDown; "Box Code", Description, Weight)
         {
         }
     }
@@ -77,7 +84,7 @@ table 50053 "Box"
         BoxHeader: Record "Box Header";
     begin
         if BoxHeaderExist(BoxHeader) then
-            Error(errCantDeleteBoxBecouseHisExistInPackage, Code, BoxHeader."No.");
+            Error(errCantDeleteBoxBecouseHisExistInPackage, "Box Code", BoxHeader."No.");
     end;
 
     trigger OnRename()
@@ -88,8 +95,8 @@ table 50053 "Box"
     local procedure BoxHeaderExist(var BoxHeader: Record "Box Header"): Boolean
     begin
         with BoxHeader do begin
-            SetCurrentKey(Code);
-            SetRange(Code, Code);
+            SetCurrentKey("Box Code");
+            SetRange("Box Code", "No.");
             if FindFirst() then
                 exit(true);
         end;

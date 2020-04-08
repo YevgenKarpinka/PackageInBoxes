@@ -18,30 +18,44 @@ page 50050 "Package Card"
                 field("Sales Order No."; "Sales Order No.")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the sales order number on the basis of which the packaging document was created',
+                                RUS = 'Определяет номер заказа продажи на основании которого был создан документ упаковки.';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the number of the involved entry or record, according to the specified number series.',
+                                RUS = 'Определяет номер соответствующей записи или операции в соответствии с указанной серией номеров.';
                 }
                 field("Create User ID"; "Create User ID")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the user id that created the packaging document.',
+                                RUS = 'Определяет код пользователя который создал документ упаковки.';
                 }
                 field("Create Date"; "Create Date")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the date and time the packaging document was created.',
+                                RUS = 'Определяет дату и время создания документа упаковки.';
                 }
                 field("Last Modified User ID"; "Last Modified User ID")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the user id that last modified the packaging document.',
+                                RUS = 'Определяет код пользователя который последним изменил документ упаковки.';
                 }
                 field("Last Modified Date"; "Last Modified Date")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the date and time of the last modification of the packaging document.',
+                                RUS = 'Определяет дату и время последниего изменения документа упаковки.';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies status the packaging document.',
+                                RUS = 'Определяет статус документа упаковки.';
                 }
             }
             part(BoxesSubPage; "Boxes Subpage")
@@ -71,6 +85,9 @@ page 50050 "Package Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Register', RUS = 'Зарегистрировать';
+                ToolTipML = ENU = 'Register package document to the next stage of processing. You must unregister the document before you can make changes to it.',
+                            RUS = 'Зарегистрировать документов упаковки на следующий этап обработки. Необходимо отменить регистрацию документа, чтобы в него можно было вносить изменения.';
+                Image = RegisterPick;
 
                 trigger OnAction()
                 begin
@@ -83,10 +100,14 @@ page 50050 "Package Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'UnRegister', RUS = 'Отменить регистрацию';
+                ToolTipML = ENU = 'Unregister package document to change.',
+                            RUS = 'Отменить регистрацию документа упаковки для изменения.';
                 Enabled = Status = Status::Registered;
+                Image = Undo;
 
                 trigger OnAction()
                 begin
+                    PackageBoxMgt.CheckWhseShipmentExist("No.");
                     PackageBoxMgt.ReOpenAllBoxes("No.");
                     PackageBoxMgt.UnRegisterPackage("No.");
                 end;
@@ -95,7 +116,10 @@ page 50050 "Package Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Close All', RUS = 'Закрыть Все';
+                ToolTipML = ENU = 'Close all of the box document to the next stage of processing. You must reopen the document before you can make changes to it.',
+                            RUS = 'Закрытие всех документов коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
                 Enabled = Status = Status::UnRegistered;
+                Image = ItemLines;
 
                 trigger OnAction()
                 var
@@ -108,7 +132,10 @@ page 50050 "Package Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Reopen All', RUS = 'Открыть Все';
+                ToolTipML = ENU = 'Reopen all the document of the box to change.',
+                            RUS = 'Повторное открытие всех документа коробки для их изменения.';
                 Enabled = Status = Status::UnRegistered;
+                Image = RefreshLines;
 
                 trigger OnAction()
                 begin
@@ -119,11 +146,28 @@ page 50050 "Package Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Delete Empty Boxes', RUS = 'Удалить пустые коробки';
+                ToolTipML = ENU = 'Delete empty box documents.',
+                            RUS = 'Удаление пустых документов коробки.';
                 Enabled = Status = Status::UnRegistered;
+                Image = Delete;
 
                 trigger OnAction()
                 begin
                     PackageBoxMgt.DeleteEmptyBoxes("No.");
+                end;
+            }
+            action(DeleteEmptyLines)
+            {
+                ApplicationArea = Warehouse;
+                CaptionML = ENU = 'Delete Empty Lines', RUS = 'Удалить пустые строки';
+                ToolTipML = ENU = 'Delete blank lines in box documents.',
+                            RUS = 'Удаление пустых строк в документах коробки.';
+                Enabled = Status = Status::UnRegistered;
+                Image = DeleteRow;
+
+                trigger OnAction()
+                begin
+                    PackageBoxMgt.DeleteEmptyLines("No.");
                 end;
             }
         }

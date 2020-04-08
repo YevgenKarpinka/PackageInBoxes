@@ -17,33 +17,45 @@ page 50051 "Boxes Subpage"
                 field("No."; "No.")
                 {
                     ApplicationArea = Warehouse;
-                    Editable = false;
+                    ToolTipML = ENU = 'Specifies the number of the involved entry or record, according to the specified number series.',
+                                RUS = 'Определяет номер соответствующей записи или операции в соответствии с указанной серией номеров.';
                 }
                 field("Create Date"; "Create Date")
                 {
                     ApplicationArea = Warehouse;
-                    Editable = false;
+                    ToolTipML = ENU = 'Specifies the date the box document was created.',
+                                RUS = 'Определяет дату создания документа коробка.';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = Warehouse;
-                    Editable = false;
+                    ToolTipML = ENU = 'Specifies status the box document.',
+                                RUS = 'Определяет статус документа коробка.';
                 }
                 field("External Document No."; "External Document No.")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies external document number the box document.',
+                                RUS = 'Определяет внешний номер документа коробка.';
                 }
-                field(Code; Code)
+                field("Box Code"; "Box Code")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies a box code from a box reference.',
+                                RUS = 'Определяет код коробки из справочника коробки.';
                 }
                 field(Weight; Weight)
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies a weight of the box.',
+                                RUS = 'Определяет вес коробки.';
                 }
                 field(QuantityInBox; PackageBoxMgt.GetQuantityInBox("No."))
                 {
                     ApplicationArea = Warehouse;
+                    CaptionML = ENU = 'Quantity in Box', RUS = 'Количество в коробке';
+                    ToolTipML = ENU = 'Specifies the quantity of item that lies in the box.',
+                                RUS = 'Определяет количество товара который лежит в коробке.';
                 }
             }
 
@@ -58,6 +70,8 @@ page 50051 "Boxes Subpage"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Create', RUS = 'Создать';
+                ToolTipML = ENU = 'Create a box document so that you can put goods into it.',
+                            RUS = 'Создать документ коробки чтобы в него можно было класть товар.';
                 Image = PickLines;
 
                 trigger OnAction()
@@ -78,6 +92,9 @@ page 50051 "Boxes Subpage"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Close', RUS = 'Закрыть';
+                ToolTipML = ENU = 'Close the box document to the next stage of processing. You must reopen the document before you can make changes to it.',
+                            RUS = 'Закрытие документа коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
+                Enabled = Status = Status::Open;
                 Image = ItemLines;
 
                 trigger OnAction()
@@ -92,7 +109,9 @@ page 50051 "Boxes Subpage"
             action(ReOpen)
             {
                 ApplicationArea = Warehouse;
-                CaptionML = ENU = 'ReOpen', RUS = 'Открыть';
+                CaptionML = ENU = 'Reopen', RUS = 'Открыть';
+                ToolTipML = ENU = 'Reopen the box document to change.',
+                            RUS = 'Повторное открытие документа коробки для его изменения.';
                 Enabled = Status = Status::Close;
                 Image = RefreshLines;
 
@@ -110,6 +129,8 @@ page 50051 "Boxes Subpage"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Assembly', RUS = 'Собрать';
+                ToolTipML = ENU = 'Assembly in the box all the items remaining on the table.',
+                            RUS = 'Собрать в коробку весь оставшийся на столе товар.';
                 Enabled = Status = Status::Open;
                 Image = GetActionMessages;
 

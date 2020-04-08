@@ -15,19 +15,27 @@ page 50056 "Whse. Shipment Item Lookup"
             {
                 field("Item No."; "Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the item code of warehouse shipment that can be put in the box of the packaging document.',
+                                RUS = 'Определяет код товара складской отгрузки который можно положить в коробку документа упаковки.';
                 }
-                field("Remaining Quantity"; PackageBoxMgt.GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No."))
+                field("Qty. to Ship"; "Qty. to Ship")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the quantity of item of warehouse shipment available for packaging in the box.',
+                                RUS = 'Определяет количество товара складской отгрузки доступное для упаковки в коробку.';
                 }
                 field("No."; "No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the number of warehouse shipment that is available for packaging.',
+                                RUS = 'Определяет номер складской отгрузки которая доступна для упаковки.';
                 }
                 field("Line No."; "Line No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the line number of the warehouse shipment that is available for packaging.',
+                                RUS = 'Определяет номер строки складской отгрузки которая доступна для упаковки.';
                 }
             }
         }
@@ -39,7 +47,7 @@ page 50056 "Whse. Shipment Item Lookup"
         {
             // action(ActionName)
             // {
-            //     ApplicationArea = All;
+            //     ApplicationArea = Warehouse;
 
             //     trigger OnAction()
             //     begin

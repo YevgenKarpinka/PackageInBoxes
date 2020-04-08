@@ -17,41 +17,53 @@ page 50054 "Box Card"
             {
                 Editable = Status = Status::Open;
 
-                field("No.";
-                "No.")
+                field("No."; "No.")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the number of the involved entry or record, according to the specified number series.',
+                                RUS = 'Определяет номер соответствующей записи или операции в соответствии с указанной серией номеров.';
                 }
                 field("Sales Order No."; "Sales Order No.")
                 {
                     ApplicationArea = Warehouse;
-                    Editable = false;
+                    ToolTipML = ENU = 'Specifies the sales order number on the basis of which the packaging document was created',
+                                RUS = 'Определяет номер заказа продажи на основании которого был создан документ упаковки.';
                 }
                 field("Create Date"; "Create Date")
                 {
                     ApplicationArea = Warehouse;
-                    Editable = false;
+                    ToolTipML = ENU = 'Specifies the date and time the box document was created.',
+                                RUS = 'Определяет дату и время создания документа коробки.';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = Warehouse;
-                    Editable = false;
+                    ToolTipML = ENU = 'Specifies status the box document.',
+                                RUS = 'Определяет статус документа коробки.';
                 }
                 field("External Document No."; "External Document No.")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the external document number.',
+                                RUS = 'Определяет номер внешнего документа.';
                 }
-                field(Code; Code)
+                field("Box Code"; "Box Code")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the box code according to the directory.',
+                                RUS = 'Определяет код коробки согласно справочника.';
                 }
                 field(Weight; Weight)
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies weight of the box.',
+                                RUS = 'Определяет вес коробки.';
                 }
                 field("Quantity In Box"; PackageBoxMgt.GetQuantityInBox("No."))
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the quantity of units of item that lies in the box.',
+                                RUS = 'Определяет количество единиц товара который лежит в коробке.';
                 }
             }
             part(BoxLinesSubPage; "Box Lines Subpage")
@@ -72,6 +84,9 @@ page 50054 "Box Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Close', RUS = 'Закрыть';
+                ToolTipML = ENU = 'Close the document of the box to the next stage of processing. You must reopen the document before you can make changes to it.',
+                            RUS = 'Закрытие документа коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
+                Enabled = Status = Status::Open;
                 Image = ItemLines;
 
                 trigger OnAction()
@@ -86,6 +101,8 @@ page 50054 "Box Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Reopen', RUS = 'Открыть';
+                ToolTipML = ENU = 'Reopen the document of the box to change.',
+                            RUS = 'Повторное открытие документа коробки для его изменения.';
                 Enabled = Status = Status::Close;
                 Image = RefreshLines;
 
@@ -103,8 +120,10 @@ page 50054 "Box Card"
             {
                 ApplicationArea = Warehouse;
                 CaptionML = ENU = 'Assembly', RUS = 'Собрать';
-                Image = GetActionMessages;
+                ToolTipML = ENU = 'Assembly in the box all the items remaining on the table.',
+                            RUS = 'Собрать в коробку весь оставшийся на столе товар.';
                 Enabled = Status = Status::Open;
+                Image = GetActionMessages;
 
                 trigger OnAction()
                 begin

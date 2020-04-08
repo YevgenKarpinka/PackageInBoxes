@@ -14,8 +14,8 @@ codeunit 50050 "Package Box Mgt."
 
     var
         WhseSetup: Record "Warehouse Setup";
-        errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not fully packaged to the Box!',
-                                                              RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован в коробку!';
+        errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not fully packed!',
+                                                              RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован!';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -65,6 +65,24 @@ codeunit 50050 "Package Box Mgt."
                 repeat
                     CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
                 until Next() = 0;
+        end;
+    end;
+
+    procedure CheckWhseShipmentExist(PackageNo: Code[20])
+    var
+        PackageHeader: Record "Package Header";
+        WhseShptLine: Record "Warehouse Shipment Line";
+    begin
+        GetWhseSetup();
+        if not WhseSetup."Enable Box Packaging" then exit;
+        PackageHeader.Get(PackageNo);
+        if not PackageUnRegistered(PackageHeader."No.") then exit;
+
+        with WhseShptLine do begin
+            SetCurrentKey("Source Document", "Source No.");
+            SetRange("Source Document", "Source Document"::"Sales Order");
+            SetRange("Source No.", PackageHeader."Sales Order No.");
+            FindFirst();
         end;
     end;
 
@@ -288,7 +306,7 @@ codeunit 50050 "Package Box Mgt."
         with BoxLine do begin
             SetCurrentKey("Shipment No.", "Item No.", "Line No.");
             SetRange("Shipment No.", WhseShipmentNo);
-            SetRange("Line No.", LineNo);
+            SetRange("Shipment Line No.", LineNo);
             SetRange("Item No.", ItemNo);
             CalcSums("Quantity in Box");
             exit("Quantity in Box");
@@ -339,6 +357,24 @@ codeunit 50050 "Package Box Mgt."
                 if BoxIsEmpty("No.") then
                     Delete(true);
             until Next() = 0;
+        end;
+    end;
+
+    procedure DeleteEmptyLines(PackageNo: Code[20])
+    var
+        BoxHeader: Record "Box Header";
+        BoxLine: Record "Box Line";
+    begin
+        with BoxHeader do begin
+            SetRange("Package No.", PackageNo);
+            FindSet();
+        end;
+
+        with BoxLine do begin
+            SetCurrentKey("Sales Order No.");
+            SetRange("Sales Order No.", BoxHeader."Sales Order No.");
+            SetRange("Quantity in Box", 0);
+            DeleteAll(true);
         end;
     end;
 

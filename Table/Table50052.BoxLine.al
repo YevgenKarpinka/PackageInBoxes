@@ -9,19 +9,25 @@ table 50052 "Box Line"
         field(1; "Box No."; Code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Box No.', RUS = 'Коробка Но.';
+            Editable = false;
         }
         field(2; "Line No."; Integer)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Line No.', RUS = 'Строка Но.';
+            Editable = false;
         }
         field(3; "Item No."; Code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Item No.', RUS = 'Товар Но.';
 
             trigger OnLookup()
             var
                 WhseShipmentLine: Record "Warehouse Shipment Line";
                 tempWhseShipmentLine: Record "Warehouse Shipment Line" temporary;
+                RemainingItemQuantity: Decimal;
             begin
                 GetSalesOrderNo();
                 with WhseShipmentLine do begin
@@ -32,10 +38,13 @@ table 50052 "Box Line"
                         repeat
                             tempWhseShipmentLine.SetRange("No.", "No.");
                             tempWhseShipmentLine.SetRange("Item No.", "Item No.");
-                            if tempWhseShipmentLine.IsEmpty
-                              and (PackageBoxMgt.GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No.") > 0) then begin
-                                tempWhseShipmentLine := WhseShipmentLine;
-                                tempWhseShipmentLine.Insert();
+                            if tempWhseShipmentLine.IsEmpty then begin
+                                RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No.");
+                                if RemainingItemQuantity > 0 then begin
+                                    tempWhseShipmentLine := WhseShipmentLine;
+                                    tempWhseShipmentLine."Qty. to Ship" := RemainingItemQuantity;
+                                    tempWhseShipmentLine.Insert();
+                                end;
                             end;
                         until Next() = 0;
                 end;
@@ -50,6 +59,7 @@ table 50052 "Box Line"
         field(4; "Quantity in Box"; Decimal)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Quantity in Box', RUS = 'Количество в коробке';
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -59,20 +69,26 @@ table 50052 "Box Line"
                 if xRec."Quantity in Box" = "Quantity in Box" then exit;
                 RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No.");
                 if "Quantity in Box" > xRec."Quantity in Box" + RemainingItemQuantity then
-                    Error(errPickedQuantityInShipmentLessEntered, xRec."Quantity in Box" + RemainingItemQuantity, "Quantity in Box");
+                    Error(errRemainingQuantityЕoShip, xRec."Quantity in Box" + RemainingItemQuantity);
             end;
         }
         field(5; "Sales Order No."; code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Sales Order No.', RUS = 'Заказ продажи Но.';
+            Editable = false;
         }
         field(6; "Shipment No."; code[20])
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Shipment No.', RUS = 'Отгрузка Но.';
+            Editable = false;
         }
         field(7; "Shipment Line No."; Integer)
         {
             DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Shipment Line No.', RUS = 'Строка отгрузки Но.';
+            Editable = false;
         }
     }
 
@@ -83,6 +99,10 @@ table 50052 "Box Line"
             Clustered = true;
         }
         key(SK; "Sales Order No.", "Item No.")
+        {
+
+        }
+        key(SK1; "Shipment No.", "Shipment Line No.", "Item No.")
         {
 
         }
@@ -111,8 +131,8 @@ table 50052 "Box Line"
 
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";
-        errPickedQuantityInShipmentLessEntered: TextConst ENU = 'Picked Quantity In Shipment %1\Entered Quantity %2\Not Allowed Enter Bigest Picked Quantity!',
-                                            RUS = 'Подобранное количество %1\Ввели %2\Нельзя ввести больше подобранного количества!';
+        errRemainingQuantityЕoShip: TextConst ENU = 'Remaining Quantity to Ship %1!',
+                                              RUS = 'Остаток для отгрузки %1!';
 
     local procedure InitInsert()
     var

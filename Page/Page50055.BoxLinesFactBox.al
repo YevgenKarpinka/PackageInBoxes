@@ -18,15 +18,24 @@ page 50055 "Box Lines FactBox"
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the item code of warehouse shipment that lies in the box.',
+                                RUS = 'Определяет код товара складской отгрузки который лежит в коробке.';
+
                 }
                 field("Quantity in Box"; "Quantity in Box")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the quantity of item in the warehouse shipment that lies in the box.',
+                                RUS = 'Определяет количество товара складской отгрузки который лежит в коробке.';
+
                 }
-                field("Remaining Quantity"; PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No."))
+                field("Unpacked Quantity"; PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No."))
                 {
                     ApplicationArea = Warehouse;
-                    CaptionML = ENU = 'Remaining Quantity', RUS = 'Количество для упаковки';
+                    CaptionML = ENU = 'Unpacked Quantity', RUS = 'Не упакованное количество';
+                    ToolTipML = ENU = 'Specifies the unpacked quantity of the items of the warehouse shipment to be put in the box of the packaging document.',
+                                RUS = 'Определяет не упакованное количество товара складской отгрузки который нужно положить в коробку документа упаковки.';
+
                 }
             }
         }

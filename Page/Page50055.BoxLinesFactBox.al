@@ -5,8 +5,6 @@ page 50055 "Box Lines FactBox"
     ApplicationArea = Warehouse;
     UsageCategory = History;
     SourceTable = "Box Line";
-    InsertAllowed = false;
-    DeleteAllowed = false;
     Editable = false;
 
     layout
@@ -36,6 +34,18 @@ page 50055 "Box Lines FactBox"
                     ToolTipML = ENU = 'Specifies the unpacked quantity of the items of the warehouse shipment to be put in the box of the packaging document.',
                                 RUS = 'Определяет не упакованное количество товара складской отгрузки который нужно положить в коробку документа упаковки.';
 
+                }
+                field("Shipment No."; "Shipment No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the number of warehouse shipment items that are in the box.',
+                                RUS = 'Определяет номер складской отгрузки товар который лежит в коробке.';
+                }
+                field("Shipment Line No."; "Shipment Line No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the line number of the warehouse shipment of the items with which lies in the box.',
+                                RUS = 'Определяет номер строки складской отгрузки товар с который лежит в коробке.';
                 }
             }
         }

@@ -62,6 +62,12 @@ table 50051 "Box Header"
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Status', RUS = 'Статус';
             Editable = false;
+
+            trigger OnValidate()
+            begin
+                if Status = Status::Close then
+                    PackageBoxMgt.DeleteEmptyLinesByBox("No.");
+            end;
         }
         field(9; "No. Series"; Code[20])
         {
@@ -92,7 +98,7 @@ table 50051 "Box Header"
     var
         WhseSetup: Record "Warehouse Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        WhseSetupGetted: Boolean;
+        PackageBoxMgt: Codeunit "Package Box Mgt.";
 
     trigger OnInsert()
     begin
@@ -169,9 +175,7 @@ table 50051 "Box Header"
 
     local procedure GetWhseSetup()
     begin
-        if WhseSetupGetted then exit;
         WhseSetup.Get();
-        WhseSetupGetted := true;
     end;
 }
 

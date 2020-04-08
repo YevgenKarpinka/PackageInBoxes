@@ -20,5 +20,15 @@ tableextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5769
             CaptionML = ENU = 'Box No. Series', RUS = 'Серия Номеров Коробки';
             TableRelation = "No. Series";
         }
+        field(50053; "Delete Empty Box"; Boolean)
+        {
+            DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Delete Empty Box', RUS = 'Удалять пустые коробки';
+        }
+        field(50054; "Delete Empty Lines"; Boolean)
+        {
+            DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Delete Empty Lines', RUS = 'Удалять пустые строки';
+        }
     }
 }

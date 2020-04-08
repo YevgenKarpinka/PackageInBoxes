@@ -14,6 +14,7 @@ pageextension 50051 "Warehouse Shipment Ext." extends "Warehouse Shipment" //733
                 CaptionML = ENU = 'Create Package', RUS = 'Создать Упаковку';
                 ToolTipML = ENU = 'Create or Open Package, if package was created.',
                             RUS = 'Создать или Открыть Упаковку, если упаковка была уже создана.';
+                Enabled = Status = Status::Released;
                 Image = InventoryPick;
 
                 trigger OnAction()

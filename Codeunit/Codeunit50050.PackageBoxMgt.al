@@ -16,6 +16,8 @@ codeunit 50050 "Package Box Mgt."
         WhseSetup: Record "Warehouse Setup";
         errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not fully packed!',
                                                               RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован!';
+        errWhseShipmentsSalesOrderNotExist: TextConst ENU = 'A Sales Order %1 has no released Warehouse shipments!',
+                                                      RUS = 'У Заказа продажи %1 нет выпущеных Складских отгрузок!';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -43,6 +45,8 @@ codeunit 50050 "Package Box Mgt."
                 until Next() = 0;
         end;
 
+        DeleteEmptyBoxes(PackageHeader."No.");
+        DeleteEmptyLines(PackageHeader."No.");
         CloseAllBoxes(PackageHeader."No.");
         RegisterPackage(PackageHeader."No.");
     end;
@@ -76,13 +80,13 @@ codeunit 50050 "Package Box Mgt."
         GetWhseSetup();
         if not WhseSetup."Enable Box Packaging" then exit;
         PackageHeader.Get(PackageNo);
-        if not PackageUnRegistered(PackageHeader."No.") then exit;
 
         with WhseShptLine do begin
             SetCurrentKey("Source Document", "Source No.");
             SetRange("Source Document", "Source Document"::"Sales Order");
             SetRange("Source No.", PackageHeader."Sales Order No.");
-            FindFirst();
+            if not FindFirst() then
+                Error(errWhseShipmentsSalesOrderNotExist, PackageHeader."Sales Order No.");
         end;
     end;
 
@@ -116,13 +120,6 @@ codeunit 50050 "Package Box Mgt."
             SetCurrentKey("Sales Order No.");
             SetRange("Sales Order No.", WhseShipmentLine."Source No.");
             if FindFirst() then exit(true);
-        end;
-
-        with WhseActLine do begin
-            SetCurrentKey("Source Document", "Source No.");
-            SetRange("Source Document", "Source Document"::"Sales Order");
-            SetRange("Source No.", WhseShipmentLine."Source No.");
-            FindFirst();
         end;
 
         with PackageHeader do begin
@@ -350,6 +347,9 @@ codeunit 50050 "Package Box Mgt."
     var
         BoxHeader: Record "Box Header";
     begin
+        GetWhseSetup();
+        if not WhseSetup."Delete Empty Box" then exit;
+
         with BoxHeader do begin
             SetRange("Package No.", PackageNo);
             FindSet();
@@ -365,14 +365,32 @@ codeunit 50050 "Package Box Mgt."
         BoxHeader: Record "Box Header";
         BoxLine: Record "Box Line";
     begin
+        GetWhseSetup();
+        if not WhseSetup."Delete Empty Lines" then exit;
+
         with BoxHeader do begin
             SetRange("Package No.", PackageNo);
             FindSet();
         end;
 
         with BoxLine do begin
-            SetCurrentKey("Sales Order No.");
+            SetCurrentKey("Sales Order No.", "Quantity in Box");
             SetRange("Sales Order No.", BoxHeader."Sales Order No.");
+            SetRange("Quantity in Box", 0);
+            DeleteAll(true);
+        end;
+    end;
+
+    procedure DeleteEmptyLinesByBox(BoxNo: Code[20])
+    var
+        BoxLine: Record "Box Line";
+    begin
+        GetWhseSetup();
+        if not WhseSetup."Delete Empty Lines" then exit;
+
+        with BoxLine do begin
+            SetCurrentKey("Quantity in Box");
+            SetRange("Box No.", BoxNo);
             SetRange("Quantity in Box", 0);
             DeleteAll(true);
         end;

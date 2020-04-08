@@ -1,0 +1,66 @@
+page 50058 "Boxes FactBox"
+{
+    CaptionML = ENU = 'Boxes', RUS = 'Коробки';
+    PageType = ListPart;
+    ApplicationArea = Warehouse;
+    UsageCategory = History;
+    SourceTable = "Box Header";
+    Editable = false;
+
+    layout
+    {
+        area(Content)
+        {
+            repeater(RepeaterName)
+            {
+                field("No."; "No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the number of the involved entry or record, according to the specified number series.',
+                                RUS = 'Определяет номер соответствующей записи или операции в соответствии с указанной серией номеров.';
+                }
+                field("Create Date"; "Create Date")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the date the box document was created.',
+                                RUS = 'Определяет дату создания документа коробка.';
+                }
+                field(Status; Status)
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies status the box document.',
+                                RUS = 'Определяет статус документа коробка.';
+                }
+                field("External Document No."; "External Document No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies external document number the box document.',
+                                RUS = 'Определяет внешний номер документа коробка.';
+                }
+                field("Box Code"; "Box Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies a box code from a box reference.',
+                                RUS = 'Определяет код коробки из справочника коробки.';
+                }
+                field(Weight; Weight)
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies a weight of the box.',
+                                RUS = 'Определяет вес коробки.';
+                }
+                field(QuantityInBox; PackageBoxMgt.GetQuantityInBox("No."))
+                {
+                    ApplicationArea = Warehouse;
+                    CaptionML = ENU = 'Quantity in Box', RUS = 'Количество в коробке';
+                    ToolTipML = ENU = 'Specifies the quantity of item that lies in the box.',
+                                RUS = 'Определяет количество товара который лежит в коробке.';
+                }
+            }
+
+        }
+    }
+
+    var
+        PackageBoxMgt: Codeunit "Package Box Mgt.";
+}

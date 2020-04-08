@@ -27,6 +27,18 @@ pageextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5775
                     ToolTipML = ENU = 'Specifies the number series code to use when you assign numbers to Box.',
                                 RUS = 'Указывает код серии номеров, который будет использоваться при назначении номеров для коробки.';
                 }
+                field("Delete Empty Box"; "Delete Empty Box")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Enable or Disable the removal of empty box documents during registration of a packaging document.',
+                                RUS = 'Включить или Выключить удаление пустых документов коробки во время регистрации документа упаковки.';
+                }
+                field("Delete Empty Lines"; "Delete Empty Lines")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Enable or Disable the removal of blank lines of a box document during registration of a packaging document.',
+                                RUS = 'Включить или Выключить удаление пустых строк документа коробки во время регистрации документа упаковки.';
+                }
             }
         }
     }

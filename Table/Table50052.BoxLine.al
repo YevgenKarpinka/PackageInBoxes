@@ -76,7 +76,7 @@ table 50052 "Box Line"
                 with BoxHeader do begin
                     SetRange("No.", "Box No.");
                     FindFirst();
-                    PackageBoxMgt.CheckWhseShipmentExist("Package No.");
+                    PackageBoxMgt.CheckWhseShipmentExist("Package No.")
                 end;
 
                 RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No.");

@@ -16,8 +16,8 @@ codeunit 50050 "Package Box Mgt."
         WhseSetup: Record "Warehouse Setup";
         errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not fully packed!',
                                                               RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован!';
-        errWhseShipmentsSalesOrderNotExist: TextConst ENU = 'A Sales Order %1 has no released Warehouse shipments!',
-                                                      RUS = 'У Заказа продажи %1 нет выпущеных Складских отгрузок!';
+        errNotAllowUnregisterIfShipmentPosted: TextConst ENU = 'Not allow uregister Package %1 if Warehouse shipment posted!',
+                                                         RUS = 'Нельзя отменить регистрацию Упаковки %1 если Складских отгрузка учтена!';
         errCreatePackageBeforePostingWarehouseShipment: TextConst ENU = 'Create Package before posting Warehouse Shipment %1.',
                                                                   RUS = 'Создайте Упаковку перед учетом Складской отгрузки %1.';
         errPackageMustBeRegistered: TextConst ENU = 'Package %1 must be registered.',
@@ -95,7 +95,7 @@ codeunit 50050 "Package Box Mgt."
             SetRange("Source Document", "Source Document"::"Sales Order");
             SetRange("Source No.", PackageHeader."Sales Order No.");
             if not FindFirst() then
-                Error(errWhseShipmentsSalesOrderNotExist, PackageHeader."Sales Order No.");
+                Error(errNotAllowUnregisterIfShipmentPosted, "No.");
         end;
     end;
 

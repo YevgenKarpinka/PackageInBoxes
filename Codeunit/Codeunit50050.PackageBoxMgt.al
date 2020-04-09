@@ -182,9 +182,8 @@ codeunit 50050 "Package Box Mgt."
                 Modify(true);
                 exit;
             end else begin
-                SetRange("Shipment No.");
-                SetRange("Item No.");
-                SetRange("Shipment Line No.");
+                Reset();
+                SetRange("Box No.", BoxNo);
                 if FindLast() then
                     LineNo := "Line No." + 10000
                 else
@@ -247,8 +246,8 @@ codeunit 50050 "Package Box Mgt."
     begin
         with PackageHeader do begin
             Get(PackageNo);
-            if Status = Status::UnRegistered then exit;
-            Status := Status::UnRegistered;
+            if Status = Status::Unregistered then exit;
+            Status := Status::Unregistered;
             Modify(true);
         end;
     end;
@@ -366,7 +365,7 @@ codeunit 50050 "Package Box Mgt."
     begin
         with PackageHeader do begin
             Get(PackageNo);
-            exit(Status = Status::UnRegistered);
+            exit(Status = Status::Unregistered);
         end;
     end;
 

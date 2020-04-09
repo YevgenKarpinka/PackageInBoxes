@@ -27,6 +27,12 @@ pageextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5775
                     ToolTipML = ENU = 'Specifies the number series code to use when you assign numbers to Box.',
                                 RUS = 'Указывает код серии номеров, который будет использоваться при назначении номеров для коробки.';
                 }
+                field("Create and Open Box"; "Create and Open Box")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Enable or Disable opening a box document when it is created.',
+                                RUS = 'Включить или Выключить открытие документа коробки при его создании.';
+                }
                 field("Delete Empty Box"; "Delete Empty Box")
                 {
                     ApplicationArea = Warehouse;

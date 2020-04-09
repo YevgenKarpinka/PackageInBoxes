@@ -5,7 +5,6 @@ page 50057 "Package List"
     ApplicationArea = Warehouse;
     UsageCategory = Lists;
     SourceTable = "Package Header";
-    // CardPageId = "Package Card";
     RefreshOnActivate = true;
     InsertAllowed = false;
     DeleteAllowed = false;
@@ -84,15 +83,8 @@ page 50057 "Package List"
                 Image = Open;
 
                 trigger OnAction()
-                var
-                    tempPackageHeader: Record "Package Header" temporary;
                 begin
-                    with tempPackageHeader do begin
-                        tempPackageHeader := Rec;
-                        Insert();
-                    end;
-
-                    Page.RunModal(Page::"Package Card", tempPackageHeader);
+                    Page.RunModal(Page::"Package Card", Rec);
                 end;
             }
             action(DeletePackage)

@@ -22,6 +22,8 @@ page 50056 "Whse. Shipment Item Lookup"
                 field("Qty. to Ship"; "Qty. to Ship")
                 {
                     ApplicationArea = Warehouse;
+                    CaptionML = ENU = 'Unpacked Quantity',
+                                RUS = 'Не упакованное количество';
                     ToolTipML = ENU = 'Specifies the quantity of item of warehouse shipment available for packaging in the box.',
                                 RUS = 'Определяет количество товара складской отгрузки доступное для упаковки в коробку.';
                 }

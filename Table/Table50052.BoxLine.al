@@ -51,7 +51,7 @@ table 50052 "Box Line"
 
                 tempWhseShipmentLine.Reset();
                 if tempWhseShipmentLine.Count = 0 then
-                    Error(errAllItemsPacked);
+                    Error(errPickedItemsPacked);
 
                 if Page.RunModal(Page::"Whse. Shipment Item Lookup", tempWhseShipmentLine) = Action::LookupOK then begin
                     Validate("Item No.", tempWhseShipmentLine."Item No.");
@@ -68,12 +68,20 @@ table 50052 "Box Line"
 
             trigger OnValidate()
             var
+                BoxHeader: Record "Box Header";
                 RemainingItemQuantity: Decimal;
             begin
                 if xRec."Quantity in Box" = "Quantity in Box" then exit;
+
+                with BoxHeader do begin
+                    SetRange("No.", "Box No.");
+                    FindFirst();
+                    PackageBoxMgt.CheckWhseShipmentExist("Package No.");
+                end;
+
                 RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No.");
                 if "Quantity in Box" > xRec."Quantity in Box" + RemainingItemQuantity then
-                    Error(errRemainingQuantityToShip, xRec."Quantity in Box" + RemainingItemQuantity);
+                    Error(errRemainingQuantityToPacking, xRec."Quantity in Box" + RemainingItemQuantity);
             end;
         }
         field(5; "Sales Order No."; code[20])
@@ -135,10 +143,10 @@ table 50052 "Box Line"
 
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";
-        errRemainingQuantityToShip: TextConst ENU = 'Remaining Quantity to Ship %1!',
-                                              RUS = 'Остаток для отгрузки %1!';
-        errAllItemsPacked: TextConst ENU = 'All Items are Packed.',
-                                        RUS = 'Весь товар упакован.';
+        errRemainingQuantityToPacking: TextConst ENU = 'Remaining quantity to packing %1!',
+                                                 RUS = 'Остаток для упаковки %1!';
+        errPickedItemsPacked: TextConst ENU = 'Picked items are packed.',
+                                        RUS = 'Подобранный товар упакован.';
 
     local procedure InitInsert()
     var

@@ -63,7 +63,7 @@ page 50050 "Package Card"
                 ApplicationArea = Warehouse;
                 SubPageLink = "Package No." = field("No.");
                 UpdatePropagation = Both;
-                Editable = Status = Status::UnRegistered;
+                Editable = Status = Status::Unregistered;
             }
         }
         area(FactBoxes)
@@ -91,17 +91,16 @@ page 50050 "Package Card"
 
                 trigger OnAction()
                 begin
-                    PackageBoxMgt.CheckPackageBeforeRegister("No.");
                     PackageBoxMgt.DeleteEmptyLines("No.");
                     PackageBoxMgt.DeleteEmptyBoxes("No.");
                     PackageBoxMgt.CloseAllBoxes("No.");
                     PackageBoxMgt.RegisterPackage("No.");
                 end;
             }
-            action(UnRegistered)
+            action(Unregistered)
             {
                 ApplicationArea = Warehouse;
-                CaptionML = ENU = 'UnRegister', RUS = 'Отменить регистрацию';
+                CaptionML = ENU = 'Unregister', RUS = 'Отменить регистрацию';
                 ToolTipML = ENU = 'Unregister package document to change.',
                             RUS = 'Отменить регистрацию документа упаковки для изменения.';
                 Enabled = Status = Status::Registered;
@@ -110,8 +109,8 @@ page 50050 "Package Card"
                 trigger OnAction()
                 begin
                     PackageBoxMgt.CheckWhseShipmentExist("No.");
-                    PackageBoxMgt.ReOpenAllBoxes("No.");
                     PackageBoxMgt.UnRegisterPackage("No.");
+                    PackageBoxMgt.ReOpenAllBoxes("No.");
                 end;
             }
             action(CloseAll)
@@ -120,7 +119,7 @@ page 50050 "Package Card"
                 CaptionML = ENU = 'Close All', RUS = 'Закрыть Все';
                 ToolTipML = ENU = 'Close all of the box document to the next stage of processing. You must reopen the document before you can make changes to it.',
                             RUS = 'Закрытие всех документов коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
-                Enabled = Status = Status::UnRegistered;
+                Enabled = Status = Status::Unregistered;
                 Image = ItemLines;
 
                 trigger OnAction()
@@ -136,7 +135,7 @@ page 50050 "Package Card"
                 CaptionML = ENU = 'Reopen All', RUS = 'Открыть Все';
                 ToolTipML = ENU = 'Reopen all the document of the box to change.',
                             RUS = 'Повторное открытие всех документа коробки для их изменения.';
-                Enabled = Status = Status::UnRegistered;
+                Enabled = Status = Status::Unregistered;
                 Image = RefreshLines;
 
                 trigger OnAction()
@@ -150,7 +149,7 @@ page 50050 "Package Card"
                 CaptionML = ENU = 'Delete Empty Boxes', RUS = 'Удалить пустые коробки';
                 ToolTipML = ENU = 'Delete empty box documents.',
                             RUS = 'Удаление пустых документов коробки.';
-                Enabled = Status = Status::UnRegistered;
+                Enabled = Status = Status::Unregistered;
                 Image = Delete;
 
                 trigger OnAction()
@@ -164,7 +163,7 @@ page 50050 "Package Card"
                 CaptionML = ENU = 'Delete Empty Lines', RUS = 'Удалить пустые строки';
                 ToolTipML = ENU = 'Delete blank lines in box documents.',
                             RUS = 'Удаление пустых строк в документах коробки.';
-                Enabled = Status = Status::UnRegistered;
+                Enabled = Status = Status::Unregistered;
                 Image = DeleteRow;
 
                 trigger OnAction()

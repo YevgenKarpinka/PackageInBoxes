@@ -30,5 +30,10 @@ tableextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5769
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Delete Empty Lines', RUS = 'Удалять пустые строки';
         }
+        field(50055; "Create and Open Box"; Boolean)
+        {
+            DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Create and Open Box', RUS = 'Создать и открыть Коробку';
+        }
     }
 }

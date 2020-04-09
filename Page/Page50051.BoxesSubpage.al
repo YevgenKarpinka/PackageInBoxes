@@ -78,12 +78,17 @@ page 50051 "Boxes Subpage"
                 var
                     BoxHeader: Record "Box Header";
                 begin
-                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then exit;
+                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then
+                        Error(errPackageMustBeUnregister, "Package No.");
+
                     with BoxHeader do begin
                         Init();
                         "Package No." := Rec."Package No.";
                         Insert(true);
                     end;
+
+                    GetWhseSetup();
+                    if not WhseSetup."Create and Open Box" then exit;
                     Commit();
                     Page.RunModal(Page::"Box Card", BoxHeader);
                 end;
@@ -148,8 +153,14 @@ page 50051 "Boxes Subpage"
     }
 
     var
+        WhseSetup: Record "Warehouse Setup";
         PackageHeader: Record "Package Header";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
         errPackageMustBeUnregister: TextConst ENU = 'Package %1 must be unregister!',
                                               RUS = 'Упаковка %1 должна быть не зарегистрирована';
+
+    local procedure GetWhseSetup()
+    begin
+        WhseSetup.Get();
+    end;
 }

@@ -168,7 +168,7 @@ enum 50050 PackageStatus
 
     value(0; UnRegistered)
     {
-        CaptionML = ENU = 'UnRegistered', RUS = 'Не зарегистрирован';
+        CaptionML = ENU = 'Unregistered', RUS = 'Не зарегистрирован';
     }
     value(1; Registered)
     {

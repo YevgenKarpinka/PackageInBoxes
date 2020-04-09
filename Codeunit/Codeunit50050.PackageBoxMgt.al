@@ -45,15 +45,16 @@ codeunit 50050 "Package Box Mgt."
                 Error(errPackageMustBeRegistered, PackageHeader."No.");
         end;
 
-        with WhseShptLine do begin
-            SetCurrentKey("Source No.");
-            SetRange("Source No.", WhseShptLine."Source No.");
-            if FindSet() then
-                repeat
-                    CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
-                until Next() = 0;
-        end;
+        // with WhseShptLine do begin
+        //     SetCurrentKey("Source No.");
+        //     SetRange("Source No.", WhseShptLine."Source No.");
+        //     if FindSet() then
+        //         repeat
+        //             CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
+        //         until Next() = 0;
+        // end;
 
+        CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
         DeleteEmptyBoxes(PackageHeader."No.");
         DeleteEmptyLines(PackageHeader."No.");
         CloseAllBoxes(PackageHeader."No.");
@@ -231,7 +232,7 @@ codeunit 50050 "Package Box Mgt."
     var
         PackageHeader: Record "Package Header";
     begin
-        CheckRemainingItemQuantityBeforeRegisterPackage(PackageNo);
+        // CheckRemainingItemQuantityBeforeRegisterPackage(PackageNo);
         with PackageHeader do begin
             Get(PackageNo);
             if Status = Status::Registered then exit;
@@ -313,7 +314,7 @@ codeunit 50050 "Package Box Mgt."
         BoxLine: Record "Box Line";
     begin
         with BoxLine do begin
-            SetCurrentKey("Shipment No.", "Item No.", "Line No.");
+            SetCurrentKey("Shipment No.", "Shipment Line No.", "Item No.");
             SetRange("Shipment No.", WhseShipmentNo);
             SetRange("Shipment Line No.", LineNo);
             SetRange("Item No.", ItemNo);
@@ -431,6 +432,18 @@ codeunit 50050 "Package Box Mgt."
             SetRange("Box No.", BoxNo);
             SetFilter("Quantity in Box", '>%1', 0);
             exit(IsEmpty);
+        end;
+    end;
+
+    procedure WhseShipmentIsPosted(ShipmentNo: Code[20]; LineNo: Integer): Boolean
+    var
+        PostedWhseShipmentLine: Record "Posted Whse. Shipment Line";
+    begin
+        with PostedWhseShipmentLine do begin
+            SetCurrentKey("Whse. Shipment No.", "Whse Shipment Line No.");
+            SetRange("Whse. Shipment No.", ShipmentNo);
+            SetRange("Whse Shipment Line No.", LineNo);
+            exit(FindFirst());
         end;
     end;
 

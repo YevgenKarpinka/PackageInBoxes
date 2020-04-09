@@ -128,11 +128,15 @@ table 50052 "Box Line"
 
     trigger OnModify()
     begin
+        if PackageBoxMgt.WhseShipmentIsPosted("Shipment No.", "Shipment Line No.") then
+            Error(errModifyNotAllowedWhseShipmentLineNoPosted, "Shipment No.", "Shipment Line No.");
         BoxLineModify();
     end;
 
     trigger OnDelete()
     begin
+        if PackageBoxMgt.WhseShipmentIsPosted("Shipment No.", "Shipment Line No.") then
+            Error(errDeleteNotAllowedWhseShipmentLineNoPosted, "Shipment No.", "Shipment Line No.");
         BoxLineModify();
     end;
 
@@ -147,6 +151,10 @@ table 50052 "Box Line"
                                                  RUS = 'Остаток для упаковки %1!';
         errPickedItemsPacked: TextConst ENU = 'Picked items are packed.',
                                         RUS = 'Подобранный товар упакован.';
+        errDeleteNotAllowedWhseShipmentLineNoPosted: TextConst ENU = 'Cannot be deleted.\Line %1 Warehouse shipment %2 posted',
+                                        RUS = 'Удалить нельзя.\Строка %1 Складской отгрузки %2 учтена!';
+        errModifyNotAllowedWhseShipmentLineNoPosted: TextConst ENU = 'Cannot be changed.\Line %1 Warehouse shipment %2 posted!',
+                                        RUS = 'Изменить нельзя.\Строка %1 Складской отгрузки %2 учтена!';
 
     local procedure InitInsert()
     var

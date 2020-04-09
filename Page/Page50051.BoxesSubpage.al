@@ -118,7 +118,9 @@ page 50051 "Boxes Subpage"
                 trigger OnAction()
                 var
                 begin
-                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then exit;
+                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then
+                        Error(errPackageMustBeUnregister, "Package No.");
+
                     if Status = Status::Close then begin
                         Status := Status::Open;
                         Modify();
@@ -136,7 +138,9 @@ page 50051 "Boxes Subpage"
 
                 trigger OnAction()
                 begin
-                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then exit;
+                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then
+                        Error(errPackageMustBeUnregister, "Package No.");
+
                     PackageBoxMgt.AsemblyBox("Package No.", "No.");
                 end;
             }
@@ -146,4 +150,6 @@ page 50051 "Boxes Subpage"
     var
         PackageHeader: Record "Package Header";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
+        errPackageMustBeUnregister: TextConst ENU = 'Package %1 must be unregister!',
+                                              RUS = 'Упаковка %1 должна быть не зарегистрирована';
 }

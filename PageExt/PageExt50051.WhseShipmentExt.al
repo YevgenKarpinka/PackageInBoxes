@@ -34,15 +34,10 @@ pageextension 50051 "Warehouse Shipment Ext." extends "Warehouse Shipment" //733
 
     local procedure GetWhseSetup()
     begin
-        if not WhseSetupGetted then begin
-            WhseSetup.Get();
-            WhseSetupGetted := true;
-        end;
+        WhseSetup.Get();
     end;
 
     var
         WhseSetup: Record "Warehouse Setup";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
-        WhseSetupGetted: Boolean;
-        VisibleCreatePackage: Boolean;
 }

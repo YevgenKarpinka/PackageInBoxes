@@ -18,6 +18,12 @@ codeunit 50050 "Package Box Mgt."
                                                               RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован!';
         errWhseShipmentsSalesOrderNotExist: TextConst ENU = 'A Sales Order %1 has no released Warehouse shipments!',
                                                       RUS = 'У Заказа продажи %1 нет выпущеных Складских отгрузок!';
+        errCreatePackageBeforePostingWarehouseShipment: TextConst ENU = 'Create Package before posting Warehouse Shipment %1.',
+                                                                  RUS = 'Создайте Упаковку перед учетом Складской отгрузки %1.';
+        errPackageMustBeRegistered: TextConst ENU = 'Package %1 must be registered.',
+                                              RUS = 'Упаковка %1 должна быть зарегистрирована.';
+        errCreateBoxForPackage: TextConst ENU = 'Create box for Package %1.',
+                                          RUS = 'Создайте коробку для Упаковки %1.';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -32,8 +38,11 @@ codeunit 50050 "Package Box Mgt."
         with PackageHeader do begin
             SetCurrentKey("Sales Order No.");
             SetRange("Sales Order No.", WhseShptLine."Source No.");
-            FindFirst();
-            if not PackageUnRegistered(PackageHeader."No.") then exit;
+            if not FindFirst() then
+                Error(errCreatePackageBeforePostingWarehouseShipment, WhseShptLine."No.");
+
+            if not PackageUnRegistered(PackageHeader."No.") then
+                Error(errPackageMustBeRegistered, PackageHeader."No.");
         end;
 
         with WhseShptLine do begin
@@ -111,6 +120,9 @@ codeunit 50050 "Package Box Mgt."
         WhseShipmentLine: Record "Warehouse Shipment Line";
         WhseActLine: Record "Warehouse Activity Line";
     begin
+        with WhseShipmentHeader do
+            TestField(Status, Status::Released);
+
         with WhseShipmentLine do begin
             SetRange("No.", WhseShipmentHeader."No.");
             FindFirst();
@@ -137,7 +149,8 @@ codeunit 50050 "Package Box Mgt."
         BoxHeader: Record "Box Header";
         RemainingQuantity: Decimal;
     begin
-        BoxHeader.Get(PackageNo, BoxNo);
+        if not BoxHeader.Get(PackageNo, BoxNo) then
+            Error(errCreateBoxForPackage, PackageNo);
 
         with WhseShipmentLine do begin
             SetCurrentKey("Source Document", "Source No.");
@@ -311,15 +324,29 @@ codeunit 50050 "Package Box Mgt."
     end;
 
     procedure GetRemainingItemQuantityInOrder(SalesOrderNo: Code[20]; ItemNo: Code[20]): Decimal
+    var
+        RemainingQuantityInOrder: Decimal;
     begin
-        exit(CalcItemQuantityInOrder(SalesOrderNo, ItemNo) -
-             CalcItemQuantityInBoxesByOrder(SalesOrderNo, ItemNo));
+        RemainingQuantityInOrder := CalcItemQuantityInOrder(SalesOrderNo, ItemNo) -
+                                        CalcItemQuantityInBoxesByOrder(SalesOrderNo, ItemNo);
+
+        if RemainingQuantityInOrder < 0 then
+            exit(0)
+        else
+            exit(RemainingQuantityInOrder);
     end;
 
     procedure GetRemainingItemQuantityInShipment(WhseShipmentNo: Code[20]; ItemNo: Code[20]; LineNo: Integer): Decimal
+    var
+        RemainingQuantityInShipment: Decimal;
     begin
-        exit(CalcItemPickedQuantitybyShipment(WhseShipmentNo, ItemNo, LineNo) -
-             CalcItemQuantityInBoxesByShipment(WhseShipmentNo, ItemNo, LineNo));
+        RemainingQuantityInShipment := CalcItemPickedQuantitybyShipment(WhseShipmentNo, ItemNo, LineNo) -
+                                           CalcItemQuantityInBoxesByShipment(WhseShipmentNo, ItemNo, LineNo);
+
+        if RemainingQuantityInShipment < 0 then
+            exit(0)
+        else
+            exit(RemainingQuantityInShipment);
     end;
 
     procedure GetQuantityInBox(BoxNo: Code[20]): Decimal

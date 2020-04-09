@@ -8,7 +8,6 @@ page 50054 "Box Card"
     InsertAllowed = false;
     DeleteAllowed = true;
 
-
     layout
     {
         area(Content)

@@ -41,22 +41,6 @@ page 50056 "Whse. Shipment Item Lookup"
         }
     }
 
-    actions
-    {
-        area(Processing)
-        {
-            // action(ActionName)
-            // {
-            //     ApplicationArea = Warehouse;
-
-            //     trigger OnAction()
-            //     begin
-
-            //     end;
-            // }
-        }
-    }
-
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";
 }

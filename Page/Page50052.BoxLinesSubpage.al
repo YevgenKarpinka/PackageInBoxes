@@ -55,23 +55,6 @@ page 50052 "Box Lines Subpage"
         }
     }
 
-    actions
-    {
-        area(Processing)
-        {
-            // action(ActionName)
-            // {
-            //     ApplicationArea = Warehouse;
-
-            //     trigger OnAction()
-            //     begin
-
-            //     end;
-            // }
-        }
-    }
-
-
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.Update();

@@ -32,7 +32,7 @@ table 50051 "Box Header"
                 end;
             end;
         }
-        field(4; "Create Date"; Date)
+        field(4; "Create Date"; DateTime)
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Create Date', RUS = 'Дата создания';
@@ -164,7 +164,7 @@ table 50051 "Box Header"
             NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", DT2Date(PackageHeader."Create Date"), "No.", "No. Series");
         end;
 
-        "Create Date" := DT2Date(CurrentDateTime);
+        "Create Date" := CurrentDateTime;
     end;
 
     local procedure TestNoSeries()

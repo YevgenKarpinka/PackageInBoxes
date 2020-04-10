@@ -51,6 +51,12 @@ page 50052 "Box Lines Subpage"
                     ToolTipML = ENU = 'Specifies the line number of the warehouse shipment of the items with which lies in the box.',
                                 RUS = 'Определяет номер строки складской отгрузки товар с который лежит в коробке.';
                 }
+                field("Create Date"; "Create Date")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the date and time the box document was created.',
+                                RUS = 'Определяет дату и время создания документа коробка.';
+                }
             }
         }
     }

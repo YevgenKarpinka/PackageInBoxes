@@ -14,8 +14,8 @@ codeunit 50050 "Package Box Mgt."
 
     var
         WhseSetup: Record "Warehouse Setup";
-        errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not fully packed!',
-                                                              RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован!';
+        errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not packed %3!',
+                                                              RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован %3!';
         errNotAllowUnregisterIfShipmentPosted: TextConst ENU = 'Not allow uregister Package %1 if Warehouse shipment posted!',
                                                          RUS = 'Нельзя отменить регистрацию Упаковки %1 если Складских отгрузка учтена!';
         errCreatePackageBeforePostingWarehouseShipment: TextConst ENU = 'Create Package before posting Warehouse Shipment %1.',
@@ -102,7 +102,7 @@ codeunit 50050 "Package Box Mgt."
                 repeat
                     RemainingItemQuantity := GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No.");
                     if RemainingItemQuantity > 0 then
-                        Error(errItemPickedButNotFullyPackagedToBox, "Item No.", "No.");
+                        Error(errItemPickedButNotFullyPackagedToBox, "Item No.", "No.", RemainingItemQuantity);
                 until Next() = 0;
         end;
     end;
@@ -386,17 +386,16 @@ codeunit 50050 "Package Box Mgt."
         GetWhseSetup();
         if not WhseSetup."Delete Empty Lines" then exit;
 
-        with BoxHeader do begin
-            SetRange("Package No.", PackageNo);
-            FindSet();
-        end;
-
-        with BoxLine do begin
-            SetCurrentKey("Sales Order No.", "Quantity in Box");
-            SetRange("Sales Order No.", BoxHeader."Sales Order No.");
-            SetRange("Quantity in Box", 0);
-            DeleteAll(true);
-        end;
+        BoxHeader.SetRange("Package No.", PackageNo);
+        if BoxHeader.FindSet() then
+            repeat
+                with BoxLine do begin
+                    SetCurrentKey("Quantity in Box");
+                    SetRange("Box No.", BoxHeader."No.");
+                    SetRange("Quantity in Box", 0);
+                    DeleteAll(true);
+                end;
+            until BoxHeader.Next() = 0;
     end;
 
     procedure DeleteEmptyLinesByBox(BoxNo: Code[20])

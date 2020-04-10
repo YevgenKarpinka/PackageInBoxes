@@ -23,8 +23,8 @@ page 50051 "Boxes Subpage"
                 field("Create Date"; "Create Date")
                 {
                     ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the date the box document was created.',
-                                RUS = 'Определяет дату создания документа коробка.';
+                    ToolTipML = ENU = 'Specifies the date and time the box document was created.',
+                                RUS = 'Определяет дату и время создания документа коробка.';
                 }
                 field(Status; Status)
                 {

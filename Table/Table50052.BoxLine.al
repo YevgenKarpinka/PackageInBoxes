@@ -102,6 +102,12 @@ table 50052 "Box Line"
             CaptionML = ENU = 'Shipment Line No.', RUS = 'Строка отгрузки Но.';
             Editable = false;
         }
+        field(8; "Create Date"; DateTime)
+        {
+            DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Create Date', RUS = 'Дата создания';
+            Editable = false;
+        }
     }
 
     keys
@@ -162,6 +168,8 @@ table 50052 "Box Line"
     begin
         if "Sales Order No." = '' then
             GetSalesOrderNo();
+
+        "Create Date" := CurrentDateTime;
     end;
 
     local procedure GetSalesOrderNo()

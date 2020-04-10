@@ -4,6 +4,7 @@ page 50057 "Package List"
                 RUS = 'Список Упаковки';
     InsertAllowed = false;
     SourceTable = "Package Header";
+    CardPageId = "Package Card";
     SourceTableView = sorting("No.")
                       order(Descending);
     DataCaptionFields = "No.", "Sales Order No.";

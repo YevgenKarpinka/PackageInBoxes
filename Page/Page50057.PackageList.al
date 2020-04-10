@@ -1,14 +1,14 @@
 page 50057 "Package List"
 {
-    CaptionML = ENU = 'Package List', RUS = 'Список Упаковки';
-    PageType = List;
-    ApplicationArea = Warehouse;
-    UsageCategory = Lists;
-    SourceTable = "Package Header";
-    RefreshOnActivate = true;
+    CaptionML = ENU = 'Package List',
+                RUS = 'Список Упаковки';
     InsertAllowed = false;
-    DeleteAllowed = false;
-    Editable = false;
+    SourceTable = "Package Header";
+    SourceTableView = sorting("No.")
+                      order(Descending);
+    DataCaptionFields = "No.", "Sales Order No.";
+    PageType = Document;
+    RefreshOnActivate = true;
 
     layout
     {
@@ -69,51 +69,4 @@ page 50057 "Package List"
             }
         }
     }
-
-    actions
-    {
-        area(Processing)
-        {
-            action(OpenPackage)
-            {
-                ApplicationArea = Warehouse;
-                CaptionML = ENU = 'Open Package', RUS = 'Открыть упаковку';
-                ToolTipML = ENU = 'Open package document to the next view or changes. You must unregister the document before you can make changes to it.',
-                            RUS = 'Открыть документов упаковки для просмотра либо изменения. Необходимо отменить регистрацию документа, чтобы в него можно было вносить изменения.';
-                Image = Open;
-
-                trigger OnAction()
-                begin
-                    Page.RunModal(Page::"Package Card", Rec);
-                end;
-            }
-            action(DeletePackage)
-            {
-                ApplicationArea = Warehouse;
-                CaptionML = ENU = 'Delete Package', RUS = 'Удалить упаковку';
-                ToolTipML = ENU = 'Remove documents from unregistered packaging. To delete a document, you must unregister.',
-                            RUS = 'Удалить документов незарегистрированной упаковки. Чтобы удалить документ необходимо отменить регистрацию.';
-                Image = Delete;
-
-                trigger OnAction()
-                var
-                    PackageHeader: Record "Package Header";
-                begin
-                    CurrPage.SetSelectionFilter(PackageHeader);
-                    with PackageHeader do begin
-                        FindFirst();
-                        repeat
-                            if Status <> Status::UnRegistered then
-                                Error(errPackageMustBeUnregistered, "No.");
-                            Delete(true);
-                        until Next() = 0;
-                    end;
-                end;
-            }
-        }
-    }
-
-    var
-        errPackageMustBeUnregistered: TextConst ENU = 'Package %1 Must Be Unregistered!',
-                                                RUS = 'Упаковка %1 должна быть не зарегистрирована!';
 }

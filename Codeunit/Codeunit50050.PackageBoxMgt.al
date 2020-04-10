@@ -45,15 +45,6 @@ codeunit 50050 "Package Box Mgt."
                 Error(errPackageMustBeRegistered, PackageHeader."No.");
         end;
 
-        // with WhseShptLine do begin
-        //     SetCurrentKey("Source No.");
-        //     SetRange("Source No.", WhseShptLine."Source No.");
-        //     if FindSet() then
-        //         repeat
-        //             CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
-        //         until Next() = 0;
-        // end;
-
         CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
         DeleteEmptyBoxes(PackageHeader."No.");
         DeleteEmptyLines(PackageHeader."No.");

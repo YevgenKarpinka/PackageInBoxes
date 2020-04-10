@@ -3,6 +3,7 @@ table 50053 "Box"
     DataClassification = ToBeClassified;
     CaptionML = ENU = 'Box', RUS = 'Коробка';
     LookupPageId = Boxes;
+    DrillDownPageId = Boxes;
 
     fields
     {

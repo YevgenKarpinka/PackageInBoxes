@@ -64,6 +64,12 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the quantity of units of item that lies in the box.',
                                 RUS = 'Определяет количество единиц товара который лежит в коробке.';
                 }
+                field("Tracking No."; "Tracking No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
             }
             part(BoxLinesSubPage; "Box Lines Subpage")
             {

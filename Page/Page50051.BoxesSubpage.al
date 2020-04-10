@@ -57,6 +57,12 @@ page 50051 "Boxes Subpage"
                     ToolTipML = ENU = 'Specifies the quantity of item that lies in the box.',
                                 RUS = 'Определяет количество товара который лежит в коробке.';
                 }
+                field("Tracking No."; "Tracking No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
             }
 
         }

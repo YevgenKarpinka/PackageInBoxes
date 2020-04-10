@@ -2,6 +2,8 @@ table 50050 "Package Header"
 {
     DataClassification = ToBeClassified;
     CaptionML = ENU = 'Package', RUS = 'Упаковка';
+    LookupPageId = "Package List";
+    DrillDownPageId = "Package List";
 
     fields
     {
@@ -82,6 +84,8 @@ table 50050 "Package Header"
         WhseSetupGetted: Boolean;
         errCantDeletePackageNo: TextConst ENU = 'Can''t Delete Package No. = %1',
                                           RUS = 'Нельзя удалить документ Упаковки Но. = %1';
+        errPackageMustBeUnregistered: TextConst ENU = 'Package %1 Must Be Unregistered!',
+                                                RUS = 'Упаковка %1 должна быть не зарегистрирована!';
 
     trigger OnInsert()
     begin
@@ -96,6 +100,8 @@ table 50050 "Package Header"
 
     trigger OnDelete()
     begin
+        if Status <> Status::UnRegistered then
+            Error(errPackageMustBeUnregistered, "No.");
         DeleteBoxHeader();
     end;
 

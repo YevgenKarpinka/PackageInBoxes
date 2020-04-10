@@ -9,6 +9,8 @@ page 50057 "Package List"
     DataCaptionFields = "No.", "Sales Order No.";
     PageType = Document;
     RefreshOnActivate = true;
+    ApplicationArea = Warehouse;
+    UsageCategory = Lists;
 
     layout
     {

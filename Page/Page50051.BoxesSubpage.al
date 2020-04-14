@@ -38,17 +38,17 @@ page 50051 "Boxes Subpage"
                     ToolTipML = ENU = 'Specifies external document number the box document.',
                                 RUS = 'Определяет внешний номер документа коробка.';
                 }
-                field("Box Code"; "Box Code")
+                // field("Box Code"; "Box Code")
+                // {
+                //     ApplicationArea = Warehouse;
+                //     ToolTipML = ENU = 'Specifies a box code from a box reference.',
+                //                 RUS = 'Определяет код коробки из справочника коробки.';
+                // }
+                field("Gross Weight"; "Gross Weight")
                 {
                     ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies a box code from a box reference.',
-                                RUS = 'Определяет код коробки из справочника коробки.';
-                }
-                field(Weight; Weight)
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies a weight of the box.',
-                                RUS = 'Определяет вес коробки.';
+                    ToolTipML = ENU = 'Specifies a gross weight of the box.',
+                                RUS = 'Определяет вес брутто коробки.';
                 }
                 field(QuantityInBox; PackageBoxMgt.GetQuantityInBox("No."))
                 {

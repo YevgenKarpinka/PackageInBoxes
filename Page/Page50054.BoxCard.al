@@ -52,11 +52,11 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the box code according to the directory.',
                                 RUS = 'Определяет код коробки согласно справочника.';
                 }
-                field(Weight; Weight)
+                field("Gross Weight"; "Gross Weight")
                 {
                     ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies weight of the box.',
-                                RUS = 'Определяет вес коробки.';
+                    ToolTipML = ENU = 'Specifies gross weight of the box.',
+                                RUS = 'Определяет вес брутто коробки.';
                 }
                 field("Quantity In Box"; PackageBoxMgt.GetQuantityInBox("No."))
                 {

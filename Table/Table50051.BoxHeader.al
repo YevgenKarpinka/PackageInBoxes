@@ -28,7 +28,7 @@ table 50051 "Box Header"
             begin
                 if xRec."Box Code" <> Rec."Box Code" then begin
                     Box.Get("Box Code");
-                    Weight := Box.Weight;
+                    "Gross Weight" := Box.Weight;
                 end;
             end;
         }
@@ -38,10 +38,10 @@ table 50051 "Box Header"
             CaptionML = ENU = 'Create Date', RUS = 'Дата создания';
             Editable = false;
         }
-        field(5; Weight; Decimal)
+        field(5; "Gross Weight"; Decimal)
         {
             DataClassification = ToBeClassified;
-            CaptionML = ENU = 'Weight', RUS = 'Вес';
+            CaptionML = ENU = 'Gross Weight', RUS = 'Вес брутто';
             DecimalPlaces = 0 : 5;
             NotBlank = true;
         }

@@ -43,11 +43,11 @@ page 50058 "Boxes FactBox"
                     ToolTipML = ENU = 'Specifies a box code from a box reference.',
                                 RUS = 'Определяет код коробки из справочника коробки.';
                 }
-                field(Weight; Weight)
+                field("Gross Weight"; "Gross Weight")
                 {
                     ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies a weight of the box.',
-                                RUS = 'Определяет вес коробки.';
+                    ToolTipML = ENU = 'Specifies a gross weight of the box.',
+                                RUS = 'Определяет вес брутто коробки.';
                 }
                 field(QuantityInBox; PackageBoxMgt.GetQuantityInBox("No."))
                 {

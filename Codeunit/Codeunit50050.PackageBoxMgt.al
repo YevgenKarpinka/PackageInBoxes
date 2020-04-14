@@ -24,6 +24,8 @@ codeunit 50050 "Package Box Mgt."
                                               RUS = 'Упаковка %1 должна быть зарегистрирована.';
         errCreateBoxForPackage: TextConst ENU = 'Create box for Package %1.',
                                           RUS = 'Создайте коробку для Упаковки %1.';
+        errCantDeleteShipmentLineWhileItemPackedInBoxNo: TextConst ENU = 'Can''t delete Shipment %1 Line %2 while Item %3 packed in Box %4.',
+                                                                   RUS = 'Нельзя удалить строку %2 Отгрузки %1 пока Товар %3 запакован в Коробку %4.';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -51,6 +53,27 @@ codeunit 50050 "Package Box Mgt."
         CloseAllBoxes(PackageHeader."No.");
         RegisterPackage(PackageHeader."No.");
     end;
+
+    [EventSubscriber(ObjectType::Table, 7320, 'OnBeforeWhseShptLineDelete', '', false, false)]
+    local procedure CheckBoxLineExist(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
+    var
+        BoxLine: Record "Box Line";
+    begin
+        GetWhseSetup();
+        if not WhseSetup."Enable Box Packaging"
+        and not (WarehouseShipmentLine."Source Document" = WarehouseShipmentLine."Source Document"::"Sales Order") then
+            exit;
+
+        with BoxLine do begin
+            SetCurrentKey("Shipment No.", "Shipment Line No.");
+            SetRange("Shipment No.", WarehouseShipmentLine."No.");
+            SetRange("Shipment Line No.", WarehouseShipmentLine."Line No.");
+            if FindFirst() then
+                Error(errCantDeleteShipmentLineWhileItemPackedInBoxNo, WarehouseShipmentLine."No.",
+                    WarehouseShipmentLine."Line No.", "Item No.", "Box No.");
+        end;
+    end;
+
 
     procedure CheckPackageBeforeRegister(PackageNo: Code[20])
     var

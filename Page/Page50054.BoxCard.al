@@ -46,12 +46,12 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the external document number.',
                                 RUS = 'Определяет номер внешнего документа.';
                 }
-                field("Box Code"; "Box Code")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the box code according to the directory.',
-                                RUS = 'Определяет код коробки согласно справочника.';
-                }
+                // field("Box Code"; "Box Code")
+                // {
+                //     ApplicationArea = Warehouse;
+                //     ToolTipML = ENU = 'Specifies the box code according to the directory.',
+                //                 RUS = 'Определяет код коробки согласно справочника.';
+                // }
                 field("Gross Weight"; "Gross Weight")
                 {
                     ApplicationArea = Warehouse;

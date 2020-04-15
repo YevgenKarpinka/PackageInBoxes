@@ -27,10 +27,12 @@ report 50050 "Packing List"
             column(ShipToName; PackageBoxMgt.GetShipToNameByOrder("Sales Order No.")) { }
             column(ShipToAddress; PackageBoxMgt.GetShipToAddressByOrder("Sales Order No.")) { }
             column(ShipToCity; PackageBoxMgt.GetShipToCityByOrder("Sales Order No.")) { }
+            column(Sales_Order_No_; "Sales Order No.") { }
+            column(OrderDate; PackageBoxMgt.GetSalesOrderData("Sales Order No.")) { }
 
             dataitem(BoxHeader; "Box Header")
             {
-                RequestFilterFields = "Package No.", "No.", "Sales Order No.";
+                RequestFilterFields = "No.";
                 DataItemTableView = sorting("No.");
 
                 column(Package_No_; "Package No.") { }
@@ -49,6 +51,7 @@ report 50050 "Packing List"
                     column(Position_No; PositionNo) { }
                     column(Item_No_; "Item No.") { }
                     column(Description; PackageBoxMgt.GetItemDescription("Item No.")) { }
+                    column(ItemUoM; PackageBoxMgt.GetItemUoM("Item No.")) { }
                     column(Quantity_in_Box; "Quantity in Box")
                     {
                         DecimalPlaces = 0 : 5;

@@ -78,6 +78,28 @@ codeunit 50050 "Package Box Mgt."
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Act.-Register (Yes/No)", 'OnAfterCode', '', false, false)]
+    local procedure CreatePackageAfterRegisterPick(var WarehouseActivityLine: Record "Warehouse Activity Line")
+    var
+        PackageHeader: Record "Package Header";
+    begin
+        GetWhseSetup();
+        if not WhseSetup."Enable Box Packaging"
+        and not (WarehouseActivityLine."Source Document" = WarehouseActivityLine."Source Document"::"Sales Order") then
+            exit;
+
+        with PackageHeader do begin
+            SetCurrentKey("Sales Order No.");
+            SetRange("Sales Order No.", WarehouseActivityLine."Source No.");
+            if FindFirst() then exit;
+        end;
+
+        with PackageHeader do begin
+            Init();
+            "Sales Order No." := WarehouseActivityLine."Source No.";
+            if Insert(true) then;
+        end;
+    end;
 
     procedure CheckPackageBeforeRegister(PackageNo: Code[20])
     var
@@ -139,18 +161,18 @@ codeunit 50050 "Package Box Mgt."
         WhseShipmentLine: Record "Warehouse Shipment Line";
         WhseActLine: Record "Warehouse Activity Line";
     begin
+        with PackageHeader do begin
+            SetCurrentKey("Sales Order No.");
+            SetRange("Sales Order No.", WhseShipmentLine."Source No.");
+            if FindFirst() then exit(true);
+        end;
+
         with WhseShipmentHeader do
             TestField(Status, Status::Released);
 
         with WhseShipmentLine do begin
             SetRange("No.", WhseShipmentHeader."No.");
             FindFirst();
-        end;
-
-        with PackageHeader do begin
-            SetCurrentKey("Sales Order No.");
-            SetRange("Sales Order No.", WhseShipmentLine."Source No.");
-            if FindFirst() then exit(true);
         end;
 
         with PackageHeader do begin
@@ -551,13 +573,13 @@ codeunit 50050 "Package Box Mgt."
     procedure GetBillToCityByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Bill-to City" + ', ' + SalesHeader."Bill-to County" + '' + SalesHeader."Bill-to Post Code");
+        exit(SalesHeader."Bill-to City" + ', ' + SalesHeader."Bill-to County" + ' ' + SalesHeader."Bill-to Post Code");
     end;
 
     procedure GetShipToCityByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Ship-to City" + ', ' + SalesHeader."Ship-to County" + '' + SalesHeader."Ship-to Post Code");
+        exit(SalesHeader."Ship-to City" + ', ' + SalesHeader."Ship-to County" + ' ' + SalesHeader."Ship-to Post Code");
     end;
 
     procedure GetSalesOrderData(SalesOrderNo: Code[20]): Text
@@ -576,5 +598,11 @@ codeunit 50050 "Package Box Mgt."
     begin
         GetItem(ItemNo);
         exit(Item.Description + Item."Description 2");
+    end;
+
+    procedure GetItemUoM(ItemNo: Code[20]): Text
+    begin
+        GetItem(ItemNo);
+        exit(Item."Sales Unit of Measure");
     end;
 }

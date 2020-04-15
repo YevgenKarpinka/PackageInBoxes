@@ -11,55 +11,6 @@
       <rd:DataSourceID>ab84a751-40cd-4802-8a13-fb3c88fc7d01</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Package_No_">
-          <DataField>Package_No_</DataField>
-        </Field>
-        <Field Name="Box_No">
-          <DataField>Box_No</DataField>
-        </Field>
-        <Field Name="External_Document_No_">
-          <DataField>External_Document_No_</DataField>
-        </Field>
-        <Field Name="Gross_Weight">
-          <DataField>Gross_Weight</DataField>
-        </Field>
-        <Field Name="Gross_WeightFormat">
-          <DataField>Gross_WeightFormat</DataField>
-        </Field>
-        <Field Name="QuantityInBox">
-          <DataField>QuantityInBox</DataField>
-        </Field>
-        <Field Name="QuantityInBoxFormat">
-          <DataField>QuantityInBoxFormat</DataField>
-        </Field>
-        <Field Name="Position_No">
-          <DataField>Position_No</DataField>
-        </Field>
-        <Field Name="Item_No_">
-          <DataField>Item_No_</DataField>
-        </Field>
-        <Field Name="Quantity_in_Box">
-          <DataField>Quantity_in_Box</DataField>
-        </Field>
-        <Field Name="Quantity_in_BoxFormat">
-          <DataField>Quantity_in_BoxFormat</DataField>
-        </Field>
-        <Field Name="Shipment_No_">
-          <DataField>Shipment_No_</DataField>
-        </Field>
-        <Field Name="Shipment_Line_No_">
-          <DataField>Shipment_Line_No_</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1205,12 +1156,6 @@
       </Page>
     </ReportSection>
   </ReportSections>
-  <ReportParametersLayout>
-    <GridLayoutDefinition>
-      <NumberOfColumns>4</NumberOfColumns>
-      <NumberOfRows>2</NumberOfRows>
-    </GridLayoutDefinition>
-  </ReportParametersLayout>
   <Code>Public Function BlankZero(ByVal Value As Decimal)
     if Value = 0 then
         Return ""
@@ -1250,4 +1195,95 @@ End Function
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="CompanyAddress">
+          <DataField>CompanyAddress</DataField>
+        </Field>
+        <Field Name="CompanyCityCounty">
+          <DataField>CompanyCityCounty</DataField>
+        </Field>
+        <Field Name="CompanyPhone">
+          <DataField>CompanyPhone</DataField>
+        </Field>
+        <Field Name="CompanyPhone2">
+          <DataField>CompanyPhone2</DataField>
+        </Field>
+        <Field Name="CompanyEmail">
+          <DataField>CompanyEmail</DataField>
+        </Field>
+        <Field Name="CompanyContactName">
+          <DataField>CompanyContactName</DataField>
+        </Field>
+        <Field Name="BillToName">
+          <DataField>BillToName</DataField>
+        </Field>
+        <Field Name="BillToAddress">
+          <DataField>BillToAddress</DataField>
+        </Field>
+        <Field Name="BillToCity">
+          <DataField>BillToCity</DataField>
+        </Field>
+        <Field Name="ShipToName">
+          <DataField>ShipToName</DataField>
+        </Field>
+        <Field Name="ShipToAddress">
+          <DataField>ShipToAddress</DataField>
+        </Field>
+        <Field Name="ShipToCity">
+          <DataField>ShipToCity</DataField>
+        </Field>
+        <Field Name="Package_No_">
+          <DataField>Package_No_</DataField>
+        </Field>
+        <Field Name="Box_No">
+          <DataField>Box_No</DataField>
+        </Field>
+        <Field Name="External_Document_No_">
+          <DataField>External_Document_No_</DataField>
+        </Field>
+        <Field Name="Gross_Weight">
+          <DataField>Gross_Weight</DataField>
+        </Field>
+        <Field Name="Gross_WeightFormat">
+          <DataField>Gross_WeightFormat</DataField>
+        </Field>
+        <Field Name="QuantityInBox">
+          <DataField>QuantityInBox</DataField>
+        </Field>
+        <Field Name="QuantityInBoxFormat">
+          <DataField>QuantityInBoxFormat</DataField>
+        </Field>
+        <Field Name="Position_No">
+          <DataField>Position_No</DataField>
+        </Field>
+        <Field Name="Item_No_">
+          <DataField>Item_No_</DataField>
+        </Field>
+        <Field Name="Description">
+          <DataField>Description</DataField>
+        </Field>
+        <Field Name="Quantity_in_Box">
+          <DataField>Quantity_in_Box</DataField>
+        </Field>
+        <Field Name="Quantity_in_BoxFormat">
+          <DataField>Quantity_in_BoxFormat</DataField>
+        </Field>
+        <Field Name="Shipment_No_">
+          <DataField>Shipment_No_</DataField>
+        </Field>
+        <Field Name="Shipment_Line_No_">
+          <DataField>Shipment_Line_No_</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

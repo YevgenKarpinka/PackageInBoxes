@@ -13,7 +13,11 @@ codeunit 50050 "Package Box Mgt."
     end;
 
     var
+        CompanyInfo: Record "Company Information";
         WhseSetup: Record "Warehouse Setup";
+        SalesHeader: Record "Sales Header";
+        Item: Record Item;
+        CompanyInfoGetted: Boolean;
         errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not packed %3!',
                                                               RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован %3!';
         errNotAllowUnregisterIfShipmentPosted: TextConst ENU = 'Not allow uregister Package %1 if Warehouse shipment posted!',
@@ -463,5 +467,114 @@ codeunit 50050 "Package Box Mgt."
     local procedure GetWhseSetup()
     begin
         WhseSetup.Get();
+    end;
+
+    local procedure GetCompanyInfo()
+    begin
+        if CompanyInfoGetted then exit;
+        CompanyInfoGetted := true;
+        CompanyInfo.Get();
+    end;
+
+    local procedure GetSalesOrderByNo(SalesOrderNo: Code[20])
+    begin
+        if SalesOrderNo = SalesHeader."No." then exit;
+        SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo);
+    end;
+
+    procedure GetCompanyName(): Text
+    begin
+        GetCompanyInfo();
+        exit(CompanyInfo.Name + CompanyInfo."Name 2");
+    end;
+
+    procedure GetCompanyAddress(): Text
+    begin
+        GetCompanyInfo();
+        exit(CompanyInfo.Address + CompanyInfo."Address 2");
+    end;
+
+    procedure GetCompanyCityStatePostCode(): Text
+    begin
+        GetCompanyInfo();
+        exit(CompanyInfo.City + ', ' + CompanyInfo.County + ' ' + CompanyInfo."Post Code");
+    end;
+
+    procedure GetCompanyPhone(): Text
+    begin
+        GetCompanyInfo();
+        exit(CompanyInfo."Phone No.");
+    end;
+
+    procedure GetCompanyPhone2(): Text
+    begin
+        GetCompanyInfo();
+        exit(CompanyInfo."Phone No. 2");
+    end;
+
+    procedure GetCompanyEmail(): Text
+    begin
+        GetCompanyInfo();
+        exit(CompanyInfo."E-Mail");
+    end;
+
+    procedure GetCompanyContactName(): Text
+    begin
+        GetCompanyInfo();
+        exit(CompanyInfo."Contact Person");
+    end;
+
+    procedure GetBillToNameByOrder(SalesOrderNo: Code[20]): Text
+    begin
+        GetSalesOrderByNo(SalesOrderNo);
+        exit(SalesHeader."Bill-to Name" + SalesHeader."Bill-to Name 2");
+    end;
+
+    procedure GetShipToNameByOrder(SalesOrderNo: Code[20]): Text
+    begin
+        GetSalesOrderByNo(SalesOrderNo);
+        exit(SalesHeader."Ship-to Name" + SalesHeader."Ship-to Name 2");
+    end;
+
+    procedure GetBillToAddressByOrder(SalesOrderNo: Code[20]): Text
+    begin
+        GetSalesOrderByNo(SalesOrderNo);
+        exit(SalesHeader."Bill-to Address" + SalesHeader."Bill-to Address 2");
+    end;
+
+    procedure GetShipToAddressByOrder(SalesOrderNo: Code[20]): Text
+    begin
+        GetSalesOrderByNo(SalesOrderNo);
+        exit(SalesHeader."Ship-to Address" + SalesHeader."Ship-to Address 2");
+    end;
+
+    procedure GetBillToCityByOrder(SalesOrderNo: Code[20]): Text
+    begin
+        GetSalesOrderByNo(SalesOrderNo);
+        exit(SalesHeader."Bill-to City" + ', ' + SalesHeader."Bill-to County" + '' + SalesHeader."Bill-to Post Code");
+    end;
+
+    procedure GetShipToCityByOrder(SalesOrderNo: Code[20]): Text
+    begin
+        GetSalesOrderByNo(SalesOrderNo);
+        exit(SalesHeader."Ship-to City" + ', ' + SalesHeader."Ship-to County" + '' + SalesHeader."Ship-to Post Code");
+    end;
+
+    procedure GetSalesOrderData(SalesOrderNo: Code[20]): Text
+    begin
+        GetSalesOrderByNo(SalesOrderNo);
+        exit(Format(SalesHeader."Document Date"));
+    end;
+
+    local procedure GetItem(ItemNo: Code[20])
+    begin
+        if ItemNo = Item."No." then exit;
+        Item.Get(ItemNo);
+    end;
+
+    procedure GetItemDescription(ItemNo: Code[20]): Text
+    begin
+        GetItem(ItemNo);
+        exit(Item.Description + Item."Description 2");
     end;
 }

@@ -123,16 +123,17 @@ page 50050 "Package Card"
                     ApplicationArea = All;
                     Image = PurchaseInvoice;
                     CaptionML = ENU = 'Print Packing List', RUS = 'Печать упаковочного листа';
+                    // Visible = false;
 
                     trigger OnAction()
                     var
                         PackageHeader: Record "Package Header";
-                        BoxHeader: Record "Box Header";
+                    // BoxHeader: Record "Box Header";
                     begin
                         PackageHeader := Rec;
-                        CurrPage.SetSelectionFilter(PackageHeader);
-                        BoxHeader.SetRange("Package No.", PackageHeader.GetFilter("No."));
-                        Report.Run(Report::"Packing List", true, true, BoxHeader);
+                        // CurrPage.SetSelectionFilter(PackageHeader);
+                        // BoxHeader.SetRange("Package No.", PackageHeader.GetFilter("No."));
+                        Report.Run(Report::"Packing List", true, true, PackageHeader);
                     end;
                 }
             }

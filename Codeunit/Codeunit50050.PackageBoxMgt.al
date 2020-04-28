@@ -161,18 +161,18 @@ codeunit 50050 "Package Box Mgt."
         WhseShipmentLine: Record "Warehouse Shipment Line";
         WhseActLine: Record "Warehouse Activity Line";
     begin
-        with PackageHeader do begin
-            SetCurrentKey("Sales Order No.");
-            SetRange("Sales Order No.", WhseShipmentLine."Source No.");
-            if FindFirst() then exit(true);
-        end;
-
         with WhseShipmentHeader do
             TestField(Status, Status::Released);
 
         with WhseShipmentLine do begin
             SetRange("No.", WhseShipmentHeader."No.");
             FindFirst();
+        end;
+
+        with PackageHeader do begin
+            SetCurrentKey("Sales Order No.");
+            SetRange("Sales Order No.", WhseShipmentLine."Source No.");
+            if FindFirst() then exit(true);
         end;
 
         with PackageHeader do begin

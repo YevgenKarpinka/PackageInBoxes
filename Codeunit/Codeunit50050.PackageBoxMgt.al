@@ -30,6 +30,8 @@ codeunit 50050 "Package Box Mgt."
                                           RUS = 'Создайте коробку для Упаковки %1.';
         errCantDeleteShipmentLineWhileItemPackedInBoxNo: TextConst ENU = 'Can''t delete Shipment %1 Line %2 while Item %3 packed in Box %4.',
                                                                    RUS = 'Нельзя удалить строку %2 Отгрузки %1 пока Товар %3 запакован в Коробку %4.';
+        errPackageMustBeUnregister: TextConst ENU = 'Package %1 must be unregister!',
+                                              RUS = 'Упаковка %1 должна быть не зарегистрирована';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -240,6 +242,20 @@ codeunit 50050 "Package Box Mgt."
             "Quantity in Box" := RemainingQuantity;
             "Shipment No." := ShipmentNo;
             "Shipment Line No." := ShipmentLineNo;
+            Insert(true);
+        end;
+    end;
+
+    procedure CreateBox(PackageNo: Code[20]);
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        if not PackageUnRegistered(PackageNo) then
+            Error(errPackageMustBeUnregister, PackageNo);
+
+        with BoxHeader do begin
+            Init();
+            "Package No." := PackageNo;
             Insert(true);
         end;
     end;

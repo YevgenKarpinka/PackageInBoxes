@@ -38,12 +38,12 @@ page 50051 "Boxes Subpage"
                     ToolTipML = ENU = 'Specifies external document number the box document.',
                                 RUS = 'Определяет внешний номер документа коробка.';
                 }
-                // field("Box Code"; "Box Code")
-                // {
-                //     ApplicationArea = Warehouse;
-                //     ToolTipML = ENU = 'Specifies a box code from a box reference.',
-                //                 RUS = 'Определяет код коробки из справочника коробки.';
-                // }
+                field("Box Code"; "Box Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies a box code from a box reference.',
+                                RUS = 'Определяет код коробки из справочника коробки.';
+                }
                 field("Gross Weight"; "Gross Weight")
                 {
                     ApplicationArea = Warehouse;

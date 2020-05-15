@@ -109,12 +109,8 @@ page 50051 "Boxes Subpage"
                 Image = ItemLines;
 
                 trigger OnAction()
-                var
                 begin
-                    if Status = Status::Open then begin
-                        Status := Status::Close;
-                        Modify();
-                    end;
+                    PackageBoxMgt.CloseBox("Package No.", "No.");
                 end;
             }
             action(ReOpen)
@@ -129,13 +125,7 @@ page 50051 "Boxes Subpage"
                 trigger OnAction()
                 var
                 begin
-                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then
-                        Error(errPackageMustBeUnregister, "Package No.");
-
-                    if Status = Status::Close then begin
-                        Status := Status::Open;
-                        Modify();
-                    end;
+                    PackageBoxMgt.ReopenBox("Package No.", "No.");
                 end;
             }
             action(AssemblyBox)
@@ -149,9 +139,6 @@ page 50051 "Boxes Subpage"
 
                 trigger OnAction()
                 begin
-                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then
-                        Error(errPackageMustBeUnregister, "Package No.");
-
                     PackageBoxMgt.AsemblyBox("Package No.", "No.");
                 end;
             }

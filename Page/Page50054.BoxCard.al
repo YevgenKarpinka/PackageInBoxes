@@ -96,10 +96,7 @@ page 50054 "Box Card"
 
                 trigger OnAction()
                 begin
-                    if Status = Status::Open then begin
-                        Status := Status::Close;
-                        Modify(true);
-                    end;
+                    PackageBoxMgt.CloseBox("Package No.", "No.");
                 end;
             }
             action(ReOpen)
@@ -113,12 +110,13 @@ page 50054 "Box Card"
 
                 trigger OnAction()
                 begin
-                    PackageHeader.Get("Package No.");
-                    if PackageHeader.Status = PackageHeader.Status::UnRegistered then
-                        if Status = Status::Close then begin
-                            Status := Status::Open;
-                            Modify(true);
-                        end;
+                    PackageBoxMgt.ReopenBox("Package No.", "No.");
+                    // PackageHeader.Get("Package No.");
+                    // if PackageHeader.Status = PackageHeader.Status::UnRegistered then
+                    //     if Status = Status::Close then begin
+                    //         Status := Status::Open;
+                    //         Modify(true);
+                    //     end;
                 end;
             }
             action(AssemblyBox)

@@ -161,6 +161,8 @@ table 50052 "Box Line"
                                         RUS = 'Удалить нельзя.\Строка %1 Складской отгрузки %2 учтена!';
         errModifyNotAllowedWhseShipmentLineNoPosted: TextConst ENU = 'Cannot be changed.\Line %1 Warehouse shipment %2 posted!',
                                         RUS = 'Изменить нельзя.\Строка %1 Складской отгрузки %2 учтена!';
+        errModifyNotAllowedBoxClosed: TextConst ENU = 'Cannot be changed.\Box No. %1 Closed!',
+                                        RUS = 'Изменить нельзя.\Коробка %1 закрыта!';
 
     local procedure InitInsert()
     var
@@ -191,6 +193,8 @@ table 50052 "Box Line"
         with BoxHeader do begin
             SetRange("No.", "Box No.");
             FindFirst();
+            if Status = Status::Close then
+                Error(errModifyNotAllowedBoxClosed, "Box No.");
             BoxModify();
         end;
     end;

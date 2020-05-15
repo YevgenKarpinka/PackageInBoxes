@@ -192,6 +192,9 @@ codeunit 50050 "Package Box Mgt."
         BoxHeader: Record "Box Header";
         RemainingQuantity: Decimal;
     begin
+        if not PackageUnRegistered(PackageNo) then
+            Error(errPackageMustBeUnregister, PackageNo);
+
         if not BoxHeader.Get(PackageNo, BoxNo) then
             Error(errCreateBoxForPackage, PackageNo);
 
@@ -620,5 +623,32 @@ codeunit 50050 "Package Box Mgt."
     begin
         GetItem(ItemNo);
         exit(Item."Sales Unit of Measure");
+    end;
+
+    procedure CloseBox(PackageNo: Code[20]; BoxNo: Code[20])
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        with BoxHeader do begin
+            if Get(PackageNo, BoxNo) and (Status = Status::Open) then begin
+                TestField("Gross Weight");
+                Status := Status::Close;
+                Modify();
+            end;
+        end;
+    end;
+
+    procedure ReopenBox(PackageNo: Code[20]; BoxNo: Code[20])
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        if not PackageUnRegistered(PackageNo) then
+            Error(errPackageMustBeUnregister, PackageNo);
+        with BoxHeader do begin
+            if Status = Status::Close then begin
+                Status := Status::Open;
+                Modify();
+            end;
+        end;
     end;
 }

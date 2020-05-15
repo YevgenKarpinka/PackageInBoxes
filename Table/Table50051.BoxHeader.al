@@ -21,16 +21,6 @@ table 50051 "Box Header"
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Box Code', RUS = 'Код коробки';
             TableRelation = Box;
-
-            trigger OnValidate()
-            var
-                Box: Record Box;
-            begin
-                if xRec."Box Code" <> Rec."Box Code" then begin
-                    Box.Get("Box Code");
-                    "Gross Weight" := Box.Weight;
-                end;
-            end;
         }
         field(4; "Create Date"; DateTime)
         {

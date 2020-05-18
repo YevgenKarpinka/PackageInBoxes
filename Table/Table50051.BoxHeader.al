@@ -55,11 +55,10 @@ table 50051 "Box Header"
 
             trigger OnValidate()
             begin
-                if Status = Status::Open then
-                    if "Tracking No." <> '' then
-                        Error(errOpenBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
-                if Status = Status::Close then
+                if Status = Status::Close then begin
+                    TestField("Gross Weight");
                     PackageBoxMgt.DeleteEmptyLinesByBox("No.");
+                end;
             end;
         }
         field(9; "No. Series"; Code[20])
@@ -95,8 +94,6 @@ table 50051 "Box Header"
         PackageBoxMgt: Codeunit "Package Box Mgt.";
         errDeleteBoxNotAllowedTrackingNoExist: TextConst ENU = 'Box document %1 cannot be deleted because the tracking number %2  is exist.',
                                            RUS = 'Документ коробки %1 удалить нельзя, потому что заполнен номер отслеживания %2.';
-        errOpenBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be open because the tracking number %2  is exist.',
-                                                    RUS = 'Документ коробки %1 открыть нельзя, потому что заполнен номер отслеживания %2.';
 
     trigger OnInsert()
     begin

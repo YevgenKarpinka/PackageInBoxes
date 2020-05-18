@@ -95,11 +95,8 @@ page 50050 "Package Card"
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.CheckPackageBeforeRegister("No.");
-                        PackageBoxMgt.DeleteEmptyBoxes("No.");
-                        PackageBoxMgt.DeleteEmptyLines("No.");
-                        PackageBoxMgt.CloseAllBoxes("No.");
-                        PackageBoxMgt.RegisterPackage("No.");
+                        PackageBoxMgt.OnPackageRegister("No.");
+
                     end;
                 }
                 action(Unregistered)

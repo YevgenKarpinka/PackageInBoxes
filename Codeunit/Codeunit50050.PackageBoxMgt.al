@@ -32,6 +32,8 @@ codeunit 50050 "Package Box Mgt."
                                                                    RUS = 'Нельзя удалить строку %2 Отгрузки %1 пока Товар %3 запакован в Коробку %4.';
         errPackageMustBeUnregister: TextConst ENU = 'Package %1 must be unregister!',
                                               RUS = 'Упаковка %1 должна быть не зарегистрирована';
+        errOpenBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be open because the tracking number %2  is exist.',
+                                                    RUS = 'Документ коробки %1 открыть нельзя, потому что заполнен номер отслеживания %2.';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -632,8 +634,8 @@ codeunit 50050 "Package Box Mgt."
         with BoxHeader do begin
             if Get(PackageNo, BoxNo) and (Status = Status::Open) then begin
                 TestField("Gross Weight");
-                Status := Status::Close;
-                Modify();
+                Validate(Status, Status::Close);
+                Modify(true);
             end;
         end;
     end;
@@ -644,11 +646,25 @@ codeunit 50050 "Package Box Mgt."
     begin
         if not PackageUnRegistered(PackageNo) then
             Error(errPackageMustBeUnregister, PackageNo);
+
         with BoxHeader do begin
-            if Status = Status::Close then begin
-                Status := Status::Open;
-                Modify();
+            if Get(PackageNo, BoxNo) then begin
+                if Status = Status::Close then begin
+                    if "Tracking No." <> '' then
+                        Error(errOpenBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
+                    Validate(Status, Status::Open);
+                    Modify(true);
+                end;
             end;
         end;
+    end;
+
+    procedure OnPackageRegister(PackageNo: Code[20])
+    begin
+        CheckPackageBeforeRegister(PackageNo);
+        DeleteEmptyBoxes(PackageNo);
+        DeleteEmptyLines(PackageNo);
+        CloseAllBoxes(PackageNo);
+        RegisterPackage(PackageNo);
     end;
 }

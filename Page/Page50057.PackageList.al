@@ -12,6 +12,7 @@ page 50057 "Package List"
     Editable = false;
     PageType = List;
     UsageCategory = History;
+    // DeleteAllowed = false;
 
     layout
     {

@@ -1,17 +1,11 @@
 page 50050 "Package Card"
 {
     CaptionML = ENU = 'Package Card', RUS = 'Карточка Упаковки';
-    // PageType = Card;
-    // ApplicationArea = Warehouse;
-    // UsageCategory = Documents;
     SourceTable = "Package Header";
     RefreshOnActivate = true;
-
-    // Caption = 'Posted Whse. Shipment';
     InsertAllowed = false;
     PageType = Document;
-    // RefreshOnActivate = true;
-    // SourceTable = "Posted Whse. Shipment Header";
+    DeleteAllowed = false;
 
     layout
     {

@@ -663,8 +663,9 @@ codeunit 50050 "Package Box Mgt."
         with BoxHeader do
             if Get(PackageNo, BoxNo) then
                 if Status = Status::Close then begin
-                    if "Tracking No." <> '' then
-                        Error(errOpenBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
+                    TestField("Tracking No.", '');
+                    // if "Tracking No." <> '' then
+                    //     Error(errOpenBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
                     Validate(Status, Status::Open);
                     Modify(true);
                 end;
@@ -688,8 +689,9 @@ codeunit 50050 "Package Box Mgt."
 
         with BoxHeader do
             if Get(PackageNo, BoxNo) then begin
-                if "Tracking No." <> '' then
-                    Error(errDeleteBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
+                TestField("Tracking No.", '');
+                // if "Tracking No." <> '' then
+                //     Error(errDeleteBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
                 Delete(true);
             end;
     end;
@@ -699,7 +701,7 @@ codeunit 50050 "Package Box Mgt."
         CheckWhseShipmentExist(PackageNo);
         PackageSetUnregister(PackageNo);
         GetWhseSetup();
-        if WhseSetup."Unregister and Open Box" then
+        if WhseSetup."Unregister and Status Open" then
             ReOpenAllBoxes(PackageNo);
     end;
 }

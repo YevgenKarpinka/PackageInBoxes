@@ -7,11 +7,11 @@ page 50057 "Package List"
     CardPageId = "Package Card";
     SourceTableView = sorting("No.")
                       order(Descending);
-    DataCaptionFields = "No.", "Sales Order No.";
-    PageType = Document;
-    RefreshOnActivate = true;
+    DataCaptionFields = "No.";
     ApplicationArea = Warehouse;
-    UsageCategory = Lists;
+    Editable = false;
+    PageType = List;
+    UsageCategory = History;
 
     layout
     {

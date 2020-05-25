@@ -95,8 +95,7 @@ page 50050 "Package Card"
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.OnPackageRegister("No.");
-
+                        PackageBoxMgt.RegisterPackage("No.");
                     end;
                 }
                 action(Unregistered)
@@ -110,9 +109,7 @@ page 50050 "Package Card"
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.CheckWhseShipmentExist("No.");
-                        PackageBoxMgt.UnRegisterPackage("No.");
-                        PackageBoxMgt.ReOpenAllBoxes("No.");
+                        PackageBoxMgt.UnregisterPackage("No.");
                     end;
                 }
                 action("Print Packing List")

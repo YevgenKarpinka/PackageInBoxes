@@ -110,7 +110,7 @@ page 50054 "Box Card"
 
                 trigger OnAction()
                 begin
-                    PackageBoxMgt.ReopenBox("Package No.", "No.");
+                    PackageBoxMgt.OpenBox("Package No.", "No.");
                     // PackageHeader.Get("Package No.");
                     // if PackageHeader.Status = PackageHeader.Status::UnRegistered then
                     //     if Status = Status::Close then begin

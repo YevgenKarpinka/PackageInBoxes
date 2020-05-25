@@ -34,6 +34,8 @@ codeunit 50050 "Package Box Mgt."
                                               RUS = 'Упаковка %1 должна быть не зарегистрирована';
         errOpenBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be open because the tracking number %2  is exist.',
                                                     RUS = 'Документ коробки %1 открыть нельзя, потому что заполнен номер отслеживания %2.';
+        errDeleteBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be delete because the tracking number %2  is exist.',
+                                                    RUS = 'Документ коробки %1 удалить нельзя, потому что заполнен номер отслеживания %2.';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -59,7 +61,7 @@ codeunit 50050 "Package Box Mgt."
         DeleteEmptyBoxes(PackageHeader."No.");
         DeleteEmptyLines(PackageHeader."No.");
         CloseAllBoxes(PackageHeader."No.");
-        RegisterPackage(PackageHeader."No.");
+        PackageSetRegister(PackageHeader."No.");
     end;
 
     [EventSubscriber(ObjectType::Table, 7320, 'OnBeforeWhseShptLineDelete', '', false, false)]
@@ -82,11 +84,18 @@ codeunit 50050 "Package Box Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Act.-Register (Yes/No)", 'OnAfterCode', '', false, false)]
-    local procedure CreatePackageAfterRegisterPick(var WarehouseActivityLine: Record "Warehouse Activity Line")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Activity-Register", 'OnAfterRegisterWhseActivity', '', false, false)]
+    local procedure CreatePackageAfterRegisterPick(var WarehouseActivityHeader: Record "Warehouse Activity Header")
     var
+        WarehouseActivityLine: Record "Warehouse Activity Line";
         PackageHeader: Record "Package Header";
     begin
+        with WarehouseActivityHeader do begin
+            WarehouseActivityLine.SetRange("Activity Type", Type);
+            WarehouseActivityLine.SetRange("No.", "No.");
+            if not WarehouseActivityLine.FindFirst() then exit;
+        end;
+
         GetWhseSetup();
         if not WhseSetup."Enable Box Packaging"
         and not (WarehouseActivityLine."Source Document" = WarehouseActivityLine."Source Document"::"Sales Order") then
@@ -285,11 +294,15 @@ codeunit 50050 "Package Box Mgt."
             SetCurrentKey(Status);
             SetRange("Package No.", PackageNo);
             SetRange(Status, Status::Close);
-            ModifyAll(Status, Status::Open, true);
+            // ModifyAll(Status, Status::Open, true);
+            if FindFirst() then
+                repeat
+                    OpenBox("Package No.", "No.");
+                until Next() = 0;
         end;
     end;
 
-    procedure RegisterPackage(PackageNo: Code[20])
+    procedure PackageSetRegister(PackageNo: Code[20])
     var
         PackageHeader: Record "Package Header";
     begin
@@ -302,7 +315,7 @@ codeunit 50050 "Package Box Mgt."
         end;
     end;
 
-    procedure UnRegisterPackage(PackageNo: Code[20])
+    procedure PackageSetUnregister(PackageNo: Code[20])
     var
         PackageHeader: Record "Package Header";
     begin
@@ -640,31 +653,53 @@ codeunit 50050 "Package Box Mgt."
         end;
     end;
 
-    procedure ReopenBox(PackageNo: Code[20]; BoxNo: Code[20])
+    procedure OpenBox(PackageNo: Code[20]; BoxNo: Code[20])
     var
         BoxHeader: Record "Box Header";
     begin
         if not PackageUnRegistered(PackageNo) then
             Error(errPackageMustBeUnregister, PackageNo);
 
-        with BoxHeader do begin
-            if Get(PackageNo, BoxNo) then begin
+        with BoxHeader do
+            if Get(PackageNo, BoxNo) then
                 if Status = Status::Close then begin
                     if "Tracking No." <> '' then
                         Error(errOpenBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
                     Validate(Status, Status::Open);
                     Modify(true);
                 end;
-            end;
-        end;
     end;
 
-    procedure OnPackageRegister(PackageNo: Code[20])
+    procedure RegisterPackage(PackageNo: Code[20])
     begin
         CheckPackageBeforeRegister(PackageNo);
         DeleteEmptyBoxes(PackageNo);
         DeleteEmptyLines(PackageNo);
         CloseAllBoxes(PackageNo);
-        RegisterPackage(PackageNo);
+        PackageSetRegister(PackageNo);
+    end;
+
+    procedure DeleteBox(PackageNo: Code[20]; BoxNo: Code[20])
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        if not PackageUnRegistered(PackageNo) then
+            Error(errPackageMustBeUnregister, PackageNo);
+
+        with BoxHeader do
+            if Get(PackageNo, BoxNo) then begin
+                if "Tracking No." <> '' then
+                    Error(errDeleteBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
+                Delete(true);
+            end;
+    end;
+
+    procedure UnregisterPackage(PackageNo: Code[20])
+    begin
+        CheckWhseShipmentExist(PackageNo);
+        PackageSetUnregister(PackageNo);
+        GetWhseSetup();
+        if WhseSetup."Unregister and Open Box" then
+            ReOpenAllBoxes(PackageNo);
     end;
 }

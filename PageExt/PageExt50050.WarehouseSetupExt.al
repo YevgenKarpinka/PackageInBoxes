@@ -33,6 +33,12 @@ pageextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5775
                     ToolTipML = ENU = 'Enable or Disable opening a box document when it is created.',
                                 RUS = 'Включить или Выключить открытие документа коробки при его создании.';
                 }
+                field("Unregister and Open Box"; "Create and Open Box")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Enable or Disable change status of box to open when package unregister.',
+                                RUS = 'Включить или Выключить изменение статуса коробки на открыта при отмене регистрации упаковки.';
+                }
                 field("Delete Empty Box"; "Delete Empty Box")
                 {
                     ApplicationArea = Warehouse;

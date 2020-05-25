@@ -84,14 +84,16 @@ page 50051 "Boxes Subpage"
                 var
                     BoxHeader: Record "Box Header";
                 begin
-                    if not PackageBoxMgt.PackageUnRegistered("Package No.") then
-                        Error(errPackageMustBeUnregister, "Package No.");
+                    // if not PackageBoxMgt.PackageUnRegistered("Package No.") then
+                    //     Error(errPackageMustBeUnregister, "Package No.");
 
-                    with BoxHeader do begin
-                        Init();
-                        "Package No." := Rec."Package No.";
-                        Insert(true);
-                    end;
+                    // with BoxHeader do begin
+                    //     Init();
+                    //     "Package No." := Rec."Package No.";
+                    //     Insert(true);
+                    // end;
+
+                    PackageBoxMgt.CreateBox("Package No.");
 
                     GetWhseSetup();
                     if not WhseSetup."Create and Open Box" then exit;
@@ -125,7 +127,7 @@ page 50051 "Boxes Subpage"
                 trigger OnAction()
                 var
                 begin
-                    PackageBoxMgt.ReopenBox("Package No.", "No.");
+                    PackageBoxMgt.OpenBox("Package No.", "No.");
                 end;
             }
             action(AssemblyBox)

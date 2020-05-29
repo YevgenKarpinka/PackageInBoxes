@@ -59,7 +59,7 @@ codeunit 50050 "Package Box Mgt."
 
         CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
         DeleteEmptyBoxes(PackageHeader."No.");
-        DeleteEmptyLines(PackageHeader."No.");
+        DeleteEmptyLinesByPackag(PackageHeader."No.");
         CloseAllBoxes(PackageHeader."No.");
         PackageSetRegister(PackageHeader."No.");
     end;
@@ -84,18 +84,11 @@ codeunit 50050 "Package Box Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Activity-Register", 'OnAfterRegisterWhseActivity', '', false, false)]
-    local procedure CreatePackageAfterRegisterPick(var WarehouseActivityHeader: Record "Warehouse Activity Header")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Activity-Register", 'OnBeforeCode', '', false, false)]
+    local procedure CreatePackageAfterRegisterPick(var WarehouseActivityLine: Record "Warehouse Activity Line")
     var
-        WarehouseActivityLine: Record "Warehouse Activity Line";
         PackageHeader: Record "Package Header";
     begin
-        with WarehouseActivityHeader do begin
-            WarehouseActivityLine.SetRange("Activity Type", Type);
-            WarehouseActivityLine.SetRange("No.", "No.");
-            if not WarehouseActivityLine.FindFirst() then exit;
-        end;
-
         GetWhseSetup();
         if not WhseSetup."Enable Box Packaging"
         and not (WarehouseActivityLine."Source Document" = WarehouseActivityLine."Source Document"::"Sales Order") then
@@ -197,7 +190,7 @@ codeunit 50050 "Package Box Mgt."
         exit(true);
     end;
 
-    procedure AsemblyBox(PackageNo: Code[20]; BoxNo: Code[20])
+    procedure AssemblyBox(PackageNo: Code[20]; BoxNo: Code[20])
     var
         WhseShipmentLine: Record "Warehouse Shipment Line";
         BoxHeader: Record "Box Header";
@@ -260,7 +253,7 @@ codeunit 50050 "Package Box Mgt."
         end;
     end;
 
-    procedure CreateBox(PackageNo: Code[20]);
+    procedure CreateBox(PackageNo: Code[20])
     var
         BoxHeader: Record "Box Header";
     begin
@@ -282,7 +275,12 @@ codeunit 50050 "Package Box Mgt."
             SetCurrentKey(Status);
             SetRange("Package No.", PackageNo);
             SetRange(Status, Status::Open);
-            ModifyAll(Status, Status::Close, true);
+            if FindSet() then
+                repeat
+                    Validate(Status, Status::Close);
+                    Modify(true);
+                until Next() = 0;
+            // ModifyAll(Status, Status::Close, true);
         end;
     end;
 
@@ -310,7 +308,7 @@ codeunit 50050 "Package Box Mgt."
         with PackageHeader do begin
             Get(PackageNo);
             if Status = Status::Registered then exit;
-            Status := Status::Registered;
+            Validate(Status, Status::Registered);
             Modify(true);
         end;
     end;
@@ -461,7 +459,7 @@ codeunit 50050 "Package Box Mgt."
         end;
     end;
 
-    procedure DeleteEmptyLines(PackageNo: Code[20])
+    procedure DeleteEmptyLinesByPackag(PackageNo: Code[20])
     var
         BoxHeader: Record "Box Header";
         BoxLine: Record "Box Line";
@@ -675,7 +673,7 @@ codeunit 50050 "Package Box Mgt."
     begin
         CheckPackageBeforeRegister(PackageNo);
         DeleteEmptyBoxes(PackageNo);
-        DeleteEmptyLines(PackageNo);
+        DeleteEmptyLinesByPackag(PackageNo);
         CloseAllBoxes(PackageNo);
         PackageSetRegister(PackageNo);
     end;

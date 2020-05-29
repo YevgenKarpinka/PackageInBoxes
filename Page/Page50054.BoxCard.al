@@ -130,7 +130,7 @@ page 50054 "Box Card"
 
                 trigger OnAction()
                 begin
-                    PackageBoxMgt.AsemblyBox("Package No.", "No.");
+                    PackageBoxMgt.AssemblyBox("Package No.", "No.");
                 end;
             }
         }

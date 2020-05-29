@@ -141,7 +141,7 @@ page 50051 "Boxes Subpage"
 
                 trigger OnAction()
                 begin
-                    PackageBoxMgt.AsemblyBox("Package No.", "No.");
+                    PackageBoxMgt.AssemblyBox("Package No.", "No.");
                 end;
             }
         }

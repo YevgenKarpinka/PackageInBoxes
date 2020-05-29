@@ -186,7 +186,7 @@ page 50050 "Package Card"
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.DeleteEmptyLines("No.");
+                        PackageBoxMgt.DeleteEmptyLinesByPackag("No.");
                     end;
                 }
             }

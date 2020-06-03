@@ -84,15 +84,6 @@ page 50051 "Boxes Subpage"
                 var
                     BoxHeader: Record "Box Header";
                 begin
-                    // if not PackageBoxMgt.PackageUnRegistered("Package No.") then
-                    //     Error(errPackageMustBeUnregister, "Package No.");
-
-                    // with BoxHeader do begin
-                    //     Init();
-                    //     "Package No." := Rec."Package No.";
-                    //     Insert(true);
-                    // end;
-
                     PackageBoxMgt.CreateBox("Package No.");
 
                     GetWhseSetup();

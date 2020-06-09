@@ -3,9 +3,9 @@ report 50050 "Packing List"
     CaptionML = ENU = 'Packing List', RUS = 'Упаковочный лист';
     DefaultLayout = RDLC;
     RDLCLayout = 'Packing List.rdl';
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
-    AccessByPermission = report "Packing List" = x;
+    // UsageCategory = ReportsAndAnalysis;
+    // ApplicationArea = All;
+    // AccessByPermission = report "Packing List" = x;
 
     dataset
     {

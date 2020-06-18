@@ -124,7 +124,21 @@ page 50050 "Package Card"
                         PackageHeader: Record "Package Header";
                     begin
                         CurrPage.SetSelectionFilter(PackageHeader);
-                        Report.Run(Report::"Packing List", true, true, PackageHeader);
+                        Report.Run(Report::"Packing List", true, false, PackageHeader);
+                    end;
+                }
+                action("Print Packing Slip")
+                {
+                    ApplicationArea = All;
+                    Image = PurchaseInvoice;
+                    CaptionML = ENU = 'Print Packing Slip', RUS = 'Печать упаковочного листа';
+
+                    trigger OnAction()
+                    var
+                        PackageHeader: Record "Package Header";
+                    begin
+                        CurrPage.SetSelectionFilter(PackageHeader);
+                        Report.Run(Report::"Packing Slip", true, false, PackageHeader);
                     end;
                 }
             }

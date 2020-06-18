@@ -11,7 +11,7 @@ report 50050 "Packing List"
     {
         dataitem(PackageHeader; "Package Header")
         {
-            RequestFilterFields = "No.", "Sales Order No.";
+            RequestFilterFields = "No.";
             DataItemTableView = sorting("No.");
 
             column(CompanyName; PackageBoxMgt.GetCompanyName()) { }
@@ -29,11 +29,13 @@ report 50050 "Packing List"
             column(ShipToCity; PackageBoxMgt.GetShipToCityByOrder("Sales Order No.")) { }
             column(Sales_Order_No_; "Sales Order No.") { }
             column(OrderDate; PackageBoxMgt.GetSalesOrderData("Sales Order No.")) { }
+            column(Package_No; "No.") { }
 
             dataitem(BoxHeader; "Box Header")
             {
-                RequestFilterFields = "No.";
                 DataItemTableView = sorting("No.");
+                DataItemLink = "Package No." = field("No.");
+                DataItemLinkReference = PackageHeader;
 
                 column(Package_No_; "Package No.") { }
                 column(Box_No; "No.") { }
@@ -47,6 +49,7 @@ report 50050 "Packing List"
                 {
                     DataItemTableView = sorting("Shipment No.", "Item No.");
                     DataItemLink = "Box No." = field("No.");
+                    DataItemLinkReference = BoxHeader;
 
                     column(Position_No; PositionNo) { }
                     column(Item_No_; "Item No.") { }
@@ -81,16 +84,6 @@ report 50050 "Packing List"
     }
 
     labels { }
-
-    trigger OnInitReport()
-    begin
-
-    end;
-
-    trigger OnPreReport()
-    begin
-
-    end;
 
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";

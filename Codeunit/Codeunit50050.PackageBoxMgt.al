@@ -53,15 +53,15 @@ codeunit 50050 "Package Box Mgt."
             if not FindFirst() then
                 Error(errCreatePackageBeforePostingWarehouseShipment, WhseShptLine."No.");
 
-            if not PackageUnRegistered(PackageHeader."No.") then
+            if PackageUnRegistered(PackageHeader."No.") then
                 Error(errPackageMustBeRegistered, PackageHeader."No.");
         end;
 
-        CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
-        DeleteEmptyBoxes(PackageHeader."No.");
-        DeleteEmptyLinesByPackag(PackageHeader."No.");
-        CloseAllBoxes(PackageHeader."No.");
-        PackageSetRegister(PackageHeader."No.");
+        // CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
+        // DeleteEmptyBoxes(PackageHeader."No.");
+        // DeleteEmptyLinesByPackag(PackageHeader."No.");
+        // CloseAllBoxes(PackageHeader."No.");
+        // PackageSetRegister(PackageHeader."No.");
     end;
 
     [EventSubscriber(ObjectType::Table, 7320, 'OnBeforeWhseShptLineDelete', '', false, false)]
@@ -91,7 +91,7 @@ codeunit 50050 "Package Box Mgt."
     begin
         GetWhseSetup();
         if not WhseSetup."Enable Box Packaging"
-        and not (WarehouseActivityLine."Source Document" = WarehouseActivityLine."Source Document"::"Sales Order") then
+        or not (WarehouseActivityLine."Source Document" = WarehouseActivityLine."Source Document"::"Sales Order") then
             exit;
 
         with PackageHeader do begin
@@ -532,8 +532,8 @@ codeunit 50050 "Package Box Mgt."
 
     local procedure GetSalesOrderByNo(SalesOrderNo: Code[20])
     begin
-        if SalesOrderNo = SalesHeader."No." then exit;
-        SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo);
+        if SalesOrderNo <> SalesHeader."No." then
+            SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo);
     end;
 
     procedure GetCompanyName(): Text
@@ -622,8 +622,8 @@ codeunit 50050 "Package Box Mgt."
 
     local procedure GetItem(ItemNo: Code[20])
     begin
-        if ItemNo = Item."No." then exit;
-        Item.Get(ItemNo);
+        if ItemNo <> Item."No." then
+            Item.Get(ItemNo);
     end;
 
     procedure GetItemDescription(ItemNo: Code[20]): Text

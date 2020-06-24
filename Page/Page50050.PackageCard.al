@@ -123,8 +123,6 @@ page 50050 "Package Card"
                         PackageHeader: Record "Package Header";
                         salesHeader: Record "Sales Header";
                     begin
-                        if not salesHeader.Get(salesHeader."Document Type"::Order, "Sales Order No.") then
-                            Error(errSalesOrderPosted, "Sales Order No.");
                         CurrPage.SetSelectionFilter(PackageHeader);
                         Report.Run(Report::"Packing Slip", true, false, PackageHeader);
                     end;

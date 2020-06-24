@@ -1,4 +1,4 @@
-report 50050 "Packing Slip"
+report 50051 "Packing Slip"
 {
     CaptionML = ENU = 'Packing Slip', RUS = 'Упаковочный лист';
     DefaultLayout = RDLC;

@@ -112,21 +112,6 @@ page 50050 "Package Card"
                         PackageBoxMgt.UnregisterPackage("No.");
                     end;
                 }
-                action("Print Packing List")
-                {
-                    ApplicationArea = All;
-                    Image = PurchaseInvoice;
-                    CaptionML = ENU = 'Print Packing List', RUS = 'Печать упаковочного листа';
-                    Visible = false;
-
-                    trigger OnAction()
-                    var
-                        PackageHeader: Record "Package Header";
-                    begin
-                        CurrPage.SetSelectionFilter(PackageHeader);
-                        Report.Run(Report::"Packing List", true, false, PackageHeader);
-                    end;
-                }
                 action("Print Packing Slip")
                 {
                     ApplicationArea = All;
@@ -136,7 +121,10 @@ page 50050 "Package Card"
                     trigger OnAction()
                     var
                         PackageHeader: Record "Package Header";
+                        salesHeader: Record "Sales Header";
                     begin
+                        if not salesHeader.Get(salesHeader."Document Type"::Order, "Sales Order No.") then
+                            Error(errSalesOrderPosted, "Sales Order No.");
                         CurrPage.SetSelectionFilter(PackageHeader);
                         Report.Run(Report::"Packing Slip", true, false, PackageHeader);
                     end;
@@ -209,4 +197,6 @@ page 50050 "Package Card"
 
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";
+        errSalesOrderPosted: TextConst ENU = 'Sales Order %1 posted. Print Packing slip not allowed',
+                                        RUS = 'Заказ продажи %1 учтен. Печать Упаковочного листа запрещена';
 }

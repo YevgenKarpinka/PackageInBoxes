@@ -16,6 +16,7 @@ codeunit 50050 "Package Box Mgt."
         CompanyInfo: Record "Company Information";
         WhseSetup: Record "Warehouse Setup";
         SalesHeader: Record "Sales Header";
+        salesInvHeader: Record "Sales Invoice Header";
         Item: Record Item;
         CompanyInfoGetted: Boolean;
         errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not packed %3!',
@@ -533,7 +534,12 @@ codeunit 50050 "Package Box Mgt."
     local procedure GetSalesOrderByNo(SalesOrderNo: Code[20])
     begin
         if SalesOrderNo <> SalesHeader."No." then
-            SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo);
+            if not SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo) then
+                with salesInvHeader do begin
+                    SetCurrentKey("Order No.");
+                    SetFilter("Order No.", SalesOrderNo);
+                    FindFirst();
+                end;
     end;
 
     procedure GetCompanyName(): Text
@@ -581,43 +587,64 @@ codeunit 50050 "Package Box Mgt."
     procedure GetBillToNameByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Bill-to Name" + SalesHeader."Bill-to Name 2");
+        if salesInvHeader."Order No." = SalesOrderNo then
+            exit(salesInvHeader."Bill-to Name" + salesInvHeader."Bill-to Name 2")
+        else
+            exit(SalesHeader."Bill-to Name" + SalesHeader."Bill-to Name 2");
     end;
 
     procedure GetShipToNameByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Ship-to Name" + SalesHeader."Ship-to Name 2");
+        if salesInvHeader."Order No." = SalesOrderNo then
+            exit(salesInvHeader."Ship-to Name" + salesInvHeader."Ship-to Name 2")
+        else
+            exit(SalesHeader."Ship-to Name" + SalesHeader."Ship-to Name 2");
     end;
 
     procedure GetBillToAddressByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Bill-to Address" + SalesHeader."Bill-to Address 2");
+        if salesInvHeader."Order No." = SalesOrderNo then
+            exit(salesInvHeader."Bill-to Address" + salesInvHeader."Bill-to Address 2")
+        else
+            exit(SalesHeader."Bill-to Address" + SalesHeader."Bill-to Address 2");
     end;
 
     procedure GetShipToAddressByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Ship-to Address" + SalesHeader."Ship-to Address 2");
+        if salesInvHeader."Order No." = SalesOrderNo then
+            exit(salesInvHeader."Ship-to Address" + salesInvHeader."Ship-to Address 2")
+        else
+            exit(SalesHeader."Ship-to Address" + SalesHeader."Ship-to Address 2");
     end;
 
     procedure GetBillToCityByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Bill-to City" + ', ' + SalesHeader."Bill-to County" + ' ' + SalesHeader."Bill-to Post Code");
+        if salesInvHeader."Order No." = SalesOrderNo then
+            exit(salesInvHeader."Bill-to City" + ', ' + salesInvHeader."Bill-to County" + ' ' + salesInvHeader."Bill-to Post Code")
+        else
+            exit(SalesHeader."Bill-to City" + ', ' + SalesHeader."Bill-to County" + ' ' + SalesHeader."Bill-to Post Code");
     end;
 
     procedure GetShipToCityByOrder(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(SalesHeader."Ship-to City" + ', ' + SalesHeader."Ship-to County" + ' ' + SalesHeader."Ship-to Post Code");
+        if salesInvHeader."Order No." = SalesOrderNo then
+            exit(salesInvHeader."Ship-to City" + ', ' + salesInvHeader."Ship-to County" + ' ' + salesInvHeader."Ship-to Post Code")
+        else
+            exit(SalesHeader."Ship-to City" + ', ' + SalesHeader."Ship-to County" + ' ' + SalesHeader."Ship-to Post Code");
     end;
 
     procedure GetSalesOrderData(SalesOrderNo: Code[20]): Text
     begin
         GetSalesOrderByNo(SalesOrderNo);
-        exit(Format(SalesHeader."Document Date"));
+        if salesInvHeader."Order No." = SalesOrderNo then
+            exit(Format(salesInvHeader."Document Date"))
+        else
+            exit(Format(SalesHeader."Document Date"));
     end;
 
     local procedure GetItem(ItemNo: Code[20])

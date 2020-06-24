@@ -1,11 +1,8 @@
-report 50050 "Packing List"
+report 50050 "Packing Slip"
 {
-    CaptionML = ENU = 'Packing List', RUS = 'Упаковочный лист';
+    CaptionML = ENU = 'Packing Slip', RUS = 'Упаковочный лист';
     DefaultLayout = RDLC;
-    RDLCLayout = 'Packing List.rdl';
-    // UsageCategory = ReportsAndAnalysis;
-    // ApplicationArea = All;
-    // AccessByPermission = report "Packing List" = x;
+    RDLCLayout = 'Packing Slip.rdl';
 
     dataset
     {
@@ -29,7 +26,6 @@ report 50050 "Packing List"
             column(ShipToCity; PackageBoxMgt.GetShipToCityByOrder("Sales Order No.")) { }
             column(Sales_Order_No_; "Sales Order No.") { }
             column(OrderDate; PackageBoxMgt.GetSalesOrderData("Sales Order No.")) { }
-            column(Package_No; "No.") { }
 
             dataitem(BoxHeader; "Box Header")
             {

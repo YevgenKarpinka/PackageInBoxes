@@ -22,8 +22,13 @@
       "publisher": "Microsoft",
       "name": "Base Application",
       "version": "16.0.0.0"
+    },
+    {
+      "id": "6317e880-5065-4f48-98ff-ff40f914c170",
+      "publisher": "TComTech",
+      "name": "Fusion_v16",
+      "version": "1.0.0.0"
     }
-    
   ],
   "screenshots": [],
   "platform": "16.0.0.0",

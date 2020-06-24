@@ -73,7 +73,32 @@ table 50051 "Box Header"
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Tracking No.', RUS = 'Отслеживания Но.';
         }
-
+        field(11; "Shipping Agent Code"; Text[20])
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'Shipping Agent', RUS = 'Экспедитор';
+            Editable = false;
+        }
+        field(12; "Shipping Services Code"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'Shipping Agent Services', RUS = 'Услуга экспедитора';
+            Editable = false;
+        }
+        field(13; "Shipment Cost"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'Shipment Cost', RUS = 'Стоимость доставки';
+            Editable = false;
+            DecimalPlaces = 0 : 2;
+        }
+        field(14; "Other Cost"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'Other Cost', RUS = 'Доп. стоимость';
+            Editable = false;
+            DecimalPlaces = 0 : 2;
+        }
     }
 
     keys

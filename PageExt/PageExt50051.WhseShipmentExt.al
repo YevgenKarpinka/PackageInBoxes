@@ -1,4 +1,4 @@
-pageextension 50051 "Warehouse Shipment Ext." extends "Warehouse Shipment" //7335
+pageextension 50051 "Whse. Shipment Ext." extends "Warehouse Shipment" //7335
 {
     layout
     {

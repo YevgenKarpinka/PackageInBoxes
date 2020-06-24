@@ -729,4 +729,39 @@ codeunit 50050 "Package Box Mgt."
         if WhseSetup."Unregister and Status Open" then
             ReOpenAllBoxes(PackageNo);
     end;
+
+    procedure SentAllBoxes(PackaheNo: Code[20])
+    var
+        boxHeader: Record "Box Header";
+        jsonUpdateBox: JsonObject;
+    begin
+        with boxHeader do begin
+            SetRange("Package No.", PackaheNo);
+            if FindSet() then
+                repeat
+                    jsonUpdateBox := SentBox2Shipstation("No.");
+                    if CheckUpdateBox(jsonUpdateBox) then
+                        UpdateBox("No.", jsonUpdateBox);
+                until Next() = 0;
+        end;
+    end;
+
+    local procedure SentBox2Shipstation(BoxNo: Code[20]): JsonObject
+    var
+    begin
+
+    end;
+
+    local procedure CheckUpdateBox(jsonUpdateBox: JsonObject): Boolean
+    var
+    begin
+
+    end;
+
+    local procedure UpdateBox(BoxNo: Code[20]; jsonUpdateBox: JsonObject)
+    var
+    begin
+
+    end;
+
 }

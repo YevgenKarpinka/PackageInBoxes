@@ -46,12 +46,12 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the external document number.',
                                 RUS = 'Определяет номер внешнего документа.';
                 }
-                // field("Box Code"; "Box Code")
-                // {
-                //     ApplicationArea = Warehouse;
-                //     ToolTipML = ENU = 'Specifies the box code according to the directory.',
-                //                 RUS = 'Определяет код коробки согласно справочника.';
-                // }
+                field("Box Code"; "Box Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the box code according to the directory.',
+                                RUS = 'Определяет код коробки согласно справочника.';
+                }
                 field("Gross Weight"; "Gross Weight")
                 {
                     ApplicationArea = Warehouse;
@@ -65,6 +65,30 @@ page 50054 "Box Card"
                                 RUS = 'Определяет количество единиц товара который лежит в коробке.';
                 }
                 field("Tracking No."; "Tracking No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
+                field("Shipping Agent Code"; "Shipping Agent Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
+                field("Shipping Services Code"; "Shipping Services Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
+                field("Shipment Cost"; "Shipment Cost")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
+                field("Other Cost"; "Other Cost")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',

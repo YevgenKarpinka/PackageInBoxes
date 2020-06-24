@@ -131,6 +131,22 @@ page 50050 "Package Card"
             group(Boxes)
             {
                 CaptionML = ENU = 'Boxes', RUS = 'Коробки';
+                action(Send2ShipStation)
+                {
+                    ApplicationArea = Warehouse;
+                    CaptionML = ENU = 'Send to ShipStation', RUS = 'Отправить в ShipStation';
+                    ToolTipML = ENU = 'Send to the ShipStation all of the box document. You must reopen the document before you can make changes to it.',
+                                RUS = 'Отправить в ShipStation документы коробки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
+                    Enabled = Status = Status::Unregistered;
+                    Image = ItemLines;
+
+                    trigger OnAction()
+                    var
+                        BoxHeader: Record "Box Header";
+                    begin
+                        PackageBoxMgt.SentAllBoxes("No.");
+                    end;
+                }
                 action(CloseAll)
                 {
                     ApplicationArea = Warehouse;

@@ -18,6 +18,8 @@ codeunit 50050 "Package Box Mgt."
         SalesHeader: Record "Sales Header";
         salesInvHeader: Record "Sales Invoice Header";
         Item: Record Item;
+        glShipStationSetup: Record "ShipStation Setup";
+        ShipStationMgt: Codeunit "ShipStation Mgt.";
         CompanyInfoGetted: Boolean;
         errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not packed %3!',
                                                               RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован %3!';
@@ -37,6 +39,7 @@ codeunit 50050 "Package Box Mgt."
                                                     RUS = 'Документ коробки %1 открыть нельзя, потому что заполнен номер отслеживания %2.';
         errDeleteBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be delete because the tracking number %2  is exist.',
                                                     RUS = 'Документ коробки %1 удалить нельзя, потому что заполнен номер отслеживания %2.';
+        lblAwaitingShipment: Label 'awaiting_shipment';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -715,8 +718,6 @@ codeunit 50050 "Package Box Mgt."
         with BoxHeader do
             if Get(PackageNo, BoxNo) then begin
                 TestField("Tracking No.", '');
-                // if "Tracking No." <> '' then
-                //     Error(errDeleteBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
                 Delete(true);
             end;
     end;
@@ -730,38 +731,134 @@ codeunit 50050 "Package Box Mgt."
             ReOpenAllBoxes(PackageNo);
     end;
 
-    procedure SentAllBoxes(PackaheNo: Code[20])
+    procedure SentAllBoxes(PackageNo: Code[20])
     var
         boxHeader: Record "Box Header";
         jsonUpdateBox: JsonObject;
     begin
+        GetShipStationSetup();
+        if not glShipStationSetup."ShipStation Integration Enable" then exit;
+
         with boxHeader do begin
-            SetRange("Package No.", PackaheNo);
+            SetRange("Package No.", PackageNo);
             if FindSet() then
                 repeat
-                    jsonUpdateBox := SentBox2Shipstation("No.");
+                    jsonUpdateBox := SentBox2Shipstation(PackageNo, "No.");
                     if CheckUpdateBox(jsonUpdateBox) then
-                        UpdateBox("No.", jsonUpdateBox);
+                        UpdateBox(PackageNo, "No.", jsonUpdateBox);
                 until Next() = 0;
         end;
     end;
 
-    local procedure SentBox2Shipstation(BoxNo: Code[20]): JsonObject
+    local procedure SentBox2Shipstation(PackageNo: Code[20]; BoxNo: Code[20]): JsonObject
     var
     begin
-
+        // send box
+        CreateOrderFromBoxInShipStation(PackageNo, BoxNo);
     end;
 
     local procedure CheckUpdateBox(jsonUpdateBox: JsonObject): Boolean
     var
     begin
-
+        // send box
     end;
 
-    local procedure UpdateBox(BoxNo: Code[20]; jsonUpdateBox: JsonObject)
+    local procedure UpdateBox(PackageNo: Code[20]; BoxNo: Code[20]; jsonUpdateBox: JsonObject)
     var
     begin
 
     end;
 
+    local procedure GetShipStationSetup()
+    begin
+        with glShipStationSetup do
+            if not Get() then begin
+                Init();
+                Insert();
+            end;
+    end;
+
+    procedure CreateOrderFromBoxInShipStation(PackageNo: Code[20]; BoxNo: Code[20]): JsonObject
+    var
+        _BoxHeader: Record "Box Header";
+        _SH: Record "Sales Header";
+        _Cust: Record Customer;
+        JSText: Text;
+        JSObjectHeader: JsonObject;
+        jsonTagsArray: JsonArray;
+    begin
+        if not _BoxHeader.Get(PackageNo, BoxNo) then exit(JSObjectHeader);
+
+
+        if not _SH.Get(_SH."Document Type"::Order, _BoxHeader."Sales Order No.") then exit(JSObjectHeader);
+
+        if not _Cust.Get(_SH."Sell-to Customer No.") then exit(JSObjectHeader);
+
+        JSObjectHeader.Add('orderNumber', BoxNo);
+        if _BoxHeader."ShipStation Order Key" <> '' then
+            JSObjectHeader.Add('orderKey', _BoxHeader."ShipStation Order Key");
+        JSObjectHeader.Add('orderDate', ShipStationMgt.Date2Text4JSON(_SH."Posting Date"));
+        JSObjectHeader.Add('paymentDate', ShipStationMgt.Date2Text4JSON(_SH."Prepayment Due Date"));
+        JSObjectHeader.Add('shipByDate', ShipStationMgt.Date2Text4JSON(_SH."Shipment Date"));
+        JSObjectHeader.Add('orderStatus', lblAwaitingShipment);
+        JSObjectHeader.Add('customerUsername', _Cust."E-Mail");
+        JSObjectHeader.Add('customerEmail', _Cust."E-Mail");
+        JSObjectHeader.Add('billTo', ShipStationMgt.jsonBillToFromSH(_SH."No."));
+        JSObjectHeader.Add('shipTo', ShipStationMgt.jsonShipToFromSH(_SH."No."));
+        JSObjectHeader.Add('items', jsonItemsFromBoxLines(BoxNo));
+        JSObjectHeader.WriteTo(JSText);
+
+        JSText := ShipStationMgt.Connect2ShipStation(2, JSText, '');
+
+        // update Sales Header from ShipStation
+        // JSObjectHeader.ReadFrom(JSText);
+        // UpdateSalesHeaderFromShipStation(DocNo, JSObjectHeader);
+        exit(JSObjectHeader);
+    end;
+
+    procedure jsonItemsFromBoxLines(BoxNo: Code[20]): JsonArray
+    var
+        JSObjectLine: JsonObject;
+        JSObjectArray: JsonArray;
+        _BoxLine: Record "Box Line";
+        _ItemDescr: Record "Item Description";
+        _SalesLine: Record "Sales Line";
+    begin
+        with _BoxLine do begin
+            SetCurrentKey("Quantity in Box");
+            SetRange("Box No.", BoxNo);
+            SetFilter("Quantity in Box", '<>%1', 0);
+            if FindSet(false, false) then
+                repeat
+                    Clear(JSObjectLine);
+                    GetSalesLineFromBoxLine(_SalesLine, "Shipment No.", "Shipment Line No.");
+
+                    JSObjectLine.Add('lineItemKey', "Line No.");
+                    JSObjectLine.Add('sku', "Item No.");
+                    JSObjectLine.Add('name', _SalesLine.Description);
+                    if _ItemDescr.Get("item No.") then
+                        JSObjectLine.Add('imageUrl', _ItemDescr."Main Image URL");
+                    JSObjectLine.Add('weight', ShipStationMgt.jsonWeightFromItem(_SalesLine."Gross Weight"));
+                    JSObjectLine.Add('quantity', "Quantity in Box");
+                    JSObjectLine.Add('unitPrice', Round(_SalesLine."Amount Including VAT" / _SalesLine.Quantity, 0.01));
+                    JSObjectLine.Add('taxAmount', Round((_SalesLine."Amount Including VAT" - _SalesLine.Amount) / _SalesLine.Quantity, 0.01));
+                    JSObjectLine.Add('warehouseLocation', _SalesLine."Location Code");
+                    JSObjectLine.Add('productId', "Line No.");
+                    JSObjectLine.Add('fulfillmentSku', '');
+                    JSObjectLine.Add('adjustment', false);
+                    JSObjectArray.Add(JSObjectLine);
+                until Next() = 0;
+        end;
+        exit(JSObjectArray);
+    end;
+
+    local procedure GetSalesLineFromBoxLine(var SalesLine: Record "Sales Line"; ShipmentNo: Code[20]; ShipmentLineNo: Integer): Boolean
+    var
+        WhseShipment: Record "Warehouse Shipment Line";
+    begin
+        if WhseShipment.Get(ShipmentNo, ShipmentLineNo) and
+           SalesLine.Get(WhseShipment."Source No.", WhseShipment."Source Line No.") then
+            exit(true);
+        exit(false);
+    end;
 }

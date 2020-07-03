@@ -73,13 +73,13 @@ table 50051 "Box Header"
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Tracking No.', RUS = 'Отслеживания Но.';
         }
-        field(11; "Shipping Agent Code"; Text[20])
+        field(11; "Shipping Agent Code"; Text[30])
         {
             DataClassification = CustomerContent;
             CaptionML = ENU = 'Shipping Agent', RUS = 'Экспедитор';
             Editable = false;
         }
-        field(12; "Shipping Services Code"; Text[50])
+        field(12; "Shipping Services Code"; Text[100])
         {
             DataClassification = CustomerContent;
             CaptionML = ENU = 'Shipping Agent Services', RUS = 'Услуга экспедитора';
@@ -98,6 +98,32 @@ table 50051 "Box Header"
             CaptionML = ENU = 'Other Cost', RUS = 'Доп. стоимость';
             Editable = false;
             DecimalPlaces = 0 : 2;
+        }
+        field(15; "ShipStation Order ID"; Text[20])
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'ShipStation Order ID', RUS = 'Идентификатор Заказа ShipStation';
+            // Editable = false;
+        }
+        field(16; "ShipStation Order Key"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'ShipStation Order Key', RUS = 'Ключ Заказа ShipStation';
+            // Editable = false;
+        }
+        field(17; "ShipStation Order Status"; Option)
+        {
+            DataClassification = CustomerContent;
+            OptionMembers = "Not Sent",Sent,Updated;
+            OptionCaptionML = ENU = 'Not Sent,Sent,Updated', RUS = 'Не отправлен,Отправлен,Обновлен';
+            CaptionML = ENU = 'ShipStation Order Status', RUS = 'Статус Заказа ShipStation';
+            Editable = false;
+        }
+        field(18; "ShipStation Status"; Text[50])
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'ShipStation Status', RUS = 'Статус ShipStation';
+            Editable = false;
         }
     }
 

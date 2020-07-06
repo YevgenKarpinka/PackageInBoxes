@@ -125,6 +125,23 @@ table 50051 "Box Header"
             CaptionML = ENU = 'ShipStation Status', RUS = 'Статус ShipStation';
             Editable = false;
         }
+        field(19; "ShipStation Shipment Amount"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'ShipStation Shipment Amount', RUS = 'Сума отгрузки ShipStation';
+        }
+        field(20; "ShipStation Shipment ID"; Text[30])
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'ShipStation Shipment ID', RUS = 'ID Отгрузки ShipStation';
+            Editable = false;
+        }
+        field(21; "Box Tracking No."; Text[30])
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'Box Tracking No.', RUS = 'Номер трасс. коробки';
+            Editable = false;
+        }
     }
 
     keys

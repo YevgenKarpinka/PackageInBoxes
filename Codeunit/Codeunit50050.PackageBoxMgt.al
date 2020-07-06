@@ -745,28 +745,30 @@ codeunit 50050 "Package Box Mgt."
                 repeat
                     jsonUpdateBox := SentBox2Shipstation(PackageNo, "No.");
                     if CheckUpdateBox(jsonUpdateBox) then
-                        UpdateBox(PackageNo, "No.", jsonUpdateBox);
+                        UpdateBox(PackageNo, "No.", jsonUpdateBox)
+                    else
+                        // write error log
+                        ;
                 until Next() = 0;
         end;
     end;
 
     local procedure SentBox2Shipstation(PackageNo: Code[20]; BoxNo: Code[20]): JsonObject
-    var
     begin
-        // send box
         CreateOrderFromBoxInShipStation(PackageNo, BoxNo);
     end;
 
     local procedure CheckUpdateBox(jsonUpdateBox: JsonObject): Boolean
     var
+        _jsonToken: JsonToken;
     begin
-        // send box
+        _jsonToken := ShipStationMgt.GetJSToken(jsonUpdateBox, 'carrierCode');
+        exit(not _jsonToken.AsValue().IsNull);
     end;
 
     local procedure UpdateBox(PackageNo: Code[20]; BoxNo: Code[20]; jsonUpdateBox: JsonObject)
-    var
     begin
-
+        UpdateBoxFromShipStation(PackageNo, BoxNo, jsonUpdateBox)
     end;
 
     local procedure GetShipStationSetup()
@@ -788,7 +790,6 @@ codeunit 50050 "Package Box Mgt."
         jsonTagsArray: JsonArray;
     begin
         if not _BoxHeader.Get(PackageNo, BoxNo) then exit(JSObjectHeader);
-
 
         if not _SH.Get(_SH."Document Type"::Order, _BoxHeader."Sales Order No.") then exit(JSObjectHeader);
 
@@ -844,7 +845,6 @@ codeunit 50050 "Package Box Mgt."
                     JSObjectLine.Add('taxAmount', Round((_SalesLine."Amount Including VAT" - _SalesLine.Amount) / _SalesLine.Quantity, 0.01));
                     JSObjectLine.Add('warehouseLocation', _SalesLine."Location Code");
                     JSObjectLine.Add('productId', "Line No.");
-                    JSObjectLine.Add('fulfillmentSku', '');
                     JSObjectLine.Add('adjustment', false);
                     JSObjectArray.Add(JSObjectLine);
                 until Next() = 0;
@@ -860,5 +860,92 @@ codeunit 50050 "Package Box Mgt."
            SalesLine.Get(WhseShipment."Source No.", WhseShipment."Source Line No.") then
             exit(true);
         exit(false);
+    end;
+
+    procedure UpdateBoxFromShipStation(PackageNo: Code[20]; BoxNo: Code[20]; _jsonObject: JsonObject): Boolean
+    var
+        _BoxHeader: Record "Box Header";
+        _jsonToken: JsonToken;
+    begin
+        with _BoxHeader do begin
+
+            if not Get(PackageNo, BoxNo) then exit(false);
+            // update Sales Header from ShipStation
+
+            _jsonToken := ShipStationMgt.GetJSToken(_jsonObject, 'carrierCode');
+            if not _jsonToken.AsValue().IsNull then begin
+                "Shipping Agent Code" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'carrierCode').AsValue().AsText(), 1, MaxStrLen("Shipping Agent Code"));
+                _jsonToken := ShipStationMgt.GetJSToken(_jsonObject, 'serviceCode');
+                if not _jsonToken.AsValue().IsNull then begin
+                    "Shipping Services Code" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'serviceCode').AsValue().AsText(), 1, MaxStrLen("Shipping Services Code"));
+                end;
+            end;
+
+            // Get Rate
+            "ShipStation Order ID" := ShipStationMgt.GetJSToken(_jsonObject, 'orderId').AsValue().AsText();
+            "ShipStation Order Key" := ShipStationMgt.GetJSToken(_jsonObject, 'orderKey').AsValue().AsText();
+            "ShipStation Status" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'orderStatus').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."ShipStation Status"));
+            "ShipStation Shipment Amount" := ShipStationMgt.GetJSToken(_jsonObject, 'shippingAmount').AsValue().AsDecimal();
+
+            case "ShipStation Order Status" of
+                "ShipStation Order Status"::"Not Sent":
+                    "ShipStation Order Status" := "ShipStation Order Status"::Sent;
+                "ShipStation Order Status"::Sent:
+                    "ShipStation Order Status" := "ShipStation Order Status"::Updated;
+            end;
+
+            if "ShipStation Status" = lblAwaitingShipment then begin
+                "Box Tracking No." := '';
+                "ShipStation Shipment ID" := '';
+            end;
+            Modify();
+        end;
+    end;
+
+    procedure CreateLabel2OrderInShipStation(PackageNo: Code[20]; BoxNo: Code[20]): Boolean
+    var
+        _BoxHeader: Record "Box Header";
+        JSText: Text;
+        JSObject: JsonObject;
+        jsLabelObject: JsonObject;
+        OrdersJSArray: JsonArray;
+        OrderJSToken: JsonToken;
+        Counter: Integer;
+        notExistOrdersList: Text;
+        OrdersListCreateLabel: Text;
+        OrdersCancelled: Text;
+        txtLabel: Text;
+        txtBeforeName: Text;
+        WhseShipDocNo: Code[20];
+        errorShipStationOrderNotExist: TextConst ENU = 'ShipStation Order is not Existed!';
+        errorOrderNotExist: TextConst ENU = 'Sales Order %1 is not Existed!';
+    begin
+        with _BoxHeader do begin
+            if (not Get(PackageNo, BoxNo)) or ("ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
+            // comment to test Create Label and Attache to Warehouse Shipment
+            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, "Sales Order No.");
+
+            if not SalesHeader.Get(SalesHeader."Document Type"::Order, "Sales Order No.") then Error(errorOrderNotExist, "Sales Order No.");
+
+            // Get Order from Shipstation to Fill Variables
+            JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
+
+            JSObject.ReadFrom(JSText);
+            JSText := ShipStationMgt.Connect2ShipStation(3, ShipStationMgt.FillValuesFromOrder(JSObject, "Sales Order No.", SalesHeader."Location Code"), '');
+
+            // Update Order From Label
+            UpdateOrderFromLabel(DocNo, JSText);
+
+            // Add Lable to Shipment
+            jsLabelObject.ReadFrom(JSText);
+            txtLabel := ShipStationMgt.GetJSToken(jsLabelObject, 'labelData').AsValue().AsText();
+            txtBeforeName := _SH."No." + '-' + ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
+            ShipStationMgt.SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
+
+            // Update Sales Header From ShipStation
+            JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
+            JSObject.ReadFrom(JSText);
+            UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+        end;
     end;
 }

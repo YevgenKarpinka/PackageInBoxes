@@ -917,8 +917,9 @@ codeunit 50050 "Package Box Mgt."
         txtLabel: Text;
         txtBeforeName: Text;
         WhseShipDocNo: Code[20];
-        errorShipStationOrderNotExist: TextConst ENU = 'ShipStation Order is not Existed!';
-        errorOrderNotExist: TextConst ENU = 'Sales Order %1 is not Existed!';
+        errorShipStationOrderNotExist: TextConst ENU = 'Order in ShipStation is not Existed!';
+        errorOrderNotExist: TextConst ENU = 'Sales Order %1 is Posted or Deleted!';
+        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment to Sales Order %1 is Posted or Deleted!';
     begin
         with _BoxHeader do begin
             if (not Get(PackageNo, BoxNo)) or ("ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
@@ -934,12 +935,12 @@ codeunit 50050 "Package Box Mgt."
             JSText := ShipStationMgt.Connect2ShipStation(3, ShipStationMgt.FillValuesFromOrder(JSObject, "Sales Order No.", SalesHeader."Location Code"), '');
 
             // Update Order From Label
-            UpdateOrderFromLabel(DocNo, JSText);
+            UpdateBoxFromLabel(PackageNo, BoxNo, JSText);
 
             // Add Lable to Shipment
             jsLabelObject.ReadFrom(JSText);
             txtLabel := ShipStationMgt.GetJSToken(jsLabelObject, 'labelData').AsValue().AsText();
-            txtBeforeName := _SH."No." + '-' + ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
+            txtBeforeName := _BoxHeader."No." + '-' + ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
             ShipStationMgt.SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
 
             // Update Sales Header From ShipStation
@@ -947,5 +948,55 @@ codeunit 50050 "Package Box Mgt."
             JSObject.ReadFrom(JSText);
             UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
         end;
+    end;
+
+    procedure UpdateBoxFromLabel(PackageNo: Code[20]; BoxNo: Code[20]; jsonText: Text);
+    var
+        _BoxHeader: Record "Box Header";
+        jsLabelObject: JsonObject;
+    begin
+        with _BoxHeader do begin
+            if not Get(PackageNo, BoxNo) then exit;
+            jsLabelObject.ReadFrom(jsonText);
+            "Other Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'insuranceCost').AsValue().AsDecimal();
+            "Shipment Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentCost').AsValue().AsDecimal();
+            "Box Tracking No." := ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
+            "ShipStation Shipment ID" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentId').AsValue().AsText();
+            Modify();
+        end;
+    end;
+
+    procedure VoidLabel2OrderInShipStation(PackageNo: Code[20]; BoxNo: Code[20]): Boolean
+    var
+        _BoxHeader: Record "Box Header";
+        JSText: Text;
+        JSObject: JsonObject;
+        WhseShipDocNo: Code[20];
+        lblOrder: TextConst ENU = 'LabelOrder';
+        FileName: Text;
+        _txtBefore: Text;
+        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Created for Sales Order = %1!',
+                                         RUS = 'Для Заказа продажи = %1 не создана Складская отгрузка!';
+    begin
+        with _BoxHeader do begin
+            if (not Get(PackageNo, BoxNo)) or ("ShipStation Shipment ID" = '') then exit(false);
+
+            // Void Label in Shipstation
+            JSObject.Add('shipmentId', "ShipStation Shipment ID");
+            JSObject.WriteTo(JSText);
+            JSText := ShipStationMgt.Connect2ShipStation(8, JSText, '');
+            JSObject.ReadFrom(JSText);
+
+            // Update Sales Header From ShipStation
+            JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
+            JSObject.ReadFrom(JSText);
+            UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+
+            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, "Sales Order No.");
+            _txtBefore := "No." + '-' + "Box Tracking No.";
+        end;
+
+        FileName := StrSubstNo('%1-%2.pdf', _txtBefore, lblOrder);
+        ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
     end;
 }

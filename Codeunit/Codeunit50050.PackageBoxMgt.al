@@ -40,6 +40,10 @@ codeunit 50050 "Package Box Mgt."
         errDeleteBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be delete because the tracking number %2  is exist.',
                                                     RUS = 'Документ коробки %1 удалить нельзя, потому что заполнен номер отслеживания %2.';
         lblAwaitingShipment: Label 'awaiting_shipment';
+        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Created for Sales Order = %1!',
+                                         RUS = 'Для Заказа продажи = %1 не создана Складская отгрузка!';
+        errorShipStationOrderNotExist: TextConst ENU = 'Order in ShipStation is not Existed!';
+        errorOrderNotExist: TextConst ENU = 'Sales Order %1 is Posted or Deleted!';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -745,10 +749,7 @@ codeunit 50050 "Package Box Mgt."
                 repeat
                     jsonUpdateBox := SentBox2Shipstation(PackageNo, "No.");
                     if CheckUpdateBox(jsonUpdateBox) then
-                        UpdateBox(PackageNo, "No.", jsonUpdateBox)
-                    else
-                        // write error log
-                        ;
+                        UpdateBox(PackageNo, "No.", jsonUpdateBox);
                 until Next() = 0;
         end;
     end;
@@ -917,9 +918,7 @@ codeunit 50050 "Package Box Mgt."
         txtLabel: Text;
         txtBeforeName: Text;
         WhseShipDocNo: Code[20];
-        errorShipStationOrderNotExist: TextConst ENU = 'Order in ShipStation is not Existed!';
-        errorOrderNotExist: TextConst ENU = 'Sales Order %1 is Posted or Deleted!';
-        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment to Sales Order %1 is Posted or Deleted!';
+
     begin
         with _BoxHeader do begin
             if (not Get(PackageNo, BoxNo)) or ("ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
@@ -975,8 +974,7 @@ codeunit 50050 "Package Box Mgt."
         lblOrder: TextConst ENU = 'LabelOrder';
         FileName: Text;
         _txtBefore: Text;
-        errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Created for Sales Order = %1!',
-                                         RUS = 'Для Заказа продажи = %1 не создана Складская отгрузка!';
+
     begin
         with _BoxHeader do begin
             if (not Get(PackageNo, BoxNo)) or ("ShipStation Shipment ID" = '') then exit(false);

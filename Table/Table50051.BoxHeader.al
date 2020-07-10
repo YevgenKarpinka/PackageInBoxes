@@ -136,12 +136,6 @@ table 50051 "Box Header"
             CaptionML = ENU = 'ShipStation Shipment ID', RUS = 'ID Отгрузки ShipStation';
             Editable = false;
         }
-        field(21; "Box Tracking No."; Text[30])
-        {
-            DataClassification = CustomerContent;
-            CaptionML = ENU = 'Box Tracking No.', RUS = 'Номер трасс. коробки';
-            Editable = false;
-        }
     }
 
     keys

@@ -72,4 +72,115 @@ page 50057 "Package List"
             }
         }
     }
+    actions
+    {
+        area(Processing)
+        {
+            group(actionShipStation)
+            {
+                CaptionML = ENU = 'ShipStation', RUS = 'ShipStation';
+                Image = ReleaseShipment;
+
+                action("Create Orders")
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Create Orders', RUS = 'Создать Заказы';
+                    ToolTipML = ENU = 'Send to the ShipStation all of the box document.',
+                                RUS = 'Отправить в ShipStation все документы коробки.';
+                    Image = CreateDocuments;
+                    // Visible = (Status = Status::Released) and ("ShipStation Order Key" = '');
+
+                    trigger OnAction()
+                    begin
+                        PackageHeader.Reset();
+                        BoxHeader.Reset();
+                        CurrPage.SetSelectionFilter(PackageHeader);
+                        if PackageHeader.FindSet(false, false) then
+                            repeat
+                                with BoxHeader do begin
+                                    SetCurrentKey(Status, "ShipStation Order ID");
+                                    SetRange(Status, Status::Close);
+                                    SetFilter("ShipStation Order ID", '=%1', '');
+                                    if FindSet(false, false) then
+                                        repeat
+                                            PackageBoxMgt.CreateOrderFromBoxInShipStation("Package No.", BoxHeader."No.");
+                                        until Next() = 0;
+                                end;
+                            until Next() = 0;
+                        Message(lblOrdersCreated);
+                    end;
+                }
+                action("Create Labels")
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Create Labels', RUS = 'Создать бирки';
+                    ToolTipML = ENU = 'Create Labels all of the box document.',
+                                RUS = 'Создать бирки для всех коробок.';
+                    Image = PrintReport;
+                    // Visible = "ShipStation Order Key" <> '';
+
+                    trigger OnAction()
+                    begin
+                        PackageHeader.Reset();
+                        BoxHeader.Reset();
+                        CurrPage.SetSelectionFilter(PackageHeader);
+                        if PackageHeader.FindSet(false, false) then
+                            repeat
+                                with BoxHeader do begin
+                                    SetCurrentKey("ShipStation Order Key", "ShipStation Shipment ID");
+                                    SetFilter("ShipStation Order Key", '<>%1', '');
+                                    SetFilter("ShipStation Shipment ID", '=%1', '');
+                                    if FindSet(false, false) then
+                                        repeat
+                                            if "ShipStation Order Key" <> '' then
+                                                PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
+                                        until Next() = 0;
+                                end;
+                            until PackageHeader.Next() = 0;
+                        Message(lblLabelsCreated);
+                    end;
+                }
+                action("Void Labels")
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Void Labels', RUS = 'Отменить бирки';
+                    ToolTipML = ENU = 'Void Labels all of the box document.',
+                                RUS = 'Отменить бирки для всех коробок.';
+                    Image = VoidCreditCard;
+                    // Visible = "ShipStation Shipment ID" <> '';
+
+                    trigger OnAction()
+                    begin
+                        PackageHeader.Reset();
+                        BoxHeader.Reset();
+                        CurrPage.SetSelectionFilter(PackageHeader);
+                        if PackageHeader.FindSet(false, false) then
+                            repeat
+                                with BoxHeader do begin
+                                    SetCurrentKey("ShipStation Shipment ID");
+                                    SetFilter("ShipStation Shipment ID", '<>%1', '');
+                                    if FindSet(false, false) then
+                                        repeat
+                                            PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
+                                        until Next() = 0;
+                                end;
+                            until PackageHeader.Next() = 0;
+                        Message(lblLabelsVoided);
+                    end;
+                }
+            }
+        }
+    }
+
+    var
+        PackageHeader: Record "Package Header";
+        BoxHeader: Record "Box Header";
+        PackageBoxMgt: Codeunit "Package Box Mgt.";
+        lblOrdersCreated: TextConst ENU = 'Orders Created in ShipStation!',
+                                    RUS = 'Заказы в ShipStation созданы!';
+        lblLabelsCreated: TextConst ENU = 'Labels Created and Attached to Warehouse Shipments!',
+                                    RUS = 'Бирки созданы и прикреплены к Отгрузкам!';
+        lblLabelsVoided: TextConst ENU = 'Labels Voided!',
+                                    RUS = 'Бирки отменены!';
+
 }

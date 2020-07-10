@@ -44,6 +44,8 @@ codeunit 50050 "Package Box Mgt."
                                          RUS = 'Для Заказа продажи = %1 не создана Складская отгрузка!';
         errorShipStationOrderNotExist: TextConst ENU = 'Order in ShipStation is not Existed!';
         errorOrderNotExist: TextConst ENU = 'Sales Order %1 is Posted or Deleted!';
+        errShipStationIntegrationDisable: TextConst ENU = 'ShipStation Integration Disable.',
+                                         RUS = 'Интеграция с ShipStation отключена.';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -735,23 +737,16 @@ codeunit 50050 "Package Box Mgt."
             ReOpenAllBoxes(PackageNo);
     end;
 
-    procedure SentAllBoxes(PackageNo: Code[20])
+    procedure SentBoxInShipStation(PackageNo: Code[20]; BoxNo: Code[20])
     var
-        boxHeader: Record "Box Header";
         jsonUpdateBox: JsonObject;
     begin
         GetShipStationSetup();
-        if not glShipStationSetup."ShipStation Integration Enable" then exit;
+        if not glShipStationSetup."ShipStation Integration Enable" then Error(errShipStationIntegrationDisable);
 
-        with boxHeader do begin
-            SetRange("Package No.", PackageNo);
-            if FindSet() then
-                repeat
-                    jsonUpdateBox := SentBox2Shipstation(PackageNo, "No.");
-                    if CheckUpdateBox(jsonUpdateBox) then
-                        UpdateBox(PackageNo, "No.", jsonUpdateBox);
-                until Next() = 0;
-        end;
+        jsonUpdateBox := SentBox2Shipstation(PackageNo, BoxNo);
+        if CheckUpdateBox(jsonUpdateBox) then
+            UpdateBox(PackageNo, BoxNo, jsonUpdateBox);
     end;
 
     local procedure SentBox2Shipstation(PackageNo: Code[20]; BoxNo: Code[20]): JsonObject
@@ -896,7 +891,7 @@ codeunit 50050 "Package Box Mgt."
             end;
 
             if "ShipStation Status" = lblAwaitingShipment then begin
-                "Box Tracking No." := '';
+                "Tracking No." := '';
                 "ShipStation Shipment ID" := '';
             end;
             Modify();
@@ -959,7 +954,7 @@ codeunit 50050 "Package Box Mgt."
             jsLabelObject.ReadFrom(jsonText);
             "Other Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'insuranceCost').AsValue().AsDecimal();
             "Shipment Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentCost').AsValue().AsDecimal();
-            "Box Tracking No." := ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
+            "Tracking No." := ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
             "ShipStation Shipment ID" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentId').AsValue().AsText();
             Modify();
         end;
@@ -991,7 +986,7 @@ codeunit 50050 "Package Box Mgt."
             UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
 
             if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, "Sales Order No.");
-            _txtBefore := "No." + '-' + "Box Tracking No.";
+            _txtBefore := "No." + '-' + "Tracking No.";
         end;
 
         FileName := StrSubstNo('%1-%2.pdf', _txtBefore, lblOrder);

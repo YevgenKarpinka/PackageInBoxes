@@ -221,7 +221,7 @@ page 50050 "Package Card"
                                             PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
                                         until Next() = 0;
                                 end;
-                            until Next() = 0;
+                            until PackageHeader.Next() = 0;
                         Message(lblOrdersCreated);
                     end;
                 }

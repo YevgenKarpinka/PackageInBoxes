@@ -853,7 +853,7 @@ codeunit 50050 "Package Box Mgt."
         WhseShipment: Record "Warehouse Shipment Line";
     begin
         if WhseShipment.Get(ShipmentNo, ShipmentLineNo) and
-           SalesLine.Get(WhseShipment."Source No.", WhseShipment."Source Line No.") then
+           SalesLine.Get(SalesLine."Document Type"::Order, WhseShipment."Source No.", WhseShipment."Source Line No.") then
             exit(true);
         exit(false);
     end;

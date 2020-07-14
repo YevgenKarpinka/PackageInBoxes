@@ -64,36 +64,6 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the quantity of units of item that lies in the box.',
                                 RUS = 'Определяет количество единиц товара который лежит в коробке.';
                 }
-                field("Tracking No."; "Tracking No.")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
-                                RUS = 'Определяет номер отслеживания коробки для доставки.';
-                }
-                field("Shipping Agent Code"; "Shipping Agent Code")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
-                                RUS = 'Определяет номер отслеживания коробки для доставки.';
-                }
-                field("Shipping Services Code"; "Shipping Services Code")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
-                                RUS = 'Определяет номер отслеживания коробки для доставки.';
-                }
-                field("Shipment Cost"; "Shipment Cost")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
-                                RUS = 'Определяет номер отслеживания коробки для доставки.';
-                }
-                field("Other Cost"; "Other Cost")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
-                                RUS = 'Определяет номер отслеживания коробки для доставки.';
-                }
             }
             part(BoxLinesSubPage; "Box Lines Subpage")
             {
@@ -101,6 +71,40 @@ page 50054 "Box Card"
                 SubPageLink = "Box No." = field("No.");
                 UpdatePropagation = Both;
                 Editable = Status = Status::Open;
+            }
+            group(ShipStation)
+            {
+                Editable = Status = Status::Open;
+                field("Tracking No."; "Tracking No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery.',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
+                field("Shipping Agent"; "Shipping Agent Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the Shipping Agent of the box.',
+                                RUS = 'Определяет агента доставки для коробки.';
+                }
+                field("Shipping Services"; "Shipping Services Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the Shipping Services of the box.',
+                                RUS = 'Определяет услугу доставки для коробки.';
+                }
+                field("Shipment Cost"; "Shipment Cost")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the Shipment Cost of the box.',
+                                RUS = 'Определяет стоимость доставки коробки.';
+                }
+                field("Other Cost"; "Other Cost")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the Other Cost of the box for delivery.',
+                                RUS = 'Определяет иные затраты по доставке коробки.';
+                }
             }
         }
     }
@@ -157,10 +161,98 @@ page 50054 "Box Card"
                     PackageBoxMgt.AssemblyBox("Package No.", "No.");
                 end;
             }
+            group(actionShipStation)
+            {
+                CaptionML = ENU = 'ShipStation', RUS = 'ShipStation';
+                Image = ReleaseShipment;
+
+                action("Create Orders")
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Create Order', RUS = 'Создать Заказ';
+                    ToolTipML = ENU = 'Send to the ShipStation of the box document.',
+                                RUS = 'Отправить в ShipStation документ коробки.';
+                    Image = CreateDocuments;
+                    Visible = (Status = Status::Close) and ("ShipStation Order Key" = '');
+
+                    trigger OnAction()
+                    begin
+                        BoxHeader.Reset();
+                        CurrPage.SetSelectionFilter(BoxHeader);
+                        with BoxHeader do begin
+                            SetCurrentKey(Status, "ShipStation Order ID");
+                            SetRange(Status, Status::Close);
+                            SetFilter("ShipStation Order ID", '=%1', '');
+                            if FindSet(false, false) then
+                                repeat
+                                    PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
+                                until Next() = 0;
+                        end;
+                        Message(lblOrdersCreated);
+                    end;
+                }
+                action("Create Labels")
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Create Label', RUS = 'Создать бирку';
+                    ToolTipML = ENU = 'Create Label to the box document.',
+                                RUS = 'Создать бирку для коробки.';
+                    Image = PrintReport;
+                    Visible = "ShipStation Order Key" <> '';
+
+                    trigger OnAction()
+                    begin
+                        BoxHeader.Reset();
+                        CurrPage.SetSelectionFilter(BoxHeader);
+                        with BoxHeader do begin
+                            SetCurrentKey("ShipStation Order Key", "ShipStation Shipment ID");
+                            SetFilter("ShipStation Order Key", '<>%1', '');
+                            SetFilter("ShipStation Shipment ID", '=%1', '');
+                            if FindSet(false, false) then
+                                repeat
+                                    if "ShipStation Order Key" <> '' then
+                                        PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
+                                until Next() = 0;
+                        end;
+                        Message(lblLabelsCreated);
+                    end;
+                }
+                action("Void Labels")
+                {
+                    ApplicationArea = All;
+                    CaptionML = ENU = 'Void Label', RUS = 'Отменить бирку';
+                    ToolTipML = ENU = 'Void Label to the box document.',
+                                RUS = 'Отменить бирку для коробоки.';
+                    Image = VoidCreditCard;
+                    Visible = "ShipStation Shipment ID" <> '';
+
+                    trigger OnAction()
+                    begin
+                        BoxHeader.Reset();
+                        CurrPage.SetSelectionFilter(BoxHeader);
+                        with BoxHeader do begin
+                            SetCurrentKey("ShipStation Shipment ID");
+                            SetFilter("ShipStation Shipment ID", '<>%1', '');
+                            if FindSet(false, false) then
+                                repeat
+                                    PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
+                                until Next() = 0;
+                        end;
+                        Message(lblLabelsVoided);
+                    end;
+                }
+            }
         }
     }
 
     var
         PackageHeader: Record "Package Header";
+        BoxHeader: Record "Box Header";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
+        lblOrdersCreated: TextConst ENU = 'Orders Created in ShipStation!',
+                                    RUS = 'Заказы в ShipStation созданы!';
+        lblLabelsCreated: TextConst ENU = 'Labels Created and Attached to Warehouse Shipments!',
+                                    RUS = 'Бирки созданы и прикреплены к Отгрузкам!';
+        lblLabelsVoided: TextConst ENU = 'Labels Voided!',
+                                    RUS = 'Бирки отменены!';
 }

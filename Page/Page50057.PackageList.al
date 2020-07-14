@@ -103,10 +103,10 @@ page 50057 "Package List"
                                     SetFilter("ShipStation Order ID", '=%1', '');
                                     if FindSet(false, false) then
                                         repeat
-                                            PackageBoxMgt.CreateOrderFromBoxInShipStation("Package No.", BoxHeader."No.");
+                                            PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
                                         until Next() = 0;
                                 end;
-                            until Next() = 0;
+                            until PackageHeader.Next() = 0;
                         Message(lblOrdersCreated);
                     end;
                 }

@@ -745,20 +745,20 @@ codeunit 50050 "Package Box Mgt."
         if not glShipStationSetup."ShipStation Integration Enable" then Error(errShipStationIntegrationDisable);
 
         jsonUpdateBox := SentBox2Shipstation(PackageNo, BoxNo);
-        if CheckUpdateBox(jsonUpdateBox) then
+        if CheckUpdateBox(jsonUpdateBox, 'orderId') then
             UpdateBox(PackageNo, BoxNo, jsonUpdateBox);
     end;
 
     local procedure SentBox2Shipstation(PackageNo: Code[20]; BoxNo: Code[20]): JsonObject
     begin
-        CreateOrderFromBoxInShipStation(PackageNo, BoxNo);
+        exit(CreateOrderFromBoxInShipStation(PackageNo, BoxNo));
     end;
 
-    local procedure CheckUpdateBox(jsonUpdateBox: JsonObject): Boolean
+    local procedure CheckUpdateBox(jsonUpdateBox: JsonObject; TokenKey: Text): Boolean
     var
         _jsonToken: JsonToken;
     begin
-        _jsonToken := ShipStationMgt.GetJSToken(jsonUpdateBox, 'carrierCode');
+        _jsonToken := ShipStationMgt.GetJSToken(jsonUpdateBox, TokenKey);
         exit(not _jsonToken.AsValue().IsNull);
     end;
 
@@ -803,10 +803,11 @@ codeunit 50050 "Package Box Mgt."
         JSObjectHeader.Add('billTo', ShipStationMgt.jsonBillToFromSH(_SH."No."));
         JSObjectHeader.Add('shipTo', ShipStationMgt.jsonShipToFromSH(_SH."No."));
         JSObjectHeader.Add('items', jsonItemsFromBoxLines(BoxNo));
+        JSObjectHeader.Add('weight', ShipStationMgt.jsonWeightFromItem(_BoxHeader."Gross Weight"));
         JSObjectHeader.WriteTo(JSText);
 
         JSText := ShipStationMgt.Connect2ShipStation(2, JSText, '');
-
+        JSObjectHeader.ReadFrom(JSText);
         // update Sales Header from ShipStation
         // JSObjectHeader.ReadFrom(JSText);
         // UpdateSalesHeaderFromShipStation(DocNo, JSObjectHeader);
@@ -835,8 +836,8 @@ codeunit 50050 "Package Box Mgt."
                     JSObjectLine.Add('name', _SalesLine.Description);
                     if _ItemDescr.Get("item No.") then
                         JSObjectLine.Add('imageUrl', _ItemDescr."Main Image URL");
-                    JSObjectLine.Add('weight', ShipStationMgt.jsonWeightFromItem(_SalesLine."Gross Weight"));
-                    JSObjectLine.Add('quantity', "Quantity in Box");
+                    // JSObjectLine.Add('weight', ShipStationMgt.jsonWeightFromItem(_SalesLine."Gross Weight"));
+                    JSObjectLine.Add('quantity', ShipStationMgt.Decimal2Integer("Quantity in Box"));
                     JSObjectLine.Add('unitPrice', Round(_SalesLine."Amount Including VAT" / _SalesLine.Quantity, 0.01));
                     JSObjectLine.Add('taxAmount', Round((_SalesLine."Amount Including VAT" - _SalesLine.Amount) / _SalesLine.Quantity, 0.01));
                     JSObjectLine.Add('warehouseLocation', _SalesLine."Location Code");
@@ -894,6 +895,7 @@ codeunit 50050 "Package Box Mgt."
                 "Tracking No." := '';
                 "ShipStation Shipment ID" := '';
             end;
+
             Modify();
         end;
     end;
@@ -926,8 +928,18 @@ codeunit 50050 "Package Box Mgt."
             JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
 
             JSObject.ReadFrom(JSText);
-            JSText := ShipStationMgt.Connect2ShipStation(3, ShipStationMgt.FillValuesFromOrder(JSObject, "Sales Order No.", SalesHeader."Location Code"), '');
 
+            CheckUpdateBox(JSObject, 'orderId');
+            // jsObjHeaderUpdate.ReadFrom(JSText);
+            JSText := ShipStationMgt.FillValuesFromOrder(JSObject, "Sales Order No.", SalesHeader."Location Code");
+
+
+            JSObject.ReadFrom(JSText);
+            CheckUpdateBox(JSObject, 'orderId');
+            JSText := ShipStationMgt.Connect2ShipStation(3, JSText, '');
+
+            JSObject.ReadFrom(JSText);
+            CheckUpdateBox(JSObject, 'orderId');
             // Update Order From Label
             UpdateBoxFromLabel(PackageNo, BoxNo, JSText);
 
@@ -980,16 +992,15 @@ codeunit 50050 "Package Box Mgt."
             JSText := ShipStationMgt.Connect2ShipStation(8, JSText, '');
             JSObject.ReadFrom(JSText);
 
+            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, "Sales Order No.");
+            _txtBefore := "No." + '-' + "Tracking No.";
+            FileName := StrSubstNo('%1-%2.pdf', _txtBefore, lblOrder);
+            ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
+
             // Update Sales Header From ShipStation
             JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
             JSObject.ReadFrom(JSText);
             UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
-
-            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, "Sales Order No.");
-            _txtBefore := "No." + '-' + "Tracking No.";
         end;
-
-        FileName := StrSubstNo('%1-%2.pdf', _txtBefore, lblOrder);
-        ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
     end;
 }

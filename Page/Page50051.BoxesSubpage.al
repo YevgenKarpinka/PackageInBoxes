@@ -60,8 +60,14 @@ page 50051 "Boxes Subpage"
                 field("Tracking No."; "Tracking No.")
                 {
                     ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery..',
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery.',
                                 RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
+                field("ShipStation Shipment ID"; "ShipStation Shipment ID")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the ShipStation shipmentID of the box.',
+                                RUS = 'Определяет ShipStation ID отгрузки коробки.';
                 }
             }
 

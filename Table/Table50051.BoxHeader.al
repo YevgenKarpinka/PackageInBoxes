@@ -134,7 +134,7 @@ table 50051 "Box Header"
         {
             DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Shipment ID', RUS = 'ID Отгрузки ShipStation';
-            Editable = false;
+            // Editable = false;
         }
     }
 

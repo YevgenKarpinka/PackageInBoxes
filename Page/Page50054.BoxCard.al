@@ -105,6 +105,34 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the Other Cost of the box for delivery.',
                                 RUS = 'Определяет иные затраты по доставке коробки.';
                 }
+                field("ShipStation Status"; "ShipStation Status")
+                {
+                    ApplicationArea = Warehouse;
+                    Importance = Additional;
+                    ToolTipML = ENU = 'Specifies the ShipStation Status of the box.',
+                                RUS = 'Определяет ShipStation статус коробки.';
+                }
+                field("ShipStation Shipment ID"; "ShipStation Shipment ID")
+                {
+                    ApplicationArea = Warehouse;
+                    Importance = Additional;
+                    ToolTipML = ENU = 'Specifies the ShipStation Shipment ID of the box.',
+                                RUS = 'Определяет ShipStation ID отгрузки коробки.';
+                }
+                field("ShipStation Order ID"; "ShipStation Order ID")
+                {
+                    ApplicationArea = Warehouse;
+                    Importance = Additional;
+                    ToolTipML = ENU = 'Specifies the ShipStation Order ID of the box.',
+                                RUS = 'Определяет ShipStation ID заказа коробки.';
+                }
+                field("ShipStation Order Key"; "ShipStation Order Key")
+                {
+                    ApplicationArea = Warehouse;
+                    Importance = Additional;
+                    ToolTipML = ENU = 'Specifies the ShipStation Order Key of the box.',
+                                RUS = 'Определяет ShipStation ключ заказа коробки.';
+                }
             }
         }
     }
@@ -139,12 +167,6 @@ page 50054 "Box Card"
                 trigger OnAction()
                 begin
                     PackageBoxMgt.OpenBox("Package No.", "No.");
-                    // PackageHeader.Get("Package No.");
-                    // if PackageHeader.Status = PackageHeader.Status::UnRegistered then
-                    //     if Status = Status::Close then begin
-                    //         Status := Status::Open;
-                    //         Modify(true);
-                    //     end;
                 end;
             }
             action(AssemblyBox)
@@ -161,86 +183,80 @@ page 50054 "Box Card"
                     PackageBoxMgt.AssemblyBox("Package No.", "No.");
                 end;
             }
-            group(actionShipStation)
+
+            action("Create Orders")
             {
-                CaptionML = ENU = 'ShipStation', RUS = 'ShipStation';
-                Image = ReleaseShipment;
-
-                action("Create Orders")
-                {
-                    ApplicationArea = All;
-                    CaptionML = ENU = 'Create Order', RUS = 'Создать Заказ';
-                    ToolTipML = ENU = 'Send to the ShipStation of the box document.',
+                ApplicationArea = All;
+                CaptionML = ENU = 'Create Order', RUS = 'Создать Заказ';
+                ToolTipML = ENU = 'Send to the ShipStation of the box document.',
                                 RUS = 'Отправить в ShipStation документ коробки.';
-                    Image = CreateDocuments;
-                    Visible = (Status = Status::Close) and ("ShipStation Order Key" = '');
+                Image = CreateDocuments;
+                Visible = (Status = Status::Close) and ("ShipStation Order Key" = '');
 
-                    trigger OnAction()
-                    begin
-                        BoxHeader.Reset();
-                        CurrPage.SetSelectionFilter(BoxHeader);
-                        with BoxHeader do begin
-                            SetCurrentKey(Status, "ShipStation Order ID");
-                            SetRange(Status, Status::Close);
-                            SetFilter("ShipStation Order ID", '=%1', '');
-                            if FindSet(false, false) then
-                                repeat
-                                    PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
-                                until Next() = 0;
-                        end;
-                        Message(lblOrdersCreated);
+                trigger OnAction()
+                begin
+                    BoxHeader.Reset();
+                    CurrPage.SetSelectionFilter(BoxHeader);
+                    with BoxHeader do begin
+                        SetCurrentKey(Status, "ShipStation Order ID");
+                        SetRange(Status, Status::Close);
+                        SetFilter("ShipStation Order ID", '=%1', '');
+                        if FindSet(false, false) then
+                            repeat
+                                PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
+                            until Next() = 0;
                     end;
-                }
-                action("Create Labels")
-                {
-                    ApplicationArea = All;
-                    CaptionML = ENU = 'Create Label', RUS = 'Создать бирку';
-                    ToolTipML = ENU = 'Create Label to the box document.',
+                    Message(lblOrdersCreated);
+                end;
+            }
+            action("Create Labels")
+            {
+                ApplicationArea = All;
+                CaptionML = ENU = 'Create Label', RUS = 'Создать бирку';
+                ToolTipML = ENU = 'Create Label to the box document.',
                                 RUS = 'Создать бирку для коробки.';
-                    Image = PrintReport;
-                    Visible = "ShipStation Order Key" <> '';
+                Image = PrintReport;
+                Visible = "ShipStation Order Key" <> '';
 
-                    trigger OnAction()
-                    begin
-                        BoxHeader.Reset();
-                        CurrPage.SetSelectionFilter(BoxHeader);
-                        with BoxHeader do begin
-                            SetCurrentKey("ShipStation Order Key", "ShipStation Shipment ID");
-                            SetFilter("ShipStation Order Key", '<>%1', '');
-                            SetFilter("ShipStation Shipment ID", '=%1', '');
-                            if FindSet(false, false) then
-                                repeat
-                                    if "ShipStation Order Key" <> '' then
-                                        PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
-                                until Next() = 0;
-                        end;
-                        Message(lblLabelsCreated);
+                trigger OnAction()
+                begin
+                    BoxHeader.Reset();
+                    CurrPage.SetSelectionFilter(BoxHeader);
+                    with BoxHeader do begin
+                        SetCurrentKey("ShipStation Order Key", "ShipStation Shipment ID");
+                        SetFilter("ShipStation Order Key", '<>%1', '');
+                        SetFilter("ShipStation Shipment ID", '=%1', '');
+                        if FindSet(false, false) then
+                            repeat
+                                PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
+                            until Next() = 0;
                     end;
-                }
-                action("Void Labels")
-                {
-                    ApplicationArea = All;
-                    CaptionML = ENU = 'Void Label', RUS = 'Отменить бирку';
-                    ToolTipML = ENU = 'Void Label to the box document.',
+                    Message(lblLabelsCreated);
+                end;
+            }
+            action("Void Labels")
+            {
+                ApplicationArea = All;
+                CaptionML = ENU = 'Void Label', RUS = 'Отменить бирку';
+                ToolTipML = ENU = 'Void Label to the box document.',
                                 RUS = 'Отменить бирку для коробоки.';
-                    Image = VoidCreditCard;
-                    Visible = "ShipStation Shipment ID" <> '';
+                Image = VoidCreditCard;
+                Visible = "ShipStation Shipment ID" <> '';
 
-                    trigger OnAction()
-                    begin
-                        BoxHeader.Reset();
-                        CurrPage.SetSelectionFilter(BoxHeader);
-                        with BoxHeader do begin
-                            SetCurrentKey("ShipStation Shipment ID");
-                            SetFilter("ShipStation Shipment ID", '<>%1', '');
-                            if FindSet(false, false) then
-                                repeat
-                                    PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
-                                until Next() = 0;
-                        end;
-                        Message(lblLabelsVoided);
+                trigger OnAction()
+                begin
+                    BoxHeader.Reset();
+                    CurrPage.SetSelectionFilter(BoxHeader);
+                    with BoxHeader do begin
+                        SetCurrentKey("ShipStation Shipment ID");
+                        SetFilter("ShipStation Shipment ID", '<>%1', '');
+                        if FindSet(false, false) then
+                            repeat
+                                PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
+                            until Next() = 0;
                     end;
-                }
+                    Message(lblLabelsVoided);
+                end;
             }
         }
     }

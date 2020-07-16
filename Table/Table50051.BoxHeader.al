@@ -111,6 +111,11 @@ table 50051 "Box Header"
             CaptionML = ENU = 'ShipStation Order Key', RUS = 'Ключ Заказа ShipStation';
             // Editable = false;
         }
+        field(17; "Unit of Measure"; Enum GrossWeightUoM)
+        {
+            DataClassification = CustomerContent;
+            CaptionML = ENU = 'Unit of Measure', RUS = 'Единица измерения';
+        }
         field(18; "ShipStation Status"; Text[50])
         {
             DataClassification = CustomerContent;
@@ -144,6 +149,7 @@ table 50051 "Box Header"
 
     var
         WhseSetup: Record "Warehouse Setup";
+        asdas: Record "Unit of Measure";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         PackageBoxMgt: Codeunit "Package Box Mgt.";
         errDeleteBoxNotAllowedTrackingNoExist: TextConst ENU = 'Box document %1 cannot be deleted because the tracking number %2  is exist.',
@@ -177,6 +183,7 @@ table 50051 "Box Header"
     var
         PackageHeader: Record "Package Header";
     begin
+        TestField(Status, Status::Open);
         with PackageHeader do begin
             Get("Package No.");
             PackageModify();
@@ -241,5 +248,23 @@ enum 50051 BoxStatus
     value(1; Close)
     {
         CaptionML = ENU = 'Closed', RUS = 'Закрыта';
+    }
+}
+
+enum 50052 GrossWeightUoM
+{
+    Extensible = true;
+
+    value(0; pounds)
+    {
+        CaptionML = ENU = 'pounds', RUS = 'фунты';
+    }
+    value(1; ounces)
+    {
+        CaptionML = ENU = 'ounces', RUS = 'унции';
+    }
+    value(2; grams)
+    {
+        CaptionML = ENU = 'grams', RUS = 'граммы';
     }
 }

@@ -58,6 +58,12 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies gross weight of the box.',
                                 RUS = 'Определяет вес брутто коробки.';
                 }
+                field("Unit of Measure"; "Unit of Measure")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies unit of measure of the gross weight of the box.',
+                                RUS = 'Определяет единицу измерения веса брутто коробки.';
+                }
                 field("Quantity In Box"; PackageBoxMgt.GetQuantityInBox("No."))
                 {
                     ApplicationArea = Warehouse;
@@ -217,7 +223,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Create Label to the box document.',
                                 RUS = 'Создать бирку для коробки.';
                 Image = PrintReport;
-                Visible = ("ShipStation Order Key" <> '') and ("ShipStation Shipment ID" = '');
+                Visible = ("ShipStation Order Key" <> '') and ("ShipStation Shipment ID" = '') and (Status = Status::Close);
 
                 trigger OnAction()
                 begin

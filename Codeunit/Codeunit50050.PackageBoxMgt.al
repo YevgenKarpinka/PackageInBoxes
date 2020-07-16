@@ -288,10 +288,8 @@ codeunit 50050 "Package Box Mgt."
             SetRange(Status, Status::Open);
             if FindSet() then
                 repeat
-                    Validate(Status, Status::Close);
-                    Modify(true);
+                    CloseBox("Package No.", "No.");
                 until Next() = 0;
-            // ModifyAll(Status, Status::Close, true);
         end;
     end;
 
@@ -303,7 +301,6 @@ codeunit 50050 "Package Box Mgt."
             SetCurrentKey(Status);
             SetRange("Package No.", PackageNo);
             SetRange(Status, Status::Close);
-            // ModifyAll(Status, Status::Open, true);
             if FindFirst() then
                 repeat
                     OpenBox("Package No.", "No.");
@@ -802,7 +799,7 @@ codeunit 50050 "Package Box Mgt."
         JSObjectHeader.Add('billTo', ShipStationMgt.jsonBillToFromSH(_SH."No."));
         JSObjectHeader.Add('shipTo', ShipStationMgt.jsonShipToFromSH(_SH."No."));
         JSObjectHeader.Add('items', jsonItemsFromBoxLines(BoxNo));
-        JSObjectHeader.Add('weight', ShipStationMgt.jsonWeightFromItem(_BoxHeader."Gross Weight"));
+        JSObjectHeader.Add('weight', jsonGrossWeight(_BoxHeader."Gross Weight", Format(_BoxHeader."Unit of Measure")));
         JSObjectHeader.WriteTo(JSText);
 
         JSText := ShipStationMgt.Connect2ShipStation(2, JSText, '');
@@ -810,16 +807,36 @@ codeunit 50050 "Package Box Mgt."
         exit(JSObjectHeader);
     end;
 
+    local procedure jsonGrossWeight(GrossWeight: Decimal; UoM: Text): JsonObject
+    var
+        JSObjectLine: JsonObject;
+    begin
+        JSObjectLine.Add('value', GrossWeight);
+        JSObjectLine.Add('units', UoM);
+        exit(JSObjectLine);
+    end;
+
     procedure jsonItemsFromBoxLines(BoxNo: Code[20]): JsonArray
     var
         JSObjectLine: JsonObject;
         JSObjectArray: JsonArray;
         _BoxLine: Record "Box Line";
+        // _BoxHeader: Record "Box Header";
         _ItemDescr: Record "Item Description";
         _SalesLine: Record "Sales Line";
+    // GrossWeightPerItem: Decimal;
+    // _UoM: Text;
     begin
+        // with _BoxHeader do begin
+        //     SetCurrentKey("Sales Order No.");
+        //     SetRange("No.", BoxNo);
+        //     FindFirst();
+        //     GrossWeightPerItem := _BoxHeader."Gross Weight" / GetQuantityInBox(BoxNo);
+        //     _UoM := Format("Unit of Measure");
+        // end;
+
         with _BoxLine do begin
-            SetCurrentKey("Quantity in Box");
+            SetCurrentKey("Sales Order No.", "Quantity in Box");
             SetRange("Box No.", BoxNo);
             SetFilter("Quantity in Box", '<>%1', 0);
             if FindSet(false, false) then
@@ -832,7 +849,7 @@ codeunit 50050 "Package Box Mgt."
                     JSObjectLine.Add('name', _SalesLine.Description);
                     if _ItemDescr.Get("item No.") then
                         JSObjectLine.Add('imageUrl', _ItemDescr."Main Image URL");
-                    // JSObjectLine.Add('weight', ShipStationMgt.jsonWeightFromItem(_SalesLine."Gross Weight"));
+                    // JSObjectLine.Add('weight', jsonGrossWeight(GrossWeightPerItem, _UoM));
                     JSObjectLine.Add('quantity', ShipStationMgt.Decimal2Integer("Quantity in Box"));
                     JSObjectLine.Add('unitPrice', Round(_SalesLine."Amount Including VAT" / _SalesLine.Quantity, 0.01));
                     JSObjectLine.Add('taxAmount', Round((_SalesLine."Amount Including VAT" - _SalesLine.Amount) / _SalesLine.Quantity, 0.01));

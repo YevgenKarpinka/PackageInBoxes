@@ -37,6 +37,7 @@ report 50051 "Packing Slip"
                 column(Box_No; "No.") { }
                 column(External_Document_No_; "External Document No.") { }
                 column(Gross_Weight; "Gross Weight") { }
+                column(Tracking_No_; "Tracking No.") { }
                 column(QuantityInBox; PackageBoxMgt.GetQuantityInBox("No."))
                 {
                     DecimalPlaces = 0 : 5;

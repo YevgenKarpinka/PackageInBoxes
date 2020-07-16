@@ -218,7 +218,8 @@ page 50050 "Package Card"
                                     SetFilter("ShipStation Shipment ID", '=%1', '');
                                     if FindSet(false, false) then
                                         repeat
-                                            PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
+                                            if PackageBoxMgt.GetQuantityInBox("No.") > 0 then
+                                                PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
                                         until Next() = 0;
                                 end;
                             until PackageHeader.Next() = 0;
@@ -241,8 +242,9 @@ page 50050 "Package Card"
                         if PackageHeader.FindSet(false, false) then
                             repeat
                                 with BoxHeader do begin
-                                    SetCurrentKey("ShipStation Order Key", "ShipStation Shipment ID");
+                                    SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
                                     SetRange("Package No.", PackageHeader."No.");
+                                    SetRange(Status, Status::Close);
                                     SetFilter("ShipStation Order Key", '<>%1', '');
                                     SetFilter("ShipStation Shipment ID", '=%1', '');
                                     if FindSet(false, false) then begin

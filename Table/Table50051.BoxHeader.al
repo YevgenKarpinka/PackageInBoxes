@@ -240,6 +240,6 @@ enum 50051 BoxStatus
     }
     value(1; Close)
     {
-        CaptionML = ENU = 'Close', RUS = 'Закрыта';
+        CaptionML = ENU = 'Closed', RUS = 'Закрыта';
     }
 }

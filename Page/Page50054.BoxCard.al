@@ -198,11 +198,13 @@ page 50054 "Box Card"
                     BoxHeader.Reset();
                     CurrPage.SetSelectionFilter(BoxHeader);
                     with BoxHeader do begin
-                        SetCurrentKey(Status, "ShipStation Order ID");
+                        SetCurrentKey(Status, "ShipStation Shipment ID");
                         SetRange(Status, Status::Close);
+                        SetFilter("ShipStation Shipment ID", '=%1', '');
                         if FindSet(false, false) then
                             repeat
-                                PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
+                                if PackageBoxMgt.GetQuantityInBox("No.") > 0 then
+                                    PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
                             until Next() = 0;
                     end;
                     Message(lblOrdersCreated);
@@ -222,7 +224,8 @@ page 50054 "Box Card"
                     BoxHeader.Reset();
                     CurrPage.SetSelectionFilter(BoxHeader);
                     with BoxHeader do begin
-                        SetCurrentKey("ShipStation Order Key", "ShipStation Shipment ID");
+                        SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
+                        SetRange(Status, Status::Close);
                         SetFilter("ShipStation Order Key", '<>%1', '');
                         SetFilter("ShipStation Shipment ID", '=%1', '');
                         if FindSet(false, false) then

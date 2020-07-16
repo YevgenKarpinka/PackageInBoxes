@@ -1087,6 +1087,7 @@ codeunit 50050 "Package Box Mgt."
             Validate(Type, _customer."Posting Type Shipment Cost");
             Validate(Quantity, 1);
             Validate("No.", _customer."Sales No. Shipment Cost");
+            // Validate("Amount Including VAT", PackageShippingAmount);
             Validate("Unit Price", PackageShippingAmount);
             Modify(true)
         end;

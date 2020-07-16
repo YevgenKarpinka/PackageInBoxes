@@ -109,7 +109,12 @@ page 50051 "Boxes Subpage"
 
                 trigger OnAction()
                 begin
-                    PackageBoxMgt.CloseBox("Package No.", "No.");
+                    BoxHeader.Reset();
+                    CurrPage.SetSelectionFilter(BoxHeader);
+                    BoxHeader.FindSet(false, false);
+                    repeat
+                        PackageBoxMgt.CloseBox(BoxHeader."Package No.", BoxHeader."No.");
+                    until BoxHeader.Next() = 0;
                 end;
             }
             action(ReOpen)
@@ -122,9 +127,13 @@ page 50051 "Boxes Subpage"
                 Image = RefreshLines;
 
                 trigger OnAction()
-                var
                 begin
-                    PackageBoxMgt.OpenBox("Package No.", "No.");
+                    BoxHeader.Reset();
+                    CurrPage.SetSelectionFilter(BoxHeader);
+                    BoxHeader.FindSet(false, false);
+                    repeat
+                        PackageBoxMgt.OpenBox(BoxHeader."Package No.", BoxHeader."No.");
+                    until BoxHeader.Next() = 0;
                 end;
             }
             action(AssemblyBox)
@@ -147,6 +156,7 @@ page 50051 "Boxes Subpage"
     var
         WhseSetup: Record "Warehouse Setup";
         PackageHeader: Record "Package Header";
+        BoxHeader: Record "Box Header";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
         errPackageMustBeUnregister: TextConst ENU = 'Package %1 must be unregister!',
                                               RUS = 'Упаковка %1 должна быть не зарегистрирована';

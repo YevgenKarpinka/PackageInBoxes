@@ -191,7 +191,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Send to the ShipStation of the box document.',
                                 RUS = 'Отправить в ShipStation документ коробки.';
                 Image = CreateDocuments;
-                Visible = (Status = Status::Close) and ("ShipStation Order Key" = '');
+                Visible = (Status = Status::Close) and ("ShipStation Shipment ID" = '');
 
                 trigger OnAction()
                 begin
@@ -200,7 +200,6 @@ page 50054 "Box Card"
                     with BoxHeader do begin
                         SetCurrentKey(Status, "ShipStation Order ID");
                         SetRange(Status, Status::Close);
-                        SetFilter("ShipStation Order ID", '=%1', '');
                         if FindSet(false, false) then
                             repeat
                                 PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
@@ -216,7 +215,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Create Label to the box document.',
                                 RUS = 'Создать бирку для коробки.';
                 Image = PrintReport;
-                Visible = "ShipStation Order Key" <> '';
+                Visible = ("ShipStation Order Key" <> '') and ("ShipStation Shipment ID" = '');
 
                 trigger OnAction()
                 begin
@@ -230,6 +229,7 @@ page 50054 "Box Card"
                             repeat
                                 PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
                             until Next() = 0;
+                        PackageBoxMgt.CreateDeliverySalesLineFromPackage("Sales Order No.");
                     end;
                     Message(lblLabelsCreated);
                 end;
@@ -254,8 +254,9 @@ page 50054 "Box Card"
                             repeat
                                 PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
                             until Next() = 0;
+                        PackageBoxMgt.CreateDeliverySalesLineFromPackage("Sales Order No.");
                     end;
-                    Message(lblLabelsVoided);
+                    Message(lblLabelVoided);
                 end;
             }
         }
@@ -269,6 +270,6 @@ page 50054 "Box Card"
                                     RUS = 'Заказы в ShipStation созданы!';
         lblLabelsCreated: TextConst ENU = 'Labels Created and Attached to Warehouse Shipments!',
                                     RUS = 'Бирки созданы и прикреплены к Отгрузкам!';
-        lblLabelsVoided: TextConst ENU = 'Labels Voided!',
-                                    RUS = 'Бирки отменены!';
+        lblLabelVoided: TextConst ENU = 'Label Voided!',
+                                    RUS = 'Бирка отменена!';
 }

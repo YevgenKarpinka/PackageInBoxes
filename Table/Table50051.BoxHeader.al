@@ -111,14 +111,6 @@ table 50051 "Box Header"
             CaptionML = ENU = 'ShipStation Order Key', RUS = 'Ключ Заказа ShipStation';
             // Editable = false;
         }
-        field(17; "ShipStation Order Status"; Option)
-        {
-            DataClassification = CustomerContent;
-            OptionMembers = "Not Sent",Sent,Updated;
-            OptionCaptionML = ENU = 'Not Sent,Sent,Updated', RUS = 'Не отправлен,Отправлен,Обновлен';
-            CaptionML = ENU = 'ShipStation Order Status', RUS = 'Статус Заказа ShipStation';
-            Editable = false;
-        }
         field(18; "ShipStation Status"; Text[50])
         {
             DataClassification = CustomerContent;

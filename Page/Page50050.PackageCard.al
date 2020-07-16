@@ -203,7 +203,6 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Send to the ShipStation all of the box document.',
                                 RUS = 'Отправить в ShipStation все документы коробки.';
                     Image = CreateDocuments;
-                    // Visible = (Status = Status::Released) and ("ShipStation Order Key" = '');
 
                     trigger OnAction()
                     begin
@@ -213,9 +212,10 @@ page 50050 "Package Card"
                         if PackageHeader.FindSet(false, false) then
                             repeat
                                 with BoxHeader do begin
-                                    SetCurrentKey(Status, "ShipStation Order ID");
+                                    SetCurrentKey(Status, "ShipStation Shipment ID");
+                                    SetRange("Package No.", PackageHeader."No.");
                                     SetRange(Status, Status::Close);
-                                    SetFilter("ShipStation Order ID", '=%1', '');
+                                    SetFilter("ShipStation Shipment ID", '=%1', '');
                                     if FindSet(false, false) then
                                         repeat
                                             PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
@@ -232,7 +232,6 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Create Labels all of the box document.',
                                 RUS = 'Создать бирки для всех коробок.';
                     Image = PrintReport;
-                    // Visible = "ShipStation Order Key" <> '';
 
                     trigger OnAction()
                     begin
@@ -243,13 +242,15 @@ page 50050 "Package Card"
                             repeat
                                 with BoxHeader do begin
                                     SetCurrentKey("ShipStation Order Key", "ShipStation Shipment ID");
+                                    SetRange("Package No.", PackageHeader."No.");
                                     SetFilter("ShipStation Order Key", '<>%1', '');
                                     SetFilter("ShipStation Shipment ID", '=%1', '');
-                                    if FindSet(false, false) then
+                                    if FindSet(false, false) then begin
                                         repeat
-                                            if "ShipStation Order Key" <> '' then
-                                                PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
+                                            PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
                                         until Next() = 0;
+                                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
+                                    end;
                                 end;
                             until PackageHeader.Next() = 0;
                         Message(lblLabelsCreated);
@@ -262,7 +263,6 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Void Labels all of the box document.',
                                 RUS = 'Отменить бирки для всех коробок.';
                     Image = VoidCreditCard;
-                    // Visible = "ShipStation Shipment ID" <> '';
 
                     trigger OnAction()
                     begin
@@ -273,11 +273,14 @@ page 50050 "Package Card"
                             repeat
                                 with BoxHeader do begin
                                     SetCurrentKey("ShipStation Shipment ID");
+                                    SetRange("Package No.", PackageHeader."No.");
                                     SetFilter("ShipStation Shipment ID", '<>%1', '');
-                                    if FindSet(false, false) then
+                                    if FindSet(false, false) then begin
                                         repeat
                                             PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
                                         until Next() = 0;
+                                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
+                                    end;
                                 end;
                             until PackageHeader.Next() = 0;
                         Message(lblLabelsVoided);

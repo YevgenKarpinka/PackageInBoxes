@@ -40,6 +40,7 @@ codeunit 50050 "Package Box Mgt."
         errDeleteBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be delete because the tracking number %2  is exist.',
                                                     RUS = 'Документ коробки %1 удалить нельзя, потому что заполнен номер отслеживания %2.';
         lblAwaitingShipment: Label 'awaiting_shipment';
+        lblShipped: Label 'shipped';
         errorWhseShipNotExist: TextConst ENU = 'Warehouse Shipment is not Created for Sales Order = %1!',
                                          RUS = 'Для Заказа продажи = %1 не создана Складская отгрузка!';
         errorShipStationOrderNotExist: TextConst ENU = 'Order in ShipStation is not Existed!';
@@ -698,8 +699,6 @@ codeunit 50050 "Package Box Mgt."
             if Get(PackageNo, BoxNo) then
                 if Status = Status::Close then begin
                     TestField("Tracking No.", '');
-                    // if "Tracking No." <> '' then
-                    //     Error(errOpenBoxNotAllowedTrackginNoExist, "No.", "Tracking No.");
                     Validate(Status, Status::Open);
                     Modify(true);
                 end;
@@ -808,9 +807,6 @@ codeunit 50050 "Package Box Mgt."
 
         JSText := ShipStationMgt.Connect2ShipStation(2, JSText, '');
         JSObjectHeader.ReadFrom(JSText);
-        // update Sales Header from ShipStation
-        // JSObjectHeader.ReadFrom(JSText);
-        // UpdateSalesHeaderFromShipStation(DocNo, JSObjectHeader);
         exit(JSObjectHeader);
     end;
 
@@ -884,12 +880,12 @@ codeunit 50050 "Package Box Mgt."
             "ShipStation Status" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'orderStatus').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."ShipStation Status"));
             "ShipStation Shipment Amount" := ShipStationMgt.GetJSToken(_jsonObject, 'shippingAmount').AsValue().AsDecimal();
 
-            case "ShipStation Order Status" of
-                "ShipStation Order Status"::"Not Sent":
-                    "ShipStation Order Status" := "ShipStation Order Status"::Sent;
-                "ShipStation Order Status"::Sent:
-                    "ShipStation Order Status" := "ShipStation Order Status"::Updated;
-            end;
+            // case "ShipStation Order Status" of
+            //     "ShipStation Order Status"::"Not Sent":
+            //         "ShipStation Order Status" := "ShipStation Order Status"::Sent;
+            //     "ShipStation Order Status"::Sent:
+            //         "ShipStation Order Status" := "ShipStation Order Status"::Updated;
+            // end;
 
             if "ShipStation Status" = lblAwaitingShipment then begin
                 "Tracking No." := '';
@@ -926,20 +922,20 @@ codeunit 50050 "Package Box Mgt."
 
             // Get Order from Shipstation to Fill Variables
             JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
-
             JSObject.ReadFrom(JSText);
 
-            CheckUpdateBox(JSObject, 'orderId');
+            // CheckUpdateBox(JSObject, 'orderId');
             // jsObjHeaderUpdate.ReadFrom(JSText);
+            UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
             JSText := ShipStationMgt.FillValuesFromOrder(JSObject, "Sales Order No.", SalesHeader."Location Code");
 
 
             JSObject.ReadFrom(JSText);
-            CheckUpdateBox(JSObject, 'orderId');
+            // CheckUpdateBox(JSObject, 'orderId');
             JSText := ShipStationMgt.Connect2ShipStation(3, JSText, '');
 
             JSObject.ReadFrom(JSText);
-            CheckUpdateBox(JSObject, 'orderId');
+            // CheckUpdateBox(JSObject, 'orderId');
             // Update Order From Label
             UpdateBoxFromLabel(PackageNo, BoxNo, JSText);
 
@@ -950,9 +946,21 @@ codeunit 50050 "Package Box Mgt."
             ShipStationMgt.SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
 
             // Update Sales Header From ShipStation
-            JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
-            JSObject.ReadFrom(JSText);
-            UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+            // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
+            // JSObject.ReadFrom(JSText);
+            // UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+            ChangeShipStationStatusToShipped(PackageNo, BoxNo);
+        end;
+    end;
+
+    procedure ChangeShipStationStatusToShipped(PackageNo: Code[20]; BoxNo: Code[20]);
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        with BoxHeader do begin
+            Get(PackageNo, BoxNo);
+            "ShipStation Status" := lblShipped;
+            Modify();
         end;
     end;
 
@@ -968,6 +976,7 @@ codeunit 50050 "Package Box Mgt."
             "Shipment Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentCost').AsValue().AsDecimal();
             "Tracking No." := ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
             "ShipStation Shipment ID" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentId').AsValue().AsText();
+            "ShipStation Status" := lblShipped;
             Modify();
         end;
     end;
@@ -986,21 +995,148 @@ codeunit 50050 "Package Box Mgt."
         with _BoxHeader do begin
             if (not Get(PackageNo, BoxNo)) or ("ShipStation Shipment ID" = '') then exit(false);
 
+            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then
+                Error(errorWhseShipNotExist, "Sales Order No.");
+
             // Void Label in Shipstation
             JSObject.Add('shipmentId', "ShipStation Shipment ID");
             JSObject.WriteTo(JSText);
             JSText := ShipStationMgt.Connect2ShipStation(8, JSText, '');
-            JSObject.ReadFrom(JSText);
+            // JSObject.ReadFrom(JSText);
 
-            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, "Sales Order No.");
             _txtBefore := "No." + '-' + "Tracking No.";
-            FileName := StrSubstNo('%1-%2.pdf', _txtBefore, lblOrder);
+            FileName := StrSubstNo('%1-%2', _txtBefore, lblOrder);
             ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
 
-            // Update Sales Header From ShipStation
-            JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
-            JSObject.ReadFrom(JSText);
-            UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+            // Update Box Header From ShipStation
+            // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
+            // JSObject.ReadFrom(JSText);
+            // UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+            CleareTrackingNoShipmentID(PackageNo, BoxNo);
+        end;
+    end;
+
+    procedure CleareTrackingNoShipmentID(PackageNo: Code[20]; BoxNo: Code[20]);
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        with BoxHeader do begin
+            Get(PackageNo, BoxNo);
+            "Tracking No." := '';
+            "ShipStation Shipment ID" := '';
+            "ShipStation Status" := lblAwaitingShipment;
+            Modify();
+        end;
+    end;
+
+    procedure CreateDeliverySalesLineFromPackage(salesOrderNo: Code[20])
+    var
+        _salesHeader: Record "Sales Header";
+        _salesLine: Record "Sales Line";
+        _salesLineLast: Record "Sales Line";
+        _customer: Record Customer;
+        LineNo: Integer;
+        PackageShippingAmount: Decimal;
+        salesLineExist: Boolean;
+        ICExtended: Codeunit "IC Extended";
+    begin
+        if not _salesHeader.Get(_salesHeader."Document Type"::Order, salesOrderNo) then exit;
+
+        if (not _customer.Get(_salesHeader."Sell-to Customer No."))
+            or (_customer."Sales No. Shipment Cost" = '') then
+            exit;
+
+        PackageShippingAmount := GetPackageShippingAmountFromSalesOrder(salesOrderNo);
+        if PackageShippingAmount = 0 then begin
+            DeleteItemChargeSalesLine(salesOrderNo, _customer."Sales No. Shipment Cost");
+            exit;
+        end;
+
+        with _salesLineLast do begin
+            SetRange("Document Type", "Document Type"::Order);
+            SetRange("Document No.", salesOrderNo);
+            SetRange("No.", _customer."Sales No. Shipment Cost");
+            if FindFirst() then begin
+                salesLineExist := true;
+                LineNo := "Line No."
+            end else begin
+                SetRange("No.");
+                if FindLast() then
+                    LineNo := "Line No." + 10000
+                else
+                    LineNo := 10000;
+            end;
+        end;
+
+        with _salesHeader do
+            if Status = Status::Released then begin
+                Status := Status::Open;
+                Modify();
+            end;
+
+        with _salesLine do begin
+            if salesLineExist then
+                Get("Document Type"::Order, salesOrderNo, LineNo)
+            else begin
+                Init;
+                "Document Type" := "Document Type"::Order;
+                "Document No." := salesOrderNo;
+                "Line No." := LineNo;
+                Insert(true);
+            end;
+            Validate(Type, _customer."Posting Type Shipment Cost");
+            Validate(Quantity, 1);
+            Validate("No.", _customer."Sales No. Shipment Cost");
+            Validate("Unit Price", PackageShippingAmount);
+            Modify(true)
+        end;
+
+        with _salesHeader do begin
+            Status := Status::Released;
+            Modify();
+        end;
+
+        ICExtended.CreateItemChargeAssgnt(_salesHeader."No.", _salesHeader."Sell-to Customer No.");
+    end;
+
+    procedure DeleteItemChargeSalesLine(salesOrderNo: Code[20]; ItemNo: Code[20])
+    var
+        salesHeader: Record "Sales Header";
+        salesLine: Record "Sales Line";
+    begin
+        with salesHeader do begin
+            Get("Document Type"::Order, salesOrderNo);
+            if Status = Status::Released then begin
+                Status := Status::Open;
+                Modify();
+            end;
+        end;
+
+        with salesLine do begin
+            SetCurrentKey("No.");
+            SetRange("Document Type", "Document Type"::Order);
+            SetRange("Document No.", salesOrderNo);
+            SetRange("No.", ItemNo);
+            DeleteAll(true);
+        end;
+
+        with salesHeader do
+            if Status = Status::Open then begin
+                Status := Status::Released;
+                Modify();
+            end;
+    end;
+
+    procedure GetPackageShippingAmountFromSalesOrder(salesOrderNo: Code[20]): Decimal
+    var
+        boxHeader: Record "Box Header";
+    begin
+        with boxHeader do begin
+            SetCurrentKey("Sales Order No.", "ShipStation Shipment ID");
+            SetRange("Sales Order No.", salesOrderNo);
+            SetFilter("ShipStation Shipment ID", '<>%1', '');
+            CalcSums("Shipment Cost", "Other Cost", "ShipStation Shipment Amount");
+            exit("Shipment Cost" + "Other Cost" + "ShipStation Shipment Amount");
         end;
     end;
 }

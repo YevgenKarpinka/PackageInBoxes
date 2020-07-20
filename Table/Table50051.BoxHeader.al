@@ -55,7 +55,7 @@ table 50051 "Box Header"
 
             trigger OnValidate()
             begin
-                if Status = Status::Close then begin
+                if Status = Status::Closed then begin
                     TestField("Gross Weight");
                     PackageBoxMgt.DeleteEmptyLinesByBox("No.");
                 end;
@@ -183,7 +183,6 @@ table 50051 "Box Header"
     var
         PackageHeader: Record "Package Header";
     begin
-        TestField(Status, Status::Open);
         with PackageHeader do begin
             Get("Package No.");
             PackageModify();
@@ -245,7 +244,7 @@ enum 50051 BoxStatus
     {
         CaptionML = ENU = 'Open', RUS = 'Открыта';
     }
-    value(1; Close)
+    value(1; Closed)
     {
         CaptionML = ENU = 'Closed', RUS = 'Закрыта';
     }

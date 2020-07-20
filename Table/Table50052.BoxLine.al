@@ -193,7 +193,7 @@ table 50052 "Box Line"
         with BoxHeader do begin
             SetRange("No.", "Box No.");
             FindFirst();
-            if Status = Status::Close then
+            if Status = Status::Closed then
                 Error(errModifyNotAllowedBoxClosed, "Box No.");
             BoxModify();
         end;

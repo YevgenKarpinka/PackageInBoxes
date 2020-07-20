@@ -123,7 +123,7 @@ page 50051 "Boxes Subpage"
                 CaptionML = ENU = 'Reopen', RUS = 'Открыть';
                 ToolTipML = ENU = 'Reopen the box document to change.',
                             RUS = 'Повторное открытие документа коробки для его изменения.';
-                Enabled = Status = Status::Close;
+                Enabled = Status = Status::Closed;
                 Image = RefreshLines;
 
                 trigger OnAction()

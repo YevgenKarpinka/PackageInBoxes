@@ -300,7 +300,7 @@ codeunit 50050 "Package Box Mgt."
         with BoxHeader do begin
             SetCurrentKey(Status);
             SetRange("Package No.", PackageNo);
-            SetRange(Status, Status::Close);
+            SetRange(Status, Status::Closed);
             if FindFirst() then
                 repeat
                     OpenBox("Package No.", "No.");
@@ -679,7 +679,7 @@ codeunit 50050 "Package Box Mgt."
         with BoxHeader do begin
             if Get(PackageNo, BoxNo) and (Status = Status::Open) then begin
                 TestField("Gross Weight");
-                Validate(Status, Status::Close);
+                Validate(Status, Status::Closed);
                 Modify(true);
             end;
         end;
@@ -694,7 +694,7 @@ codeunit 50050 "Package Box Mgt."
 
         with BoxHeader do
             if Get(PackageNo, BoxNo) then
-                if Status = Status::Close then begin
+                if Status = Status::Closed then begin
                     TestField("Tracking No.", '');
                     Validate(Status, Status::Open);
                     Modify(true);

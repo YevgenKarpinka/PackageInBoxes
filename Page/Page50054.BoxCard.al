@@ -167,7 +167,7 @@ page 50054 "Box Card"
                 CaptionML = ENU = 'Reopen', RUS = 'Открыть';
                 ToolTipML = ENU = 'Reopen the document of the box to change.',
                             RUS = 'Повторное открытие документа коробки для его изменения.';
-                Enabled = Status = Status::Close;
+                Enabled = Status = Status::Closed;
                 Image = RefreshLines;
 
                 trigger OnAction()
@@ -197,7 +197,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Send to the ShipStation of the box document.',
                                 RUS = 'Отправить в ShipStation документ коробки.';
                 Image = CreateDocuments;
-                Visible = (Status = Status::Close) and ("ShipStation Shipment ID" = '');
+                Visible = (Status = Status::Closed) and ("ShipStation Shipment ID" = '');
 
                 trigger OnAction()
                 begin
@@ -205,7 +205,7 @@ page 50054 "Box Card"
                     CurrPage.SetSelectionFilter(BoxHeader);
                     with BoxHeader do begin
                         SetCurrentKey(Status, "ShipStation Shipment ID");
-                        SetRange(Status, Status::Close);
+                        SetRange(Status, Status::Closed);
                         SetFilter("ShipStation Shipment ID", '=%1', '');
                         if FindSet(false, false) then
                             repeat
@@ -223,7 +223,9 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Create Label to the box document.',
                                 RUS = 'Создать бирку для коробки.';
                 Image = PrintReport;
-                Visible = ("ShipStation Order Key" <> '') and ("ShipStation Shipment ID" = '') and (Status = Status::Close);
+                Visible = ("ShipStation Order Key" <> '')
+                and ("ShipStation Shipment ID" = '')
+                and (Status = Status::Closed);
 
                 trigger OnAction()
                 begin
@@ -231,7 +233,7 @@ page 50054 "Box Card"
                     CurrPage.SetSelectionFilter(BoxHeader);
                     with BoxHeader do begin
                         SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
-                        SetRange(Status, Status::Close);
+                        SetRange(Status, Status::Closed);
                         SetFilter("ShipStation Order Key", '<>%1', '');
                         SetFilter("ShipStation Shipment ID", '=%1', '');
                         if FindSet(false, false) then

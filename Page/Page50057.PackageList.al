@@ -100,7 +100,7 @@ page 50057 "Package List"
                                 with BoxHeader do begin
                                     SetCurrentKey(Status, "ShipStation Shipment ID");
                                     SetRange("Package No.", PackageHeader."No.");
-                                    SetRange(Status, Status::Close);
+                                    SetRange(Status, Status::Closed);
                                     SetFilter("ShipStation Shipment ID", '=%1', '');
                                     if FindSet(false, false) then
                                         repeat
@@ -130,7 +130,7 @@ page 50057 "Package List"
                                 with BoxHeader do begin
                                     SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
                                     SetRange("Package No.", PackageHeader."No.");
-                                    SetRange(Status, Status::Close);
+                                    SetRange(Status, Status::Closed);
                                     SetFilter("ShipStation Order Key", '<>%1', '');
                                     SetFilter("ShipStation Shipment ID", '=%1', '');
                                     if FindSet(false, false) then begin

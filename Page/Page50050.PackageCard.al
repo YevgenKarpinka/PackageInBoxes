@@ -15,43 +15,43 @@ page 50050 "Package Card"
             {
                 Editable = false;
 
-                field("Sales Order No."; "Sales Order No.")
+                field("Sales Order No."; Rec."Sales Order No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the sales order number on the basis of which the packaging document was created',
                                 RUS = 'Определяет номер заказа продажи на основании которого был создан документ упаковки.';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the number of the involved entry or record, according to the specified number series.',
                                 RUS = 'Определяет номер соответствующей записи или операции в соответствии с указанной серией номеров.';
                 }
-                field("Create User ID"; "Create User ID")
+                field("Create User ID"; Rec."Create User ID")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the user id that created the packaging document.',
                                 RUS = 'Определяет код пользователя который создал документ упаковки.';
                 }
-                field("Create Date"; "Create Date")
+                field("Create Date"; Rec."Create Date")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the date and time the packaging document was created.',
                                 RUS = 'Определяет дату и время создания документа упаковки.';
                 }
-                field("Last Modified User ID"; "Last Modified User ID")
+                field("Last Modified User ID"; Rec."Last Modified User ID")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the user id that last modified the packaging document.',
                                 RUS = 'Определяет код пользователя который последним изменил документ упаковки.';
                 }
-                field("Last Modified Date"; "Last Modified Date")
+                field("Last Modified Date"; Rec."Last Modified Date")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the date and time of the last modification of the packaging document.',
                                 RUS = 'Определяет дату и время последниего изменения документа упаковки.';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies status the packaging document.',
@@ -63,7 +63,7 @@ page 50050 "Package Card"
                 ApplicationArea = Warehouse;
                 SubPageLink = "Package No." = field("No.");
                 UpdatePropagation = Both;
-                Editable = Status = Status::Unregistered;
+                Editable = Rec.Status = Rec.Status::Unregistered;
             }
         }
         area(FactBoxes)
@@ -95,7 +95,7 @@ page 50050 "Package Card"
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.RegisterPackage("No.");
+                        PackageBoxMgt.RegisterPackage(Rec."No.");
                     end;
                 }
                 action(Unregistered)
@@ -104,12 +104,12 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Unregister', RUS = 'Отменить регистрацию';
                     ToolTipML = ENU = 'Unregister package document to change.',
                             RUS = 'Отменить регистрацию документа упаковки для изменения.';
-                    Enabled = Status = Status::Registered;
+                    Enabled = Rec.Status = Rec.Status::Registered;
                     Image = Undo;
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.UnregisterPackage("No.");
+                        PackageBoxMgt.UnregisterPackage(Rec."No.");
                     end;
                 }
                 action("Print Packing Slip")
@@ -138,14 +138,14 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Close All', RUS = 'Закрыть Все';
                     ToolTipML = ENU = 'Close all of the box document to the next stage of processing. You must reopen the document before you can make changes to it.',
                             RUS = 'Закрытие всех документов коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
-                    Enabled = Status = Status::Unregistered;
+                    Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = ItemLines;
 
                     trigger OnAction()
                     var
                         BoxHeader: Record "Box Header";
                     begin
-                        PackageBoxMgt.CloseAllBoxes("No.");
+                        PackageBoxMgt.CloseAllBoxes(Rec."No.");
                     end;
                 }
                 action(ReOpenAll)
@@ -154,12 +154,12 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Reopen All', RUS = 'Открыть Все';
                     ToolTipML = ENU = 'Reopen all the document of the box to change.',
                             RUS = 'Повторное открытие всех документа коробки для их изменения.';
-                    Enabled = Status = Status::Unregistered;
+                    Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = RefreshLines;
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.ReOpenAllBoxes("No.");
+                        PackageBoxMgt.ReOpenAllBoxes(Rec."No.");
                     end;
                 }
                 action(DeleteEmptyBoxes)
@@ -168,12 +168,12 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Delete Empty Boxes', RUS = 'Удалить пустые коробки';
                     ToolTipML = ENU = 'Delete empty box documents.',
                             RUS = 'Удаление пустых документов коробки.';
-                    Enabled = Status = Status::Unregistered;
+                    Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = Delete;
 
                     trigger OnAction()
                     begin
-                        PackageBoxMgt.DeleteEmptyBoxes("No.");
+                        PackageBoxMgt.DeleteEmptyBoxes(Rec."No.");
                     end;
                 }
                 action(DeleteEmptyLines)
@@ -182,7 +182,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Delete Empty Lines', RUS = 'Удалить пустые строки';
                     ToolTipML = ENU = 'Delete blank lines in box documents.',
                             RUS = 'Удаление пустых строк в документах коробки.';
-                    Enabled = Status = Status::Unregistered;
+                    Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = DeleteRow;
 
                     trigger OnAction()
@@ -211,17 +211,15 @@ page 50050 "Package Card"
                         CurrPage.SetSelectionFilter(PackageHeader);
                         if PackageHeader.FindSet(false, false) then
                             repeat
-                                with BoxHeader do begin
-                                    SetCurrentKey(Status, "ShipStation Shipment ID");
-                                    SetRange("Package No.", PackageHeader."No.");
-                                    SetRange(Status, Status::Closed);
-                                    SetFilter("ShipStation Shipment ID", '=%1', '');
-                                    if FindSet(false, false) then
-                                        repeat
-                                            if PackageBoxMgt.GetQuantityInBox("No.") > 0 then
-                                                PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
-                                        until Next() = 0;
-                                end;
+                                BoxHeader.SetCurrentKey(Status, "ShipStation Shipment ID");
+                                BoxHeader.SetRange("Package No.", PackageHeader."No.");
+                                BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
+                                BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
+                                if BoxHeader.FindSet(false, false) then
+                                    repeat
+                                        if PackageBoxMgt.GetQuantityInBox(BoxHeader."No.") > 0 then
+                                            PackageBoxMgt.SentBoxInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                    until BoxHeader.Next() = 0;
                             until PackageHeader.Next() = 0;
                         Message(lblOrdersCreated);
                     end;
@@ -241,18 +239,16 @@ page 50050 "Package Card"
                         CurrPage.SetSelectionFilter(PackageHeader);
                         if PackageHeader.FindSet(false, false) then
                             repeat
-                                with BoxHeader do begin
-                                    SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
-                                    SetRange("Package No.", PackageHeader."No.");
-                                    SetRange(Status, Status::Closed);
-                                    SetFilter("ShipStation Order Key", '<>%1', '');
-                                    SetFilter("ShipStation Shipment ID", '=%1', '');
-                                    if FindSet(false, false) then begin
-                                        repeat
-                                            PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
-                                        until Next() = 0;
-                                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
-                                    end;
+                                BoxHeader.SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
+                                BoxHeader.SetRange("Package No.", PackageHeader."No.");
+                                BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
+                                BoxHeader.SetFilter("ShipStation Order Key", '<>%1', '');
+                                BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
+                                if BoxHeader.FindSet(false, false) then begin
+                                    repeat
+                                        PackageBoxMgt.CreateLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                    until BoxHeader.Next() = 0;
+                                    PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
                                 end;
                             until PackageHeader.Next() = 0;
                         Message(lblLabelsCreated);
@@ -273,16 +269,14 @@ page 50050 "Package Card"
                         CurrPage.SetSelectionFilter(PackageHeader);
                         if PackageHeader.FindSet(false, false) then
                             repeat
-                                with BoxHeader do begin
-                                    SetCurrentKey("ShipStation Shipment ID");
-                                    SetRange("Package No.", PackageHeader."No.");
-                                    SetFilter("ShipStation Shipment ID", '<>%1', '');
-                                    if FindSet(false, false) then begin
-                                        repeat
-                                            PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
-                                        until Next() = 0;
-                                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
-                                    end;
+                                BoxHeader.SetCurrentKey("ShipStation Shipment ID");
+                                BoxHeader.SetRange("Package No.", PackageHeader."No.");
+                                BoxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
+                                if BoxHeader.FindSet(false, false) then begin
+                                    repeat
+                                        PackageBoxMgt.VoidLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                    until BoxHeader.Next() = 0;
+                                    PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
                                 end;
                             until PackageHeader.Next() = 0;
                         Message(lblLabelsVoided);

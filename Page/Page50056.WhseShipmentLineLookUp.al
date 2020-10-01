@@ -13,13 +13,13 @@ page 50056 "Whse. Shipment Item Lookup"
         {
             repeater(repeaterName)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the item code of warehouse shipment that can be put in the box of the packaging document.',
                                 RUS = 'Определяет код товара складской отгрузки который можно положить в коробку документа упаковки.';
                 }
-                field("Qty. to Ship"; "Qty. to Ship")
+                field("Qty. to Ship"; Rec."Qty. to Ship")
                 {
                     ApplicationArea = Warehouse;
                     CaptionML = ENU = 'Unpacked Quantity',
@@ -27,13 +27,13 @@ page 50056 "Whse. Shipment Item Lookup"
                     ToolTipML = ENU = 'Specifies the quantity of item of warehouse shipment available for packaging in the box.',
                                 RUS = 'Определяет количество товара складской отгрузки доступное для упаковки в коробку.';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the number of warehouse shipment that is available for packaging.',
                                 RUS = 'Определяет номер складской отгрузки которая доступна для упаковки.';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the line number of the warehouse shipment that is available for packaging.',

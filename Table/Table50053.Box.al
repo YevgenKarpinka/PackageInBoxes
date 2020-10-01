@@ -95,12 +95,10 @@ table 50053 "Box"
 
     local procedure BoxHeaderExist(var BoxHeader: Record "Box Header"): Boolean
     begin
-        with BoxHeader do begin
-            SetCurrentKey("Box Code");
-            SetRange("Box Code", "No.");
-            if FindFirst() then
-                exit(true);
-        end;
+        BoxHeader.SetCurrentKey("Box Code");
+        BoxHeader.SetRange("Box Code", BoxHeader."No.");
+        if BoxHeader.FindFirst() then
+            exit(true);
         exit(false);
     end;
 

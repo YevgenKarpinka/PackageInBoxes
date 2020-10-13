@@ -30,24 +30,22 @@ table 50052 "Box Line"
                 RemainingItemQuantity: Decimal;
             begin
                 GetSalesOrderNo();
-                with WhseShipmentLine do begin
-                    SetCurrentKey("Source Document", "Source No.");
-                    SetRange("Source Document", "Source Document"::"Sales Order");
-                    SetRange("Source No.", "Sales Order No.");
-                    if FindSet() then
-                        repeat
-                            tempWhseShipmentLine.SetRange("No.", "No.");
-                            tempWhseShipmentLine.SetRange("Item No.", "Item No.");
-                            if tempWhseShipmentLine.IsEmpty then begin
-                                RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No.");
-                                if RemainingItemQuantity > 0 then begin
-                                    tempWhseShipmentLine := WhseShipmentLine;
-                                    tempWhseShipmentLine."Qty. to Ship" := RemainingItemQuantity;
-                                    tempWhseShipmentLine.Insert();
-                                end;
+                WhseShipmentLine.SetCurrentKey("Source Document", "Source No.");
+                WhseShipmentLine.SetRange("Source Document", WhseShipmentLine."Source Document"::"Sales Order");
+                WhseShipmentLine.SetRange("Source No.", "Sales Order No.");
+                if WhseShipmentLine.FindSet() then
+                    repeat
+                        tempWhseShipmentLine.SetRange("No.", WhseShipmentLine."No.");
+                        tempWhseShipmentLine.SetRange("Item No.", "Item No.");
+                        if tempWhseShipmentLine.IsEmpty then begin
+                            RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment(WhseShipmentLine."No.", WhseShipmentLine."Item No.", WhseShipmentLine."Line No.");
+                            if RemainingItemQuantity > 0 then begin
+                                tempWhseShipmentLine := WhseShipmentLine;
+                                tempWhseShipmentLine."Qty. to Ship" := RemainingItemQuantity;
+                                tempWhseShipmentLine.Insert();
                             end;
-                        until Next() = 0;
-                end;
+                        end;
+                    until WhseShipmentLine.Next() = 0;
 
                 tempWhseShipmentLine.Reset();
                 if tempWhseShipmentLine.Count = 0 then
@@ -73,11 +71,9 @@ table 50052 "Box Line"
             begin
                 if xRec."Quantity in Box" = "Quantity in Box" then exit;
 
-                with BoxHeader do begin
-                    SetRange("No.", "Box No.");
-                    FindFirst();
-                    PackageBoxMgt.CheckWhseShipmentExist("Package No.")
-                end;
+                BoxHeader.SetRange("No.", "Box No.");
+                BoxHeader.FindFirst();
+                PackageBoxMgt.CheckWhseShipmentExist(BoxHeader."Package No.");
 
                 RemainingItemQuantity := PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No.");
                 if "Quantity in Box" > xRec."Quantity in Box" + RemainingItemQuantity then
@@ -179,10 +175,8 @@ table 50052 "Box Line"
         BoxHeader: Record "Box Header";
     begin
         if "Sales Order No." <> '' then exit;
-        with BoxHeader do begin
-            SetRange("No.", "Box No.");
-            FindFirst();
-        end;
+        BoxHeader.SetRange("No.", "Box No.");
+        BoxHeader.FindFirst();
         "Sales Order No." := BoxHeader."Sales Order No.";
     end;
 
@@ -190,12 +184,10 @@ table 50052 "Box Line"
     var
         BoxHeader: Record "Box Header";
     begin
-        with BoxHeader do begin
-            SetRange("No.", "Box No.");
-            FindFirst();
-            if Status = Status::Closed then
-                Error(errModifyNotAllowedBoxClosed, "Box No.");
-            BoxModify();
-        end;
+        BoxHeader.SetRange("No.", "Box No.");
+        BoxHeader.FindFirst();
+        if BoxHeader.Status = BoxHeader.Status::Closed then
+            Error(errModifyNotAllowedBoxClosed, "Box No.");
+        BoxHeader.BoxModify();
     end;
 }

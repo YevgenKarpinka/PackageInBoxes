@@ -13,21 +13,21 @@ page 50055 "Box Lines FactBox"
         {
             repeater(RepeaterName)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the item code of warehouse shipment that lies in the box.',
                                 RUS = 'Определяет код товара складской отгрузки который лежит в коробке.';
 
                 }
-                field("Quantity in Box"; "Quantity in Box")
+                field("Quantity in Box"; Rec."Quantity in Box")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the quantity of item in the warehouse shipment that lies in the box.',
                                 RUS = 'Определяет количество товара складской отгрузки который лежит в коробке.';
 
                 }
-                field("Unpacked Quantity"; PackageBoxMgt.GetRemainingItemQuantityInShipment("Shipment No.", "Item No.", "Shipment Line No."))
+                field("Unpacked Quantity"; PackageBoxMgt.GetRemainingItemQuantityInShipment(Rec."Shipment No.", Rec."Item No.", Rec."Shipment Line No."))
                 {
                     ApplicationArea = Warehouse;
                     CaptionML = ENU = 'Unpacked Quantity', RUS = 'Не упакованное количество';
@@ -35,13 +35,13 @@ page 50055 "Box Lines FactBox"
                                 RUS = 'Определяет не упакованное количество товара складской отгрузки который нужно положить в коробку документа упаковки.';
 
                 }
-                field("Shipment No."; "Shipment No.")
+                field("Shipment No."; Rec."Shipment No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the number of warehouse shipment items that are in the box.',
                                 RUS = 'Определяет номер складской отгрузки товар который лежит в коробке.';
                 }
-                field("Shipment Line No."; "Shipment Line No.")
+                field("Shipment Line No."; Rec."Shipment Line No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the line number of the warehouse shipment of the items with which lies in the box.',

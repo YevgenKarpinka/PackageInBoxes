@@ -58,15 +58,13 @@ codeunit 50050 "Package Box Mgt."
         and not (WhseShptLine."Source Document" = WhseShptLine."Source Document"::"Sales Order") then
             exit;
 
-        with PackageHeader do begin
-            SetCurrentKey("Sales Order No.");
-            SetRange("Sales Order No.", WhseShptLine."Source No.");
-            if not FindFirst() then
-                Error(errCreatePackageBeforePostingWarehouseShipment, WhseShptLine."No.");
+        PackageHeader.SetCurrentKey("Sales Order No.");
+        PackageHeader.SetRange("Sales Order No.", WhseShptLine."Source No.");
+        if not PackageHeader.FindFirst() then
+            Error(errCreatePackageBeforePostingWarehouseShipment, WhseShptLine."No.");
 
-            if PackageUnRegistered(PackageHeader."No.") then
-                Error(errPackageMustBeRegistered, PackageHeader."No.");
-        end;
+        if PackageUnRegistered(PackageHeader."No.") then
+            Error(errPackageMustBeRegistered, PackageHeader."No.");
 
         // CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
         // DeleteEmptyBoxes(PackageHeader."No.");
@@ -85,14 +83,12 @@ codeunit 50050 "Package Box Mgt."
         and not (WarehouseShipmentLine."Source Document" = WarehouseShipmentLine."Source Document"::"Sales Order") then
             exit;
 
-        with BoxLine do begin
-            SetCurrentKey("Shipment No.", "Shipment Line No.");
-            SetRange("Shipment No.", WarehouseShipmentLine."No.");
-            SetRange("Shipment Line No.", WarehouseShipmentLine."Line No.");
-            if FindFirst() then
-                Error(errCantDeleteShipmentLineWhileItemPackedInBoxNo, WarehouseShipmentLine."No.",
-                    WarehouseShipmentLine."Line No.", "Item No.", "Box No.");
-        end;
+        BoxLine.SetCurrentKey("Shipment No.", "Shipment Line No.");
+        BoxLine.SetRange("Shipment No.", WarehouseShipmentLine."No.");
+        BoxLine.SetRange("Shipment Line No.", WarehouseShipmentLine."Line No.");
+        if BoxLine.FindFirst() then
+            Error(errCantDeleteShipmentLineWhileItemPackedInBoxNo, WarehouseShipmentLine."No.",
+                WarehouseShipmentLine."Line No.", BoxLine."Item No.", BoxLine."Box No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Activity-Register", 'OnBeforeCode', '', false, false)]
@@ -105,17 +101,13 @@ codeunit 50050 "Package Box Mgt."
         or not (WarehouseActivityLine."Source Document" = WarehouseActivityLine."Source Document"::"Sales Order") then
             exit;
 
-        with PackageHeader do begin
-            SetCurrentKey("Sales Order No.");
-            SetRange("Sales Order No.", WarehouseActivityLine."Source No.");
-            if FindFirst() then exit;
-        end;
+        PackageHeader.SetCurrentKey("Sales Order No.");
+        PackageHeader.SetRange("Sales Order No.", WarehouseActivityLine."Source No.");
+        if PackageHeader.FindFirst() then exit;
 
-        with PackageHeader do begin
-            Init();
-            "Sales Order No." := WarehouseActivityLine."Source No.";
-            if Insert(true) then;
-        end;
+        PackageHeader.Init();
+        PackageHeader."Sales Order No." := WarehouseActivityLine."Source No.";
+        if PackageHeader.Insert(true) then;
     end;
 
     procedure CheckPackageBeforeRegister(PackageNo: Code[20])
@@ -128,15 +120,13 @@ codeunit 50050 "Package Box Mgt."
         PackageHeader.Get(PackageNo);
         if not PackageUnRegistered(PackageHeader."No.") then exit;
 
-        with WhseShptLine do begin
-            SetCurrentKey("Source Document", "Source No.");
-            SetRange("Source Document", "Source Document"::"Sales Order");
-            SetRange("Source No.", PackageHeader."Sales Order No.");
-            if FindSet() then
-                repeat
-                    CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
-                until Next() = 0;
-        end;
+        WhseShptLine.SetCurrentKey("Source Document", "Source No.");
+        WhseShptLine.SetRange("Source Document", WhseShptLine."Source Document"::"Sales Order");
+        WhseShptLine.SetRange("Source No.", PackageHeader."Sales Order No.");
+        if WhseShptLine.FindSet() then
+            repeat
+                CheckRemainingItemQuantityBeforeRegisterPackage(WhseShptLine."No.");
+            until WhseShptLine.Next() = 0;
     end;
 
     procedure CheckWhseShipmentExist(PackageNo: Code[20])
@@ -148,13 +138,11 @@ codeunit 50050 "Package Box Mgt."
         if not WhseSetup."Enable Box Packaging" then exit;
         PackageHeader.Get(PackageNo);
 
-        with WhseShptLine do begin
-            SetCurrentKey("Source Document", "Source No.");
-            SetRange("Source Document", "Source Document"::"Sales Order");
-            SetRange("Source No.", PackageHeader."Sales Order No.");
-            if not FindFirst() then
-                Error(errNotAllowUnregisterIfShipmentPosted, "No.");
-        end;
+        WhseShptLine.SetCurrentKey("Source Document", "Source No.");
+        WhseShptLine.SetRange("Source Document", WhseShptLine."Source Document"::"Sales Order");
+        WhseShptLine.SetRange("Source No.", PackageHeader."Sales Order No.");
+        if not WhseShptLine.FindFirst() then
+            Error(errNotAllowUnregisterIfShipmentPosted, WhseShptLine."No.");
     end;
 
     procedure CheckRemainingItemQuantityBeforeRegisterPackage(ShipmentNo: Code[20])
@@ -162,15 +150,13 @@ codeunit 50050 "Package Box Mgt."
         WhseShipmentLine: Record "Warehouse Shipment Line";
         RemainingItemQuantity: Decimal;
     begin
-        with WhseShipmentLine do begin
-            SetRange("No.", ShipmentNo);
-            if FindSet() then
-                repeat
-                    RemainingItemQuantity := GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No.");
-                    if RemainingItemQuantity > 0 then
-                        Error(errItemPickedButNotFullyPackagedToBox, "Item No.", "No.", RemainingItemQuantity);
-                until Next() = 0;
-        end;
+        WhseShipmentLine.SetRange("No.", ShipmentNo);
+        if WhseShipmentLine.FindSet() then
+            repeat
+                RemainingItemQuantity := GetRemainingItemQuantityInShipment(WhseShipmentLine."No.", WhseShipmentLine."Item No.", WhseShipmentLine."Line No.");
+                if RemainingItemQuantity > 0 then
+                    Error(errItemPickedButNotFullyPackagedToBox, WhseShipmentLine."Item No.", WhseShipmentLine."No.", RemainingItemQuantity);
+            until WhseShipmentLine.Next() = 0;
     end;
 
     procedure CreateNewPackageFromWarehouseShipment(var PackageHeader: Record "Package Header"; WhseShipmentHeader: Record "Warehouse Shipment Header"): Boolean
@@ -178,25 +164,18 @@ codeunit 50050 "Package Box Mgt."
         WhseShipmentLine: Record "Warehouse Shipment Line";
         WhseActLine: Record "Warehouse Activity Line";
     begin
-        with WhseShipmentHeader do
-            TestField(Status, Status::Released);
+        WhseShipmentHeader.TestField(Status, WhseShipmentHeader.Status::Released);
 
-        with WhseShipmentLine do begin
-            SetRange("No.", WhseShipmentHeader."No.");
-            FindFirst();
-        end;
+        WhseShipmentLine.SetRange("No.", WhseShipmentHeader."No.");
+        WhseShipmentLine.FindFirst();
 
-        with PackageHeader do begin
-            SetCurrentKey("Sales Order No.");
-            SetRange("Sales Order No.", WhseShipmentLine."Source No.");
-            if FindFirst() then exit(true);
-        end;
+        PackageHeader.SetCurrentKey("Sales Order No.");
+        PackageHeader.SetRange("Sales Order No.", WhseShipmentLine."Source No.");
+        if PackageHeader.FindFirst() then exit(true);
 
-        with PackageHeader do begin
-            Init();
-            "Sales Order No." := WhseShipmentLine."Source No.";
-            if Insert(true) then;
-        end;
+        PackageHeader.Init();
+        PackageHeader."Sales Order No." := WhseShipmentLine."Source No.";
+        if PackageHeader.Insert(true) then;
 
         exit(true);
     end;
@@ -213,17 +192,15 @@ codeunit 50050 "Package Box Mgt."
         if not BoxHeader.Get(PackageNo, BoxNo) then
             Error(errCreateBoxForPackage, PackageNo);
 
-        with WhseShipmentLine do begin
-            SetCurrentKey("Source Document", "Source No.");
-            SetRange("Source Document", "Source Document"::"Sales Order");
-            SetRange("Source No.", BoxHeader."Sales Order No.");
-            FindSet();
+        WhseShipmentLine.SetCurrentKey("Source Document", "Source No.");
+        WhseShipmentLine.SetRange("Source Document", WhseShipmentLine."Source Document"::"Sales Order");
+        WhseShipmentLine.SetRange("Source No.", BoxHeader."Sales Order No.");
+        if WhseShipmentLine.FindSet() then
             repeat
-                RemainingQuantity := GetRemainingItemQuantityInShipment("No.", "Item No.", "Line No.");
+                RemainingQuantity := GetRemainingItemQuantityInShipment(WhseShipmentLine."No.", WhseShipmentLine."Item No.", WhseShipmentLine."Line No.");
                 if RemainingQuantity > 0 then
-                    AddItemToBox("No.", BoxNo, "Item No.", "Line No.", RemainingQuantity);
-            until Next() = 0;
-        end;
+                    AddItemToBox(WhseShipmentLine."No.", BoxNo, WhseShipmentLine."Item No.", WhseShipmentLine."Line No.", RemainingQuantity);
+            until WhseShipmentLine.Next() = 0;
     end;
 
     local procedure AddItemToBox(ShipmentNo: code[20]; BoxNo: Code[20]; ItemNo: Code[20]; ShipmentLineNo: Integer; RemainingQuantity: Decimal);
@@ -232,36 +209,32 @@ codeunit 50050 "Package Box Mgt."
         LastBoxLine: Record "Box Line";
         LineNo: Integer;
     begin
-        with LastBoxLine do begin
-            SetCurrentKey("Shipment No.", "Item No.", "Shipment Line No.");
-            SetRange("Box No.", BoxNo);
-            SetRange("Shipment No.", ShipmentNo);
-            SetRange("Item No.", ItemNo);
-            SetRange("Shipment Line No.", ShipmentLineNo);
-            if FindFirst() then begin
-                "Quantity in Box" += RemainingQuantity;
-                Modify(true);
-                exit;
-            end else begin
-                Reset();
-                SetRange("Box No.", BoxNo);
-                if FindLast() then
-                    LineNo := "Line No." + 10000
-                else
-                    LineNo := 10000;
-            end;
+        LastBoxLine.SetCurrentKey("Shipment No.", "Item No.", "Shipment Line No.");
+        LastBoxLine.SetRange("Box No.", BoxNo);
+        LastBoxLine.SetRange("Shipment No.", ShipmentNo);
+        LastBoxLine.SetRange("Item No.", ItemNo);
+        LastBoxLine.SetRange("Shipment Line No.", ShipmentLineNo);
+        if LastBoxLine.FindFirst() then begin
+            LastBoxLine."Quantity in Box" += RemainingQuantity;
+            LastBoxLine.Modify(true);
+            exit;
+        end else begin
+            LastBoxLine.Reset();
+            LastBoxLine.SetRange("Box No.", BoxNo);
+            if LastBoxLine.FindLast() then
+                LineNo := LastBoxLine."Line No." + 10000
+            else
+                LineNo := 10000;
         end;
 
-        with BoxLine do begin
-            Init();
-            "Box No." := BoxNo;
-            "Line No." := LineNo;
-            "Item No." := ItemNo;
-            "Quantity in Box" := RemainingQuantity;
-            "Shipment No." := ShipmentNo;
-            "Shipment Line No." := ShipmentLineNo;
-            Insert(true);
-        end;
+        BoxLine.Init();
+        BoxLine."Box No." := BoxNo;
+        BoxLine."Line No." := LineNo;
+        BoxLine."Item No." := ItemNo;
+        BoxLine."Quantity in Box" := RemainingQuantity;
+        BoxLine."Shipment No." := ShipmentNo;
+        BoxLine."Shipment Line No." := ShipmentLineNo;
+        BoxLine.Insert(true);
     end;
 
     procedure CreateBox(PackageNo: Code[20])
@@ -271,41 +244,35 @@ codeunit 50050 "Package Box Mgt."
         if not PackageUnRegistered(PackageNo) then
             Error(errPackageMustBeUnregister, PackageNo);
 
-        with BoxHeader do begin
-            Init();
-            "Package No." := PackageNo;
-            Insert(true);
-        end;
+        BoxHeader.Init();
+        BoxHeader."Package No." := PackageNo;
+        BoxHeader.Insert(true);
     end;
 
     procedure CloseAllBoxes(PackageNo: Code[20]);
     var
         BoxHeader: Record "Box Header";
     begin
-        with BoxHeader do begin
-            SetCurrentKey(Status);
-            SetRange("Package No.", PackageNo);
-            SetRange(Status, Status::Open);
-            if FindSet() then
-                repeat
-                    CloseBox("Package No.", "No.");
-                until Next() = 0;
-        end;
+        BoxHeader.SetCurrentKey(Status);
+        BoxHeader.SetRange("Package No.", PackageNo);
+        BoxHeader.SetRange(Status, BoxHeader.Status::Open);
+        if BoxHeader.FindSet() then
+            repeat
+                CloseBox(BoxHeader."Package No.", BoxHeader."No.");
+            until BoxHeader.Next() = 0;
     end;
 
     procedure ReOpenAllBoxes(PackageNo: Code[20]);
     var
         BoxHeader: Record "Box Header";
     begin
-        with BoxHeader do begin
-            SetCurrentKey(Status);
-            SetRange("Package No.", PackageNo);
-            SetRange(Status, Status::Closed);
-            if FindFirst() then
-                repeat
-                    OpenBox("Package No.", "No.");
-                until Next() = 0;
-        end;
+        BoxHeader.SetCurrentKey(Status);
+        BoxHeader.SetRange("Package No.", PackageNo);
+        BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
+        if BoxHeader.FindFirst() then
+            repeat
+                OpenBox(BoxHeader."Package No.", BoxHeader."No.");
+            until BoxHeader.Next() = 0;
     end;
 
     procedure PackageSetRegister(PackageNo: Code[20])
@@ -313,94 +280,80 @@ codeunit 50050 "Package Box Mgt."
         PackageHeader: Record "Package Header";
     begin
         // CheckRemainingItemQuantityBeforeRegisterPackage(PackageNo);
-        with PackageHeader do begin
-            Get(PackageNo);
-            if Status = Status::Registered then exit;
-            Validate(Status, Status::Registered);
-            Modify(true);
-        end;
+        PackageHeader.Get(PackageNo);
+        if PackageHeader.Status = PackageHeader.Status::Registered then exit;
+        PackageHeader.Validate(Status, PackageHeader.Status::Registered);
+        PackageHeader.Modify(true);
     end;
 
     procedure PackageSetUnregister(PackageNo: Code[20])
     var
         PackageHeader: Record "Package Header";
     begin
-        with PackageHeader do begin
-            Get(PackageNo);
-            if Status = Status::Unregistered then exit;
-            Status := Status::Unregistered;
-            Modify(true);
-        end;
+        PackageHeader.Get(PackageNo);
+        if PackageHeader.Status = PackageHeader.Status::Unregistered then exit;
+        PackageHeader.Status := PackageHeader.Status::Unregistered;
+        PackageHeader.Modify(true);
     end;
 
     procedure CalcItemQuantityInOrder(SalesOrderNo: Code[20]; ItemNo: Code[20]): Decimal
     var
         SalesLine: Record "Sales Line";
     begin
-        with SalesLine do begin
-            SetCurrentKey("Document Type", "Document No.", Type, "No.");
-            SetRange("Document Type", "Document Type"::Order);
-            SetRange("Document No.", SalesOrderNo);
-            SetRange(Type, Type::Item);
-            SetRange("No.", ItemNo);
-            CalcSums(Quantity);
-            exit(Quantity);
-        end;
+        SalesLine.SetCurrentKey("Document Type", "Document No.", Type, "No.");
+        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+        SalesLine.SetRange("Document No.", SalesOrderNo);
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        SalesLine.SetRange("No.", ItemNo);
+        SalesLine.CalcSums(Quantity);
+        exit(SalesLine.Quantity);
     end;
 
     procedure CalcItemPickedQuantityInShipments(SalesOrderNo: Code[20]; ItemNo: Code[20]): Decimal
     var
         WhseShipmentLine: Record "Warehouse Shipment Line";
     begin
-        with WhseShipmentLine do begin
-            SetCurrentKey("Source Document", "Source No.");
-            SetRange("Source Document", "Source Document"::"Sales Order");
-            SetRange("Source No.", SalesOrderNo);
-            SetRange("Item No.", ItemNo);
-            CalcSums("Qty. Picked");
-            exit("Qty. Picked");
-        end;
+        WhseShipmentLine.SetCurrentKey("Source Document", "Source No.");
+        WhseShipmentLine.SetRange("Source Document", WhseShipmentLine."Source Document"::"Sales Order");
+        WhseShipmentLine.SetRange("Source No.", SalesOrderNo);
+        WhseShipmentLine.SetRange("Item No.", ItemNo);
+        WhseShipmentLine.CalcSums("Qty. Picked");
+        exit(WhseShipmentLine."Qty. Picked");
     end;
 
     procedure CalcItemPickedQuantityByShipment(WhseShipmentNo: Code[20]; ItemNo: Code[20]; LineNo: Integer): Decimal
     var
         WhseShipmentLine: Record "Warehouse Shipment Line";
     begin
-        with WhseShipmentLine do begin
-            SetCurrentKey("Item No.");
-            SetRange("No.", WhseShipmentNo);
-            SetRange("Line No.", LineNo);
-            SetRange("Item No.", ItemNo);
-            CalcSums("Qty. Picked");
-            exit("Qty. Picked");
-        end;
+        WhseShipmentLine.SetCurrentKey("Item No.");
+        WhseShipmentLine.SetRange("No.", WhseShipmentNo);
+        WhseShipmentLine.SetRange("Line No.", LineNo);
+        WhseShipmentLine.SetRange("Item No.", ItemNo);
+        WhseShipmentLine.CalcSums("Qty. Picked");
+        exit(WhseShipmentLine."Qty. Picked");
     end;
 
     procedure CalcItemQuantityInBoxesByOrder(SalesOrderNo: Code[20]; ItemNo: Code[20]): Decimal
     var
         BoxLine: Record "Box Line";
     begin
-        with BoxLine do begin
-            SetCurrentKey("Sales Order No.", "Item No.");
-            SetRange("Sales Order No.", SalesOrderNo);
-            SetRange("Item No.", ItemNo);
-            CalcSums("Quantity in Box");
-            exit("Quantity in Box");
-        end;
+        BoxLine.SetCurrentKey("Sales Order No.", "Item No.");
+        BoxLine.SetRange("Sales Order No.", SalesOrderNo);
+        BoxLine.SetRange("Item No.", ItemNo);
+        BoxLine.CalcSums("Quantity in Box");
+        exit(BoxLine."Quantity in Box");
     end;
 
     procedure CalcItemQuantityInBoxesByShipment(WhseShipmentNo: Code[20]; ItemNo: Code[20]; LineNo: Integer): Decimal
     var
         BoxLine: Record "Box Line";
     begin
-        with BoxLine do begin
-            SetCurrentKey("Shipment No.", "Shipment Line No.", "Item No.");
-            SetRange("Shipment No.", WhseShipmentNo);
-            SetRange("Shipment Line No.", LineNo);
-            SetRange("Item No.", ItemNo);
-            CalcSums("Quantity in Box");
-            exit("Quantity in Box");
-        end;
+        BoxLine.SetCurrentKey("Shipment No.", "Shipment Line No.", "Item No.");
+        BoxLine.SetRange("Shipment No.", WhseShipmentNo);
+        BoxLine.SetRange("Shipment Line No.", LineNo);
+        BoxLine.SetRange("Item No.", ItemNo);
+        BoxLine.CalcSums("Quantity in Box");
+        exit(BoxLine."Quantity in Box");
     end;
 
     procedure GetRemainingItemQuantityInOrder(SalesOrderNo: Code[20]; ItemNo: Code[20]): Decimal
@@ -433,21 +386,17 @@ codeunit 50050 "Package Box Mgt."
     var
         BoxLine: Record "Box Line";
     begin
-        with BoxLine do begin
-            SetRange("Box No.", BoxNo);
-            CalcSums("Quantity in Box");
-            exit("Quantity in Box");
-        end;
+        BoxLine.SetRange("Box No.", BoxNo);
+        BoxLine.CalcSums("Quantity in Box");
+        exit(BoxLine."Quantity in Box");
     end;
 
     procedure PackageUnRegistered(PackageNo: Code[20]): Boolean
     var
         PackageHeader: Record "Package Header";
     begin
-        with PackageHeader do begin
-            Get(PackageNo);
-            exit(Status = Status::Unregistered);
-        end;
+        PackageHeader.Get(PackageNo);
+        exit(PackageHeader.Status = PackageHeader.Status::Unregistered);
     end;
 
     procedure DeleteEmptyBoxes(PackageNo: Code[20])
@@ -457,14 +406,12 @@ codeunit 50050 "Package Box Mgt."
         GetWhseSetup();
         if not WhseSetup."Delete Empty Box" then exit;
 
-        with BoxHeader do begin
-            SetRange("Package No.", PackageNo);
-            FindSet();
-            repeat
-                if BoxIsEmpty("No.") then
-                    Delete(true);
-            until Next() = 0;
-        end;
+        BoxHeader.SetRange("Package No.", PackageNo);
+        BoxHeader.FindSet();
+        repeat
+            if BoxIsEmpty(BoxHeader."No.") then
+                BoxHeader.Delete(true);
+        until BoxHeader.Next() = 0;
     end;
 
     procedure DeleteEmptyLinesByPackag(PackageNo: Code[20])
@@ -478,12 +425,10 @@ codeunit 50050 "Package Box Mgt."
         BoxHeader.SetRange("Package No.", PackageNo);
         if BoxHeader.FindSet() then
             repeat
-                with BoxLine do begin
-                    SetCurrentKey("Quantity in Box");
-                    SetRange("Box No.", BoxHeader."No.");
-                    SetRange("Quantity in Box", 0);
-                    DeleteAll(true);
-                end;
+                BoxLine.SetCurrentKey("Quantity in Box");
+                BoxLine.SetRange("Box No.", BoxHeader."No.");
+                BoxLine.SetRange("Quantity in Box", 0);
+                BoxLine.DeleteAll(true);
             until BoxHeader.Next() = 0;
     end;
 
@@ -494,36 +439,30 @@ codeunit 50050 "Package Box Mgt."
         GetWhseSetup();
         if not WhseSetup."Delete Empty Lines" then exit;
 
-        with BoxLine do begin
-            SetCurrentKey("Quantity in Box");
-            SetRange("Box No.", BoxNo);
-            SetRange("Quantity in Box", 0);
-            DeleteAll(true);
-        end;
+        BoxLine.SetCurrentKey("Quantity in Box");
+        BoxLine.SetRange("Box No.", BoxNo);
+        BoxLine.SetRange("Quantity in Box", 0);
+        BoxLine.DeleteAll(true);
     end;
 
     procedure BoxIsEmpty(BoxNo: Code[20]): Boolean
     var
         BoxLine: Record "Box Line";
     begin
-        with BoxLine do begin
-            SetCurrentKey("Quantity in Box");
-            SetRange("Box No.", BoxNo);
-            SetFilter("Quantity in Box", '>%1', 0);
-            exit(IsEmpty);
-        end;
+        BoxLine.SetCurrentKey("Quantity in Box");
+        BoxLine.SetRange("Box No.", BoxNo);
+        BoxLine.SetFilter("Quantity in Box", '>%1', 0);
+        exit(BoxLine.IsEmpty);
     end;
 
     procedure WhseShipmentIsPosted(ShipmentNo: Code[20]; LineNo: Integer): Boolean
     var
         PostedWhseShipmentLine: Record "Posted Whse. Shipment Line";
     begin
-        with PostedWhseShipmentLine do begin
-            SetCurrentKey("Whse. Shipment No.", "Whse Shipment Line No.");
-            SetRange("Whse. Shipment No.", ShipmentNo);
-            SetRange("Whse Shipment Line No.", LineNo);
-            exit(FindFirst());
-        end;
+        PostedWhseShipmentLine.SetCurrentKey("Whse. Shipment No.", "Whse Shipment Line No.");
+        PostedWhseShipmentLine.SetRange("Whse. Shipment No.", ShipmentNo);
+        PostedWhseShipmentLine.SetRange("Whse Shipment Line No.", LineNo);
+        exit(PostedWhseShipmentLine.FindFirst());
     end;
 
     local procedure GetWhseSetup()
@@ -541,12 +480,11 @@ codeunit 50050 "Package Box Mgt."
     local procedure GetSalesOrderByNo(SalesOrderNo: Code[20])
     begin
         if SalesOrderNo <> SalesHeader."No." then
-            if not SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo) then
-                with salesInvHeader do begin
-                    SetCurrentKey("Order No.");
-                    SetFilter("Order No.", SalesOrderNo);
-                    FindFirst();
-                end;
+            if not SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo) then begin
+                salesInvHeader.SetCurrentKey("Order No.");
+                salesInvHeader.SetFilter("Order No.", SalesOrderNo);
+                salesInvHeader.FindFirst();
+            end;
     end;
 
     procedure GetCompanyName(): Text
@@ -676,12 +614,10 @@ codeunit 50050 "Package Box Mgt."
     var
         BoxHeader: Record "Box Header";
     begin
-        with BoxHeader do begin
-            if Get(PackageNo, BoxNo) and (Status = Status::Open) then begin
-                TestField("Gross Weight");
-                Validate(Status, Status::Closed);
-                Modify(true);
-            end;
+        if BoxHeader.Get(PackageNo, BoxNo) and (BoxHeader.Status = BoxHeader.Status::Open) then begin
+            BoxHeader.TestField("Gross Weight");
+            BoxHeader.Validate(Status, BoxHeader.Status::Closed);
+            BoxHeader.Modify(true);
         end;
     end;
 
@@ -692,13 +628,12 @@ codeunit 50050 "Package Box Mgt."
         if not PackageUnRegistered(PackageNo) then
             Error(errPackageMustBeUnregister, PackageNo);
 
-        with BoxHeader do
-            if Get(PackageNo, BoxNo) then
-                if Status = Status::Closed then begin
-                    TestField("Tracking No.", '');
-                    Validate(Status, Status::Open);
-                    Modify(true);
-                end;
+        if BoxHeader.Get(PackageNo, BoxNo) then
+            if BoxHeader.Status = BoxHeader.Status::Closed then begin
+                BoxHeader.TestField("Tracking No.", '');
+                BoxHeader.Validate(Status, BoxHeader.Status::Open);
+                BoxHeader.Modify(true);
+            end;
     end;
 
     procedure RegisterPackage(PackageNo: Code[20])
@@ -717,11 +652,10 @@ codeunit 50050 "Package Box Mgt."
         if not PackageUnRegistered(PackageNo) then
             Error(errPackageMustBeUnregister, PackageNo);
 
-        with BoxHeader do
-            if Get(PackageNo, BoxNo) then begin
-                TestField("Tracking No.", '');
-                Delete(true);
-            end;
+        if BoxHeader.Get(PackageNo, BoxNo) then begin
+            BoxHeader.TestField("Tracking No.", '');
+            BoxHeader.Delete(true);
+        end;
     end;
 
     procedure UnregisterPackage(PackageNo: Code[20])
@@ -765,11 +699,10 @@ codeunit 50050 "Package Box Mgt."
 
     local procedure GetShipStationSetup()
     begin
-        with glShipStationSetup do
-            if not Get() then begin
-                Init();
-                Insert();
-            end;
+        if not glShipStationSetup.Get() then begin
+            glShipStationSetup.Init();
+            glShipStationSetup.Insert();
+        end;
     end;
 
     procedure CreateOrderFromBoxInShipStation(PackageNo: Code[20]; BoxNo: Code[20]): JsonObject
@@ -835,30 +768,28 @@ codeunit 50050 "Package Box Mgt."
         //     _UoM := Format("Unit of Measure");
         // end;
 
-        with _BoxLine do begin
-            SetCurrentKey("Sales Order No.", "Quantity in Box");
-            SetRange("Box No.", BoxNo);
-            SetFilter("Quantity in Box", '<>%1', 0);
-            if FindSet(false, false) then
-                repeat
-                    Clear(JSObjectLine);
-                    GetSalesLineFromBoxLine(_SalesLine, "Shipment No.", "Shipment Line No.");
+        _BoxLine.SetCurrentKey("Sales Order No.", "Quantity in Box");
+        _BoxLine.SetRange("Box No.", BoxNo);
+        _BoxLine.SetFilter("Quantity in Box", '<>%1', 0);
+        if _BoxLine.FindSet(false, false) then
+            repeat
+                Clear(JSObjectLine);
+                GetSalesLineFromBoxLine(_SalesLine, _BoxLine."Shipment No.", _BoxLine."Shipment Line No.");
 
-                    JSObjectLine.Add('lineItemKey', "Line No.");
-                    JSObjectLine.Add('sku', "Item No.");
-                    JSObjectLine.Add('name', _SalesLine.Description);
-                    if _ItemDescr.Get("item No.") then
-                        JSObjectLine.Add('imageUrl', _ItemDescr."Main Image URL");
-                    // JSObjectLine.Add('weight', jsonGrossWeight(GrossWeightPerItem, _UoM));
-                    JSObjectLine.Add('quantity', ShipStationMgt.Decimal2Integer("Quantity in Box"));
-                    JSObjectLine.Add('unitPrice', Round(_SalesLine."Amount Including VAT" / _SalesLine.Quantity, 0.01));
-                    JSObjectLine.Add('taxAmount', Round((_SalesLine."Amount Including VAT" - _SalesLine.Amount) / _SalesLine.Quantity, 0.01));
-                    JSObjectLine.Add('warehouseLocation', _SalesLine."Location Code");
-                    JSObjectLine.Add('productId', "Line No.");
-                    JSObjectLine.Add('adjustment', false);
-                    JSObjectArray.Add(JSObjectLine);
-                until Next() = 0;
-        end;
+                JSObjectLine.Add('lineItemKey', _BoxLine."Line No.");
+                JSObjectLine.Add('sku', _BoxLine."Item No.");
+                JSObjectLine.Add('name', _SalesLine.Description);
+                if _ItemDescr.Get(_BoxLine."Item No.") then
+                    JSObjectLine.Add('imageUrl', _ItemDescr."Main Image URL");
+                // JSObjectLine.Add('weight', jsonGrossWeight(GrossWeightPerItem, _UoM));
+                JSObjectLine.Add('quantity', ShipStationMgt.Decimal2Integer(_BoxLine."Quantity in Box"));
+                JSObjectLine.Add('unitPrice', Round(_SalesLine."Amount Including VAT" / _SalesLine.Quantity, 0.01));
+                JSObjectLine.Add('taxAmount', Round((_SalesLine."Amount Including VAT" - _SalesLine.Amount) / _SalesLine.Quantity, 0.01));
+                JSObjectLine.Add('warehouseLocation', _SalesLine."Location Code");
+                JSObjectLine.Add('productId', _BoxLine."Line No.");
+                JSObjectLine.Add('adjustment', false);
+                JSObjectArray.Add(JSObjectLine);
+            until _BoxLine.Next() = 0;
         exit(JSObjectArray);
     end;
 
@@ -877,40 +808,38 @@ codeunit 50050 "Package Box Mgt."
         _BoxHeader: Record "Box Header";
         _jsonToken: JsonToken;
     begin
-        with _BoxHeader do begin
 
-            if not Get(PackageNo, BoxNo) then exit(false);
-            // update Sales Header from ShipStation
+        if not _BoxHeader.Get(PackageNo, BoxNo) then exit(false);
+        // update Sales Header from ShipStation
 
-            _jsonToken := ShipStationMgt.GetJSToken(_jsonObject, 'carrierCode');
+        _jsonToken := ShipStationMgt.GetJSToken(_jsonObject, 'carrierCode');
+        if not _jsonToken.AsValue().IsNull then begin
+            _BoxHeader."Shipping Agent Code" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'carrierCode').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."Shipping Agent Code"));
+            _jsonToken := ShipStationMgt.GetJSToken(_jsonObject, 'serviceCode');
             if not _jsonToken.AsValue().IsNull then begin
-                "Shipping Agent Code" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'carrierCode').AsValue().AsText(), 1, MaxStrLen("Shipping Agent Code"));
-                _jsonToken := ShipStationMgt.GetJSToken(_jsonObject, 'serviceCode');
-                if not _jsonToken.AsValue().IsNull then begin
-                    "Shipping Services Code" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'serviceCode').AsValue().AsText(), 1, MaxStrLen("Shipping Services Code"));
-                end;
+                _BoxHeader."Shipping Services Code" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'serviceCode').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."Shipping Services Code"));
             end;
-
-            // Get Rate
-            "ShipStation Order ID" := ShipStationMgt.GetJSToken(_jsonObject, 'orderId').AsValue().AsText();
-            "ShipStation Order Key" := ShipStationMgt.GetJSToken(_jsonObject, 'orderKey').AsValue().AsText();
-            "ShipStation Status" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'orderStatus').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."ShipStation Status"));
-            "ShipStation Shipment Amount" := ShipStationMgt.GetJSToken(_jsonObject, 'shippingAmount').AsValue().AsDecimal();
-
-            // case "ShipStation Order Status" of
-            //     "ShipStation Order Status"::"Not Sent":
-            //         "ShipStation Order Status" := "ShipStation Order Status"::Sent;
-            //     "ShipStation Order Status"::Sent:
-            //         "ShipStation Order Status" := "ShipStation Order Status"::Updated;
-            // end;
-
-            if "ShipStation Status" = lblAwaitingShipment then begin
-                "Tracking No." := '';
-                "ShipStation Shipment ID" := '';
-            end;
-
-            Modify();
         end;
+
+        // Get Rate
+        _BoxHeader."ShipStation Order ID" := ShipStationMgt.GetJSToken(_jsonObject, 'orderId').AsValue().AsText();
+        _BoxHeader."ShipStation Order Key" := ShipStationMgt.GetJSToken(_jsonObject, 'orderKey').AsValue().AsText();
+        _BoxHeader."ShipStation Status" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'orderStatus').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."ShipStation Status"));
+        _BoxHeader."ShipStation Shipment Amount" := ShipStationMgt.GetJSToken(_jsonObject, 'shippingAmount').AsValue().AsDecimal();
+
+        // case "ShipStation Order Status" of
+        //     "ShipStation Order Status"::"Not Sent":
+        //         "ShipStation Order Status" := "ShipStation Order Status"::Sent;
+        //     "ShipStation Order Status"::Sent:
+        //         "ShipStation Order Status" := "ShipStation Order Status"::Updated;
+        // end;
+
+        if _BoxHeader."ShipStation Status" = lblAwaitingShipment then begin
+            _BoxHeader."Tracking No." := '';
+            _BoxHeader."ShipStation Shipment ID" := '';
+        end;
+
+        _BoxHeader.Modify();
     end;
 
     procedure CreateLabel2OrderInShipStation(PackageNo: Code[20]; BoxNo: Code[20]): Boolean
@@ -930,55 +859,51 @@ codeunit 50050 "Package Box Mgt."
         WhseShipDocNo: Code[20];
 
     begin
-        with _BoxHeader do begin
-            if (not Get(PackageNo, BoxNo)) or ("ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
-            // comment to test Create Label and Attache to Warehouse Shipment
-            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, "Sales Order No.");
+        if (not _BoxHeader.Get(PackageNo, BoxNo)) or (_BoxHeader."ShipStation Order ID" = '') then Error(errorShipStationOrderNotExist);
+        // comment to test Create Label and Attache to Warehouse Shipment
+        if not ShipStationMgt.FindWarehouseSipment(_BoxHeader."Sales Order No.", WhseShipDocNo) then Error(errorWhseShipNotExist, _BoxHeader."Sales Order No.");
 
-            if not SalesHeader.Get(SalesHeader."Document Type"::Order, "Sales Order No.") then Error(errorOrderNotExist, "Sales Order No.");
+        if not SalesHeader.Get(SalesHeader."Document Type"::Order, _BoxHeader."Sales Order No.") then Error(errorOrderNotExist, _BoxHeader."Sales Order No.");
 
-            // Get Order from Shipstation to Fill Variables
-            JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
-            JSObject.ReadFrom(JSText);
+        // Get Order from Shipstation to Fill Variables
+        JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', _BoxHeader."ShipStation Order ID"));
+        JSObject.ReadFrom(JSText);
 
-            // CheckUpdateBox(JSObject, 'orderId');
-            // jsObjHeaderUpdate.ReadFrom(JSText);
-            UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
-            JSText := ShipStationMgt.FillValuesFromOrder(JSObject, "Sales Order No.", SalesHeader."Location Code");
+        // CheckUpdateBox(JSObject, 'orderId');
+        // jsObjHeaderUpdate.ReadFrom(JSText);
+        UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+        JSText := ShipStationMgt.FillValuesFromOrder(JSObject, _BoxHeader."Sales Order No.", SalesHeader."Location Code");
 
 
-            JSObject.ReadFrom(JSText);
-            // CheckUpdateBox(JSObject, 'orderId');
-            JSText := ShipStationMgt.Connect2ShipStation(3, JSText, '');
+        JSObject.ReadFrom(JSText);
+        // CheckUpdateBox(JSObject, 'orderId');
+        JSText := ShipStationMgt.Connect2ShipStation(3, JSText, '');
 
-            JSObject.ReadFrom(JSText);
-            // CheckUpdateBox(JSObject, 'orderId');
-            // Update Order From Label
-            UpdateBoxFromLabel(PackageNo, BoxNo, JSText);
+        JSObject.ReadFrom(JSText);
+        // CheckUpdateBox(JSObject, 'orderId');
+        // Update Order From Label
+        UpdateBoxFromLabel(PackageNo, BoxNo, JSText);
 
-            // Add Lable to Shipment
-            jsLabelObject.ReadFrom(JSText);
-            txtLabel := ShipStationMgt.GetJSToken(jsLabelObject, 'labelData').AsValue().AsText();
-            txtBeforeName := _BoxHeader."No." + '-' + ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
-            ShipStationMgt.SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
+        // Add Lable to Shipment
+        jsLabelObject.ReadFrom(JSText);
+        txtLabel := ShipStationMgt.GetJSToken(jsLabelObject, 'labelData').AsValue().AsText();
+        txtBeforeName := _BoxHeader."No." + '-' + ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
+        ShipStationMgt.SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
 
-            // Update Sales Header From ShipStation
-            // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
-            // JSObject.ReadFrom(JSText);
-            // UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
-            ChangeShipStationStatusToShipped(PackageNo, BoxNo);
-        end;
+        // Update Sales Header From ShipStation
+        // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
+        // JSObject.ReadFrom(JSText);
+        // UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+        ChangeShipStationStatusToShipped(PackageNo, BoxNo);
     end;
 
     procedure ChangeShipStationStatusToShipped(PackageNo: Code[20]; BoxNo: Code[20]);
     var
         BoxHeader: Record "Box Header";
     begin
-        with BoxHeader do begin
-            Get(PackageNo, BoxNo);
-            "ShipStation Status" := lblShipped;
-            Modify();
-        end;
+        BoxHeader.Get(PackageNo, BoxNo);
+        BoxHeader."ShipStation Status" := lblShipped;
+        BoxHeader.Modify();
     end;
 
     procedure UpdateBoxFromLabel(PackageNo: Code[20]; BoxNo: Code[20]; jsonText: Text);
@@ -986,16 +911,14 @@ codeunit 50050 "Package Box Mgt."
         _BoxHeader: Record "Box Header";
         jsLabelObject: JsonObject;
     begin
-        with _BoxHeader do begin
-            if not Get(PackageNo, BoxNo) then exit;
-            jsLabelObject.ReadFrom(jsonText);
-            "Other Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'insuranceCost').AsValue().AsDecimal();
-            "Shipment Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentCost').AsValue().AsDecimal();
-            "Tracking No." := ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
-            "ShipStation Shipment ID" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentId').AsValue().AsText();
-            "ShipStation Status" := lblShipped;
-            Modify();
-        end;
+        if not _BoxHeader.Get(PackageNo, BoxNo) then exit;
+        jsLabelObject.ReadFrom(jsonText);
+        _BoxHeader."Other Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'insuranceCost').AsValue().AsDecimal();
+        _BoxHeader."Shipment Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentCost').AsValue().AsDecimal();
+        _BoxHeader."Tracking No." := ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
+        _BoxHeader."ShipStation Shipment ID" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentId').AsValue().AsText();
+        _BoxHeader."ShipStation Status" := lblShipped;
+        _BoxHeader.Modify();
     end;
 
     procedure VoidLabel2OrderInShipStation(PackageNo: Code[20]; BoxNo: Code[20]): Boolean
@@ -1009,41 +932,37 @@ codeunit 50050 "Package Box Mgt."
         _txtBefore: Text;
 
     begin
-        with _BoxHeader do begin
-            if (not Get(PackageNo, BoxNo)) or ("ShipStation Shipment ID" = '') then exit(false);
+        if (not _BoxHeader.Get(PackageNo, BoxNo)) or (_BoxHeader."ShipStation Shipment ID" = '') then exit(false);
 
-            if not ShipStationMgt.FindWarehouseSipment("Sales Order No.", WhseShipDocNo) then
-                Error(errorWhseShipNotExist, "Sales Order No.");
+        if not ShipStationMgt.FindWarehouseSipment(_BoxHeader."Sales Order No.", WhseShipDocNo) then
+            Error(errorWhseShipNotExist, _BoxHeader."Sales Order No.");
 
-            // Void Label in Shipstation
-            JSObject.Add('shipmentId', "ShipStation Shipment ID");
-            JSObject.WriteTo(JSText);
-            JSText := ShipStationMgt.Connect2ShipStation(8, JSText, '');
-            // JSObject.ReadFrom(JSText);
+        // Void Label in Shipstation
+        JSObject.Add('shipmentId', _BoxHeader."ShipStation Shipment ID");
+        JSObject.WriteTo(JSText);
+        JSText := ShipStationMgt.Connect2ShipStation(8, JSText, '');
+        // JSObject.ReadFrom(JSText);
 
-            _txtBefore := "No." + '-' + "Tracking No.";
-            FileName := StrSubstNo('%1-%2', _txtBefore, lblOrder);
-            ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
+        _txtBefore := _BoxHeader."No." + '-' + _BoxHeader."Tracking No.";
+        FileName := StrSubstNo('%1-%2', _txtBefore, lblOrder);
+        ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
 
-            // Update Box Header From ShipStation
-            // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
-            // JSObject.ReadFrom(JSText);
-            // UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
-            CleareTrackingNoShipmentID(PackageNo, BoxNo);
-        end;
+        // Update Box Header From ShipStation
+        // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
+        // JSObject.ReadFrom(JSText);
+        // UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
+        CleareTrackingNoShipmentID(PackageNo, BoxNo);
     end;
 
     procedure CleareTrackingNoShipmentID(PackageNo: Code[20]; BoxNo: Code[20]);
     var
         BoxHeader: Record "Box Header";
     begin
-        with BoxHeader do begin
-            Get(PackageNo, BoxNo);
-            "Tracking No." := '';
-            "ShipStation Shipment ID" := '';
-            "ShipStation Status" := lblAwaitingShipment;
-            Modify();
-        end;
+        BoxHeader.Get(PackageNo, BoxNo);
+        BoxHeader."Tracking No." := '';
+        BoxHeader."ShipStation Shipment ID" := '';
+        BoxHeader."ShipStation Status" := lblAwaitingShipment;
+        BoxHeader.Modify();
     end;
 
     procedure CreateDeliverySalesLineFromPackage(salesOrderNo: Code[20])
@@ -1069,50 +988,43 @@ codeunit 50050 "Package Box Mgt."
             exit;
         end;
 
-        with _salesLineLast do begin
-            SetRange("Document Type", "Document Type"::Order);
-            SetRange("Document No.", salesOrderNo);
-            SetRange("No.", _customer."Sales No. Shipment Cost");
-            if FindFirst() then begin
-                salesLineExist := true;
-                LineNo := "Line No."
-            end else begin
-                SetRange("No.");
-                if FindLast() then
-                    LineNo := "Line No." + 10000
-                else
-                    LineNo := 10000;
-            end;
+        _salesLineLast.SetRange("Document Type", _salesLineLast."Document Type"::Order);
+        _salesLineLast.SetRange("Document No.", salesOrderNo);
+        _salesLineLast.SetRange("No.", _customer."Sales No. Shipment Cost");
+        if _salesLineLast.FindFirst() then begin
+            salesLineExist := true;
+            LineNo := _salesLineLast."Line No."
+        end else begin
+            _salesLineLast.SetRange("No.");
+            if _salesLineLast.FindLast() then
+                LineNo := _salesLineLast."Line No." + 10000
+            else
+                LineNo := 10000;
         end;
 
-        with _salesHeader do
-            if Status = Status::Released then begin
-                Status := Status::Open;
-                Modify();
-            end;
-
-        with _salesLine do begin
-            if salesLineExist then
-                Get("Document Type"::Order, salesOrderNo, LineNo)
-            else begin
-                Init;
-                "Document Type" := "Document Type"::Order;
-                "Document No." := salesOrderNo;
-                "Line No." := LineNo;
-                Insert(true);
-            end;
-            Validate(Type, _customer."Posting Type Shipment Cost");
-            Validate(Quantity, 1);
-            Validate("No.", _customer."Sales No. Shipment Cost");
-            // Validate("Amount Including VAT", PackageShippingAmount);
-            Validate("Unit Price", PackageShippingAmount);
-            Modify(true)
+        if _salesHeader.Status = _salesHeader.Status::Released then begin
+            _salesHeader.Status := _salesHeader.Status::Open;
+            _salesHeader.Modify();
         end;
 
-        with _salesHeader do begin
-            Status := Status::Released;
-            Modify();
+        if salesLineExist then
+            _salesLine.Get(_salesLine."Document Type"::Order, salesOrderNo, LineNo)
+        else begin
+            _salesLine.Init;
+            _salesLine."Document Type" := _salesLine."Document Type"::Order;
+            _salesLine."Document No." := salesOrderNo;
+            _salesLine."Line No." := LineNo;
+            _salesLine.Insert(true);
         end;
+        _salesLine.Validate(Type, _customer."Posting Type Shipment Cost");
+        _salesLine.Validate(Quantity, 1);
+        _salesLine.Validate("No.", _customer."Sales No. Shipment Cost");
+        // Validate("Amount Including VAT", PackageShippingAmount);
+        _salesLine.Validate("Unit Price", PackageShippingAmount);
+        _salesLine.Modify(true);
+
+        _salesHeader.Status := _salesHeader.Status::Released;
+        _salesHeader.Modify();
 
         ICExtended.CreateItemChargeAssgnt(_salesHeader."No.", _salesHeader."Sell-to Customer No.");
     end;
@@ -1122,39 +1034,32 @@ codeunit 50050 "Package Box Mgt."
         salesHeader: Record "Sales Header";
         salesLine: Record "Sales Line";
     begin
-        with salesHeader do begin
-            Get("Document Type"::Order, salesOrderNo);
-            if Status = Status::Released then begin
-                Status := Status::Open;
-                Modify();
-            end;
+        salesHeader.Get(salesHeader."Document Type"::Order, salesOrderNo);
+        if salesHeader.Status = salesHeader.Status::Released then begin
+            salesHeader.Status := salesHeader.Status::Open;
+            salesHeader.Modify();
         end;
 
-        with salesLine do begin
-            SetCurrentKey("No.");
-            SetRange("Document Type", "Document Type"::Order);
-            SetRange("Document No.", salesOrderNo);
-            SetRange("No.", ItemNo);
-            DeleteAll(true);
-        end;
+        salesLine.SetCurrentKey("No.");
+        salesLine.SetRange("Document Type", salesLine."Document Type"::Order);
+        salesLine.SetRange("Document No.", salesOrderNo);
+        salesLine.SetRange("No.", ItemNo);
+        salesLine.DeleteAll(true);
 
-        with salesHeader do
-            if Status = Status::Open then begin
-                Status := Status::Released;
-                Modify();
-            end;
+        if salesHeader.Status = salesHeader.Status::Open then begin
+            salesHeader.Status := salesHeader.Status::Released;
+            salesHeader.Modify();
+        end;
     end;
 
     procedure GetPackageShippingAmountFromSalesOrder(salesOrderNo: Code[20]): Decimal
     var
         boxHeader: Record "Box Header";
     begin
-        with boxHeader do begin
-            SetCurrentKey("Sales Order No.", "ShipStation Shipment ID");
-            SetRange("Sales Order No.", salesOrderNo);
-            SetFilter("ShipStation Shipment ID", '<>%1', '');
-            CalcSums("Shipment Cost", "Other Cost", "ShipStation Shipment Amount");
-            exit("Shipment Cost" + "Other Cost" + "ShipStation Shipment Amount");
-        end;
+        boxHeader.SetCurrentKey("Sales Order No.", "ShipStation Shipment ID");
+        boxHeader.SetRange("Sales Order No.", salesOrderNo);
+        boxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
+        boxHeader.CalcSums("Shipment Cost", "Other Cost", "ShipStation Shipment Amount");
+        exit(boxHeader."Shipment Cost" + boxHeader."Other Cost" + boxHeader."ShipStation Shipment Amount");
     end;
 }

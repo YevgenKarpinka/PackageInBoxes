@@ -183,20 +183,16 @@ table 50051 "Box Header"
     var
         PackageHeader: Record "Package Header";
     begin
-        with PackageHeader do begin
-            Get("Package No.");
-            PackageModify();
-        end;
+        PackageHeader.Get("Package No.");
+        PackageHeader.PackageModify();
     end;
 
     local procedure DeleteBoxLine();
     var
         BoxLine: Record "Box Line";
     begin
-        with BoxLine do begin
-            SetRange("Box No.", "No.");
-            DeleteAll(true);
-        end;
+        BoxLine.SetRange("Box No.", "No.");
+        BoxLine.DeleteAll(true);
     end;
 
     local procedure InitInsert()
@@ -217,8 +213,7 @@ table 50051 "Box Header"
     local procedure TestNoSeries()
     begin
         GetWhseSetup();
-        with WhseSetup do
-            TestField("Box No. Series");
+        WhseSetup.TestField("Box No. Series");
     end;
 
     local procedure GetNoSeriesCode(): Code[20]

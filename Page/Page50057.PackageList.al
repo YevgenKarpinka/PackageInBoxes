@@ -19,43 +19,43 @@ page 50057 "Package List"
         {
             repeater(repeaterName)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the number of the involved entry or record, according to the specified number series.',
                                 RUS = 'Определяет номер соответствующей записи или операции в соответствии с указанной серией номеров.';
                 }
-                field("Sales Order No."; "Sales Order No.")
+                field("Sales Order No."; Rec."Sales Order No.")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the sales order number on the basis of which the packaging document was created',
                                 RUS = 'Определяет номер заказа продажи на основании которого был создан документ упаковки.';
                 }
-                field("Create User ID"; "Create User ID")
+                field("Create User ID"; Rec."Create User ID")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the user id that created the packaging document.',
                                 RUS = 'Определяет код пользователя который создал документ упаковки.';
                 }
-                field("Create Date"; "Create Date")
+                field("Create Date"; Rec."Create Date")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the date and time the packaging document was created.',
                                 RUS = 'Определяет дату и время создания документа упаковки.';
                 }
-                field("Last Modified User ID"; "Last Modified User ID")
+                field("Last Modified User ID"; Rec."Last Modified User ID")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the user id that last modified the packaging document.',
                                 RUS = 'Определяет код пользователя который последним изменил документ упаковки.';
                 }
-                field("Last Modified Date"; "Last Modified Date")
+                field("Last Modified Date"; Rec."Last Modified Date")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the date and time of the last modification of the packaging document.',
                                 RUS = 'Определяет дату и время последниего изменения документа упаковки.';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies status the packaging document.',
@@ -97,17 +97,15 @@ page 50057 "Package List"
                         CurrPage.SetSelectionFilter(PackageHeader);
                         if PackageHeader.FindSet(false, false) then
                             repeat
-                                with BoxHeader do begin
-                                    SetCurrentKey(Status, "ShipStation Shipment ID");
-                                    SetRange("Package No.", PackageHeader."No.");
-                                    SetRange(Status, Status::Closed);
-                                    SetFilter("ShipStation Shipment ID", '=%1', '');
-                                    if FindSet(false, false) then
-                                        repeat
-                                            if PackageBoxMgt.GetQuantityInBox("No.") > 0 then
-                                                PackageBoxMgt.SentBoxInShipStation("Package No.", BoxHeader."No.");
-                                        until Next() = 0;
-                                end;
+                                BoxHeader.SetCurrentKey(Status, "ShipStation Shipment ID");
+                                BoxHeader.SetRange("Package No.", PackageHeader."No.");
+                                BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
+                                BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
+                                if BoxHeader.FindSet(false, false) then
+                                    repeat
+                                        if PackageBoxMgt.GetQuantityInBox(BoxHeader."No.") > 0 then
+                                            PackageBoxMgt.SentBoxInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                    until BoxHeader.Next() = 0;
                             until PackageHeader.Next() = 0;
                         Message(lblOrdersCreated);
                     end;
@@ -127,18 +125,16 @@ page 50057 "Package List"
                         CurrPage.SetSelectionFilter(PackageHeader);
                         if PackageHeader.FindSet(false, false) then
                             repeat
-                                with BoxHeader do begin
-                                    SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
-                                    SetRange("Package No.", PackageHeader."No.");
-                                    SetRange(Status, Status::Closed);
-                                    SetFilter("ShipStation Order Key", '<>%1', '');
-                                    SetFilter("ShipStation Shipment ID", '=%1', '');
-                                    if FindSet(false, false) then begin
-                                        repeat
-                                            PackageBoxMgt.CreateLabel2OrderInShipStation("Package No.", "No.");
-                                        until Next() = 0;
-                                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
-                                    end;
+                                BoxHeader.SetCurrentKey(Status, "ShipStation Order Key", "ShipStation Shipment ID");
+                                BoxHeader.SetRange("Package No.", PackageHeader."No.");
+                                BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
+                                BoxHeader.SetFilter("ShipStation Order Key", '<>%1', '');
+                                BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
+                                if BoxHeader.FindSet(false, false) then begin
+                                    repeat
+                                        PackageBoxMgt.CreateLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                    until BoxHeader.Next() = 0;
+                                    PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
                                 end;
                             until PackageHeader.Next() = 0;
                         Message(lblLabelsCreated);
@@ -159,16 +155,14 @@ page 50057 "Package List"
                         CurrPage.SetSelectionFilter(PackageHeader);
                         if PackageHeader.FindSet(false, false) then
                             repeat
-                                with BoxHeader do begin
-                                    SetCurrentKey("ShipStation Shipment ID");
-                                    SetRange("Package No.", PackageHeader."No.");
-                                    SetFilter("ShipStation Shipment ID", '<>%1', '');
-                                    if FindSet(false, false) then begin
-                                        repeat
-                                            PackageBoxMgt.VoidLabel2OrderInShipStation("Package No.", "No.");
-                                        until Next() = 0;
-                                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
-                                    end;
+                                BoxHeader.SetCurrentKey("ShipStation Shipment ID");
+                                BoxHeader.SetRange("Package No.", PackageHeader."No.");
+                                BoxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
+                                if BoxHeader.FindSet(false, false) then begin
+                                    repeat
+                                        PackageBoxMgt.VoidLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                    until BoxHeader.Next() = 0;
+                                    PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
                                 end;
                             until PackageHeader.Next() = 0;
                         Message(lblLabelsVoided);

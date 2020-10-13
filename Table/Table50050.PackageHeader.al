@@ -137,8 +137,7 @@ table 50050 "Package Header"
     local procedure TestNoSeries()
     begin
         GetWhseSetup();
-        with WhseSetup do
-            TestField("Package No. Series");
+        WhseSetup.TestField("Package No. Series");
     end;
 
     local procedure GetNoSeriesCode(): Code[20]
@@ -154,10 +153,8 @@ table 50050 "Package Header"
     var
         BoxHeader: Record "Box Header";
     begin
-        with BoxHeader do begin
-            SetRange("Package No.", "No.");
-            DeleteAll(true);
-        end;
+        BoxHeader.SetRange("Package No.", "No.");
+        BoxHeader.DeleteAll(true);
     end;
 
     local procedure GetWhseSetup()

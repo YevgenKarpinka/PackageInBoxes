@@ -104,7 +104,7 @@ page 50051 "Boxes Subpage"
                 CaptionML = ENU = 'Close', RUS = 'Закрыть';
                 ToolTipML = ENU = 'Close the box document to the next stage of processing. You must reopen the document before you can make changes to it.',
                             RUS = 'Закрытие документа коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
-                Enabled = Rec.Status = Rec.Status::Open;
+                Enabled = Status = Status::Open;
                 Image = ItemLines;
 
                 trigger OnAction()
@@ -123,7 +123,7 @@ page 50051 "Boxes Subpage"
                 CaptionML = ENU = 'Reopen', RUS = 'Открыть';
                 ToolTipML = ENU = 'Reopen the box document to change.',
                             RUS = 'Повторное открытие документа коробки для его изменения.';
-                Enabled = Rec.Status = Rec.Status::Closed;
+                Enabled = Status = Status::Closed;
                 Image = RefreshLines;
 
                 trigger OnAction()
@@ -142,7 +142,7 @@ page 50051 "Boxes Subpage"
                 CaptionML = ENU = 'Assembly', RUS = 'Собрать';
                 ToolTipML = ENU = 'Assembly in the box all the items remaining on the table.',
                             RUS = 'Собрать в коробку весь оставшийся на столе товар.';
-                Enabled = Rec.Status = Rec.Status::Open;
+                Enabled = Status = Status::Open;
                 Image = GetActionMessages;
 
                 trigger OnAction()

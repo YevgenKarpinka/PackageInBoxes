@@ -63,7 +63,7 @@ page 50050 "Package Card"
                 ApplicationArea = Warehouse;
                 SubPageLink = "Package No." = field("No.");
                 UpdatePropagation = Both;
-                Editable = Rec.Status = Rec.Status::Unregistered;
+                Editable = Status = Status::Unregistered;
             }
         }
         area(FactBoxes)
@@ -104,7 +104,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Unregister', RUS = 'Отменить регистрацию';
                     ToolTipML = ENU = 'Unregister package document to change.',
                             RUS = 'Отменить регистрацию документа упаковки для изменения.';
-                    Enabled = Rec.Status = Rec.Status::Registered;
+                    Enabled = Status = Status::Registered;
                     Image = Undo;
 
                     trigger OnAction()
@@ -138,7 +138,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Close All', RUS = 'Закрыть Все';
                     ToolTipML = ENU = 'Close all of the box document to the next stage of processing. You must reopen the document before you can make changes to it.',
                             RUS = 'Закрытие всех документов коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                    Enabled = Status = Status::Unregistered;
                     Image = ItemLines;
 
                     trigger OnAction()
@@ -154,7 +154,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Reopen All', RUS = 'Открыть Все';
                     ToolTipML = ENU = 'Reopen all the document of the box to change.',
                             RUS = 'Повторное открытие всех документа коробки для их изменения.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                    Enabled = Status = Status::Unregistered;
                     Image = RefreshLines;
 
                     trigger OnAction()
@@ -168,7 +168,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Delete Empty Boxes', RUS = 'Удалить пустые коробки';
                     ToolTipML = ENU = 'Delete empty box documents.',
                             RUS = 'Удаление пустых документов коробки.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                    Enabled = Status = Status::Unregistered;
                     Image = Delete;
 
                     trigger OnAction()
@@ -182,7 +182,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Delete Empty Lines', RUS = 'Удалить пустые строки';
                     ToolTipML = ENU = 'Delete blank lines in box documents.',
                             RUS = 'Удаление пустых строк в документах коробки.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                    Enabled = Status = Status::Unregistered;
                     Image = DeleteRow;
 
                     trigger OnAction()
@@ -233,6 +233,8 @@ page 50050 "Package Card"
                     Image = PrintReport;
 
                     trigger OnAction()
+                    var
+                        LabelCreated: Boolean;
                     begin
                         PackageHeader.Reset();
                         BoxHeader.Reset();
@@ -247,11 +249,15 @@ page 50050 "Package Card"
                                 if BoxHeader.FindSet(false, false) then begin
                                     repeat
                                         PackageBoxMgt.CreateLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                        LabelCreated := true;
                                     until BoxHeader.Next() = 0;
                                     PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
                                 end;
                             until PackageHeader.Next() = 0;
-                        Message(lblLabelsCreated);
+                        if LabelCreated then
+                            Message(lblLabelsCreated)
+                        else
+                            Error(errNoBoxesFoundForCreatingLabels);
                     end;
                 }
                 action("Void Labels")
@@ -263,6 +269,8 @@ page 50050 "Package Card"
                     Image = VoidCreditCard;
 
                     trigger OnAction()
+                    var
+                        LabelsVoided: Boolean;
                     begin
                         PackageHeader.Reset();
                         BoxHeader.Reset();
@@ -273,13 +281,17 @@ page 50050 "Package Card"
                                 BoxHeader.SetRange("Package No.", PackageHeader."No.");
                                 BoxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
                                 if BoxHeader.FindSet(false, false) then begin
+                                    LabelsVoided := true;
                                     repeat
                                         PackageBoxMgt.VoidLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
                                     until BoxHeader.Next() = 0;
                                     PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
                                 end;
                             until PackageHeader.Next() = 0;
-                        Message(lblLabelsVoided);
+                        if LabelsVoided then
+                            Message(lblLabelsVoided)
+                        else
+                            Error(errNoLabelsForVoid);
                     end;
                 }
             }
@@ -296,4 +308,8 @@ page 50050 "Package Card"
                                     RUS = 'Бирки созданы и прикреплены к Отгрузкам!';
         lblLabelsVoided: TextConst ENU = 'Labels Voided!',
                                     RUS = 'Бирки отменены!';
+        errNoBoxesFoundForCreatingLabels: TextConst ENU = 'No boxes found for creating labels.',
+                                                    RUS = 'Коробок для создания бирок не найдено.';
+        errNoLabelsForVoid: TextConst ENU = 'No labels found for void.',
+                                    RUS = 'Бирок для аннулирования не найдено.';
 }

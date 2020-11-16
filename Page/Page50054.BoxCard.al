@@ -14,7 +14,7 @@ page 50054 "Box Card"
         {
             group(General)
             {
-                Editable = Rec.Status = Rec.Status::Open;
+                Editable = Status = Status::Open;
 
                 field("No."; Rec."No.")
                 {
@@ -76,11 +76,11 @@ page 50054 "Box Card"
                 ApplicationArea = Warehouse;
                 SubPageLink = "Box No." = field("No.");
                 UpdatePropagation = Both;
-                Editable = Rec.Status = Rec.Status::Open;
+                Editable = Status = Status::Open;
             }
             group(ShipStation)
             {
-                Editable = Rec.Status = Rec.Status::Open;
+                Editable = Status = Status::Open;
                 field("Tracking No."; Rec."Tracking No.")
                 {
                     ApplicationArea = Warehouse;
@@ -153,7 +153,7 @@ page 50054 "Box Card"
                 CaptionML = ENU = 'Close', RUS = 'Закрыть';
                 ToolTipML = ENU = 'Close the document of the box to the next stage of processing. You must reopen the document before you can make changes to it.',
                             RUS = 'Закрытие документа коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
-                Enabled = Rec.Status = Rec.Status::Open;
+                Enabled = Status = Status::Open;
                 Image = ItemLines;
 
                 trigger OnAction()
@@ -167,7 +167,7 @@ page 50054 "Box Card"
                 CaptionML = ENU = 'Reopen', RUS = 'Открыть';
                 ToolTipML = ENU = 'Reopen the document of the box to change.',
                             RUS = 'Повторное открытие документа коробки для его изменения.';
-                Enabled = Rec.Status = Rec.Status::Closed;
+                Enabled = Status = Status::Closed;
                 Image = RefreshLines;
 
                 trigger OnAction()
@@ -181,7 +181,7 @@ page 50054 "Box Card"
                 CaptionML = ENU = 'Assembly', RUS = 'Собрать';
                 ToolTipML = ENU = 'Assembly in the box all the items remaining on the table.',
                             RUS = 'Собрать в коробку весь оставшийся на столе товар.';
-                Enabled = Rec.Status = Rec.Status::Open;
+                Enabled = Status = Status::Open;
                 Image = GetActionMessages;
 
                 trigger OnAction()
@@ -197,7 +197,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Send to the ShipStation of the box document.',
                                 RUS = 'Отправить в ShipStation документ коробки.';
                 Image = CreateDocuments;
-                Visible = (Rec.Status = Rec.Status::Closed) and (Rec."ShipStation Shipment ID" = '');
+                Visible = (Status = Status::Closed) and ("ShipStation Shipment ID" = '');
 
                 trigger OnAction()
                 begin
@@ -221,9 +221,9 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Create Label to the box document.',
                                 RUS = 'Создать бирку для коробки.';
                 Image = PrintReport;
-                Visible = (Rec."ShipStation Order Key" <> '')
-                and (Rec."ShipStation Shipment ID" = '')
-                and (Rec.Status = Rec.Status::Closed);
+                Visible = ("ShipStation Order Key" <> '')
+                and ("ShipStation Shipment ID" = '')
+                and (Status = Status::Closed);
 
                 trigger OnAction()
                 begin
@@ -233,12 +233,15 @@ page 50054 "Box Card"
                     BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
                     BoxHeader.SetFilter("ShipStation Order Key", '<>%1', '');
                     BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
-                    if BoxHeader.FindSet(false, false) then
+                    if BoxHeader.FindSet(false, false) then begin
                         repeat
                             PackageBoxMgt.CreateLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
                         until BoxHeader.Next() = 0;
-                    PackageBoxMgt.CreateDeliverySalesLineFromPackage(BoxHeader."Sales Order No.");
-                    Message(lblLabelsCreated);
+                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(BoxHeader."Sales Order No.");
+                        Message(lblLabelsCreated);
+                    end else begin
+                        Error(errNoBoxesFoundForCreatingLabel);
+                    end;
                 end;
             }
             action("Void Labels")
@@ -248,7 +251,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Void Label to the box document.',
                                 RUS = 'Отменить бирку для коробоки.';
                 Image = VoidCreditCard;
-                Visible = Rec."ShipStation Shipment ID" <> '';
+                Visible = "ShipStation Shipment ID" <> '';
 
                 trigger OnAction()
                 begin
@@ -256,12 +259,16 @@ page 50054 "Box Card"
                     CurrPage.SetSelectionFilter(BoxHeader);
                     BoxHeader.SetCurrentKey("ShipStation Shipment ID");
                     BoxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
-                    if BoxHeader.FindSet(false, false) then
+                    if BoxHeader.FindSet(false, false) then begin
                         repeat
                             PackageBoxMgt.VoidLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
                         until BoxHeader.Next() = 0;
-                    PackageBoxMgt.CreateDeliverySalesLineFromPackage(BoxHeader."Sales Order No.");
-                    Message(lblLabelVoided);
+                        PackageBoxMgt.CreateDeliverySalesLineFromPackage(BoxHeader."Sales Order No.");
+                        Message(lblLabelVoided);
+                    end else begin
+                        Error(errNoLabelForVoid);
+                    end;
+
                 end;
             }
         }
@@ -277,4 +284,9 @@ page 50054 "Box Card"
                                     RUS = 'Бирки созданы и прикреплены к Отгрузкам!';
         lblLabelVoided: TextConst ENU = 'Label Voided!',
                                     RUS = 'Бирка отменена!';
+        errNoBoxesFoundForCreatingLabel: TextConst ENU = 'No boxes found for creating label.',
+                                                    RUS = 'Коробок для создания бирок не найдено.';
+        errNoLabelForVoid: TextConst ENU = 'No label found for void.',
+                                    RUS = 'Бирки для аннулирования не найдено.';
+
 }

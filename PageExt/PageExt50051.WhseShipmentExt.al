@@ -21,8 +21,7 @@ pageextension 50051 "Whse. Shipment Ext." extends "Warehouse Shipment" //7335
                 var
                     PackageHeader: Record "Package Header";
                 begin
-                    GetWhseSetup();
-                    WhseSetup.TestField("Enable Box Packaging", true);
+                    GetPackageEnable();
                     if not PackageBoxMgt.CreateNewPackageFromWarehouseShipment(PackageHeader, Rec) then exit;
                     Commit();
                     Page.RunModal(Page::"Package Card", PackageHeader);
@@ -31,12 +30,13 @@ pageextension 50051 "Whse. Shipment Ext." extends "Warehouse Shipment" //7335
         }
     }
 
-    local procedure GetWhseSetup()
+    local procedure GetPackageEnable()
     begin
-        WhseSetup.Get();
+        Location.Get("Location Code");
+        Location.TestField("Enable Box Packaging");
     end;
 
     var
-        WhseSetup: Record "Warehouse Setup";
+        Location: Record Location;
         PackageBoxMgt: Codeunit "Package Box Mgt.";
 }

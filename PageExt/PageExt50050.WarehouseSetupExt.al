@@ -9,12 +9,12 @@ pageextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5775
             {
                 CaptionML = ENU = 'Box Package', RUS = 'Упаковка в коробку';
 
-                field("Enable Box Packaging"; Rec."Enable Box Packaging")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Enabled or Disabled Packagin in Boxes.',
-                                RUS = 'Включить или Выключить упаковку в коробки.';
-                }
+                // field("Enable Box Packaging"; Rec."Enable Box Packaging")
+                // {
+                //     ApplicationArea = Warehouse;
+                //     ToolTipML = ENU = 'Enabled or Disabled Packagin in Boxes.',
+                //                 RUS = 'Включить или Выключить упаковку в коробки.';
+                // }
                 field("Create and Open Box"; Rec."Create and Open Box")
                 {
                     ApplicationArea = Warehouse;

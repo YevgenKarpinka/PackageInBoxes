@@ -54,8 +54,8 @@ codeunit 50050 "Package Box Mgt."
         PackageHeader: Record "Package Header";
     begin
         GetWhseSetup();
-        if not WhseSetup."Enable Box Packaging"
-        and not (WhseShptLine."Source Document" = WhseShptLine."Source Document"::"Sales Order") then
+        if not PackageEnableByShipment(WhseShptLine)
+        or not (WhseShptLine."Source Document" = WhseShptLine."Source Document"::"Sales Order") then
             exit;
 
         PackageHeader.SetCurrentKey("Sales Order No.");
@@ -73,14 +73,24 @@ codeunit 50050 "Package Box Mgt."
         // PackageSetRegister(PackageHeader."No.");
     end;
 
+    local procedure PackageEnableByShipment(WhseShptLine: Record "Warehouse Shipment Line"): Boolean
+    var
+        Location: Record Location;
+    begin
+        if Location.Get(WhseShptLine."Location Code") then
+            exit(Location."Enable Box Packaging");
+
+        exit(false);
+    end;
+
     [EventSubscriber(ObjectType::Table, 7320, 'OnBeforeWhseShptLineDelete', '', false, false)]
     local procedure CheckBoxLineExist(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     var
         BoxLine: Record "Box Line";
     begin
         GetWhseSetup();
-        if not WhseSetup."Enable Box Packaging"
-        and not (WarehouseShipmentLine."Source Document" = WarehouseShipmentLine."Source Document"::"Sales Order") then
+        if not PackageEnableByShipment(WarehouseShipmentLine)
+        or not (WarehouseShipmentLine."Source Document" = WarehouseShipmentLine."Source Document"::"Sales Order") then
             exit;
 
         BoxLine.SetCurrentKey("Shipment No.", "Shipment Line No.");
@@ -97,7 +107,7 @@ codeunit 50050 "Package Box Mgt."
         PackageHeader: Record "Package Header";
     begin
         GetWhseSetup();
-        if not WhseSetup."Enable Box Packaging"
+        if not PackageEnableByActivity(WarehouseActivityLine)
         or not (WarehouseActivityLine."Source Document" = WarehouseActivityLine."Source Document"::"Sales Order") then
             exit;
 
@@ -110,13 +120,23 @@ codeunit 50050 "Package Box Mgt."
         if PackageHeader.Insert(true) then;
     end;
 
+    local procedure PackageEnableByActivity(WarehouseActivityLine: Record "Warehouse Activity Line"): Boolean
+    var
+        Location: Record Location;
+    begin
+        if Location.Get(WarehouseActivityLine."Location Code") then
+            exit(Location."Enable Box Packaging");
+
+        exit(false);
+    end;
+
     procedure CheckPackageBeforeRegister(PackageNo: Code[20])
     var
         PackageHeader: Record "Package Header";
         WhseShptLine: Record "Warehouse Shipment Line";
     begin
-        GetWhseSetup();
-        if not WhseSetup."Enable Box Packaging" then exit;
+        // GetWhseSetup();
+        // if not PackageEnable(WarehouseShipmentLine) then exit;
         PackageHeader.Get(PackageNo);
         if not PackageUnRegistered(PackageHeader."No.") then exit;
 
@@ -134,8 +154,8 @@ codeunit 50050 "Package Box Mgt."
         PackageHeader: Record "Package Header";
         WhseShptLine: Record "Warehouse Shipment Line";
     begin
-        GetWhseSetup();
-        if not WhseSetup."Enable Box Packaging" then exit;
+        // GetWhseSetup();
+        // if not WhseSetup."Enable Box Packaging" then exit;
         PackageHeader.Get(PackageNo);
 
         WhseShptLine.SetCurrentKey("Source Document", "Source No.");

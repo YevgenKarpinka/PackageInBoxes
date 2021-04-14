@@ -5,6 +5,8 @@ tableextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5769
         // Add changes to table fields here
         field(50050; "Enable Box Packaging"; Boolean)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'older logic';
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Enable Box Packaging', RUS = 'Активировать Упаковку в Коробки';
         }

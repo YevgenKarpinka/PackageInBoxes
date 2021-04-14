@@ -1,3 +1,8 @@
 {
-    "al.defaultLaunchConfigurationName": "Microsoft cloud sandbox"
+    "CRS.FileNamePattern": "<ObjectTypeShortPascalCase><ObjectId>.<ObjectNameShort>.al",
+    "CRS.FileNamePatternExtensions": "<ObjectTypeShortPascalCase><ObjectId>.<ObjectNameShort>.al",
+    "CRS.FileNamePatternPageCustomizations": "<ObjectTypeShortPascalCase><ObjectId>.<ObjectNameShort>.al",
+    "CRS.OnSaveAlFileAction": "Rename",
+    "CRS.RenameWithGit": true,
+    "CRS.ObjectNameSuffix": "",
 }

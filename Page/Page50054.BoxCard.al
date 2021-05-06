@@ -14,7 +14,7 @@ page 50054 "Box Card"
         {
             group(General)
             {
-                Editable = Status = Status::Open;
+                Editable = Rec.Status = Rec.Status::Open;
 
                 field("No."; Rec."No.")
                 {
@@ -37,7 +37,7 @@ page 50054 "Box Card"
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies status the box document.',
+                    ToolTipML = ENU = 'Specifies Rec.Status the box document.',
                                 RUS = 'Определяет статус документа коробки.';
                 }
                 field("External Document No."; Rec."External Document No.")
@@ -76,11 +76,11 @@ page 50054 "Box Card"
                 ApplicationArea = Warehouse;
                 SubPageLink = "Box No." = field("No.");
                 UpdatePropagation = Both;
-                Editable = Status = Status::Open;
+                Editable = Rec.Status = Rec.Status::Open;
             }
             group(ShipStation)
             {
-                Editable = Status = Status::Open;
+                Editable = Rec.Status = Rec.Status::Open;
                 field("Tracking No."; Rec."Tracking No.")
                 {
                     ApplicationArea = Warehouse;
@@ -115,7 +115,7 @@ page 50054 "Box Card"
                 {
                     ApplicationArea = Warehouse;
                     Importance = Additional;
-                    ToolTipML = ENU = 'Specifies the ShipStation Status of the box.',
+                    ToolTipML = ENU = 'Specifies the ShipStation Rec.Status of the box.',
                                 RUS = 'Определяет ShipStation статус коробки.';
                 }
                 field("ShipStation Shipment ID"; Rec."ShipStation Shipment ID")
@@ -153,7 +153,7 @@ page 50054 "Box Card"
                 CaptionML = ENU = 'Close', RUS = 'Закрыть';
                 ToolTipML = ENU = 'Close the document of the box to the next stage of processing. You must reopen the document before you can make changes to it.',
                             RUS = 'Закрытие документа коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
-                Enabled = Status = Status::Open;
+                Enabled = Rec.Status = Rec.Status::Open;
                 Image = ItemLines;
 
                 trigger OnAction()
@@ -167,7 +167,7 @@ page 50054 "Box Card"
                 CaptionML = ENU = 'Reopen', RUS = 'Открыть';
                 ToolTipML = ENU = 'Reopen the document of the box to change.',
                             RUS = 'Повторное открытие документа коробки для его изменения.';
-                Enabled = Status = Status::Closed;
+                Enabled = Rec.Status = Rec.Status::Closed;
                 Image = RefreshLines;
 
                 trigger OnAction()
@@ -181,7 +181,7 @@ page 50054 "Box Card"
                 CaptionML = ENU = 'Assembly', RUS = 'Собрать';
                 ToolTipML = ENU = 'Assembly in the box all the items remaining on the table.',
                             RUS = 'Собрать в коробку весь оставшийся на столе товар.';
-                Enabled = Status = Status::Open;
+                Enabled = Rec.Status = Rec.Status::Open;
                 Image = GetActionMessages;
 
                 trigger OnAction()
@@ -197,7 +197,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Send to the ShipStation of the box document.',
                                 RUS = 'Отправить в ShipStation документ коробки.';
                 Image = CreateDocuments;
-                Visible = (Status = Status::Closed) and ("ShipStation Shipment ID" = '');
+                Visible = (Rec.Status = Rec.Status::Closed) and (Rec."ShipStation Shipment ID" = '');
 
                 trigger OnAction()
                 begin
@@ -221,9 +221,9 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Create Label to the box document.',
                                 RUS = 'Создать бирку для коробки.';
                 Image = PrintReport;
-                Visible = ("ShipStation Order Key" <> '')
-                and ("ShipStation Shipment ID" = '')
-                and (Status = Status::Closed);
+                Visible = (Rec."ShipStation Order Key" <> '')
+                and (Rec."ShipStation Shipment ID" = '')
+                and (Rec.Status = Rec.Status::Closed);
 
                 trigger OnAction()
                 begin
@@ -251,7 +251,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Void Label to the box document.',
                                 RUS = 'Отменить бирку для коробоки.';
                 Image = VoidCreditCard;
-                Visible = "ShipStation Shipment ID" <> '';
+                Visible = Rec."ShipStation Shipment ID" <> '';
 
                 trigger OnAction()
                 begin

@@ -2,7 +2,7 @@
   "id": "fa072300-3657-413a-a5c9-85c545dc2147",
   "name": "Fusion Box Package",
   "publisher": "TComTech",
-  "version": "18.0.0.2",
+  "version": "18.0.0.4",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -15,7 +15,7 @@
       "id": "6317e880-5065-4f48-98ff-ff40f914c170",
       "publisher": "TComTech",
       "name": "Fusion Base Extention",
-      "version": "18.0.0.3"
+      "version": "18.0.0.5"
     }
   ],
   "screenshots": [],

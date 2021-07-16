@@ -179,10 +179,16 @@ codeunit 50050 "Package Box Mgt."
             until WhseShipmentLine.Next() = 0;
     end;
 
+    procedure OpenPackageFromSalesOrder(var PackageHeader: Record "Package Header"; SalesHeader: Record "Sales Header"): Boolean
+    begin
+        PackageHeader.SetCurrentKey("Sales Order No.");
+        PackageHeader.SetRange("Sales Order No.", SalesHeader."No.");
+        exit(PackageHeader.FindFirst());
+    end;
+
     procedure CreateNewPackageFromWarehouseShipment(var PackageHeader: Record "Package Header"; WhseShipmentHeader: Record "Warehouse Shipment Header"): Boolean
     var
         WhseShipmentLine: Record "Warehouse Shipment Line";
-        WhseActLine: Record "Warehouse Activity Line";
     begin
         WhseShipmentHeader.TestField(Status, WhseShipmentHeader.Status::Released);
 
@@ -908,7 +914,8 @@ codeunit 50050 "Package Box Mgt."
         jsLabelObject.ReadFrom(JSText);
         txtLabel := ShipStationMgt.GetJSToken(jsLabelObject, 'labelData').AsValue().AsText();
         txtBeforeName := _BoxHeader."No." + '-' + ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
-        ShipStationMgt.SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
+        // ShipStationMgt.SaveLabel2Shipment(txtBeforeName, txtLabel, WhseShipDocNo);
+        ShipStationMgt.SaveLabel2Order(txtBeforeName, txtLabel, SalesHeader."No.");
 
         // Update Sales Header From ShipStation
         // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
@@ -998,7 +1005,7 @@ codeunit 50050 "Package Box Mgt."
     begin
         if not _salesHeader.Get(_salesHeader."Document Type"::Order, salesOrderNo) then exit;
 
-        if (not _customer.Get(_salesHeader."Sell-to Customer No."))
+        if not _customer.Get(_salesHeader."Sell-to Customer No.")
             or (_customer."Sales No. Shipment Cost" = '') then
             exit;
 
@@ -1037,8 +1044,8 @@ codeunit 50050 "Package Box Mgt."
             _salesLine.Insert(true);
         end;
         _salesLine.Validate(Type, _customer."Posting Type Shipment Cost");
-        _salesLine.Validate(Quantity, 1);
         _salesLine.Validate("No.", _customer."Sales No. Shipment Cost");
+        _salesLine.Validate(Quantity, 1);
         // Validate("Amount Including VAT", PackageShippingAmount);
         _salesLine.Validate("Unit Price", PackageShippingAmount);
         _salesLine.Modify(true);

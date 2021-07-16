@@ -246,7 +246,7 @@ page 50050 "Package Card"
                                 BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
                                 BoxHeader.SetFilter("ShipStation Order Key", '<>%1', '');
                                 BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
-                                if BoxHeader.FindSet(false, false) then begin
+                                if BoxHeader.FindSet() then begin
                                     repeat
                                         PackageBoxMgt.CreateLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
                                         LabelCreated := true;

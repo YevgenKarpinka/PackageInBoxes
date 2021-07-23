@@ -669,6 +669,20 @@ codeunit 50050 "Package Box Mgt."
         DeleteEmptyLinesByPackag(PackageNo);
         CloseAllBoxes(PackageNo);
         PackageSetRegister(PackageNo);
+        UpdateDeliveryStatusByPackage(PackageNo);
+        OnAfterRegisterPackage(PackageNo);
+    end;
+
+    procedure UpdateDeliveryStatusByPackage(PackageNo: Code[20])
+    var
+        BoxHeader: Record "Box Header";
+    begin
+        if PackageUnRegistered(PackageNo) then
+            Error(errPackageMustBeUnregister, PackageNo);
+
+        BoxHeader.SetRange("Package No.", PackageNo);
+        if BoxHeader.FindFirst() then
+            ShipStationMgt.SentOrderShipmentStatusForWooComerse(BoxHeader."Sales Order No.", 0);
     end;
 
     procedure DeleteBox(PackageNo: Code[20]; BoxNo: Code[20])
@@ -1088,5 +1102,10 @@ codeunit 50050 "Package Box Mgt."
         boxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
         boxHeader.CalcSums("Shipment Cost", "Other Cost", "ShipStation Shipment Amount");
         exit(boxHeader."Shipment Cost" + boxHeader."Other Cost" + boxHeader."ShipStation Shipment Amount");
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterRegisterPackage(PackageNo: Code[20])
+    begin
     end;
 }

@@ -252,6 +252,7 @@ page 50050 "Package Card"
                                         LabelCreated := true;
                                     until BoxHeader.Next() = 0;
                                     PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
+                                    ShipStationMgt.SentOrderShipmentStatusForWooComerse(BoxHeader."Sales Order No.", 1);
                                 end;
                             until PackageHeader.Next() = 0;
                         if LabelCreated then
@@ -302,6 +303,7 @@ page 50050 "Package Card"
         PackageHeader: Record "Package Header";
         BoxHeader: Record "Box Header";
         PackageBoxMgt: Codeunit "Package Box Mgt.";
+        ShipStationMgt: Codeunit "ShipStation Mgt.";
         lblOrdersCreated: TextConst ENU = 'Orders Created in ShipStation!',
                                     RUS = 'Заказы в ShipStation созданы!';
         lblLabelsCreated: TextConst ENU = 'Labels Created and Attached to Warehouse Shipments!',

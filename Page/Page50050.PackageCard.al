@@ -256,7 +256,7 @@ page 50050 "Package Card"
                                 end;
                             until PackageHeader.Next() = 0;
                         if LabelCreated then
-                            Message(lblLabelsCreated)
+                            Message(lblLabelsCreated, PackageHeader."Sales Order No.")
                         else
                             Error(errNoBoxesFoundForCreatingLabels);
                     end;
@@ -306,8 +306,8 @@ page 50050 "Package Card"
         ShipStationMgt: Codeunit "ShipStation Mgt.";
         lblOrdersCreated: TextConst ENU = 'Orders Created in ShipStation!',
                                     RUS = 'Заказы в ShipStation созданы!';
-        lblLabelsCreated: TextConst ENU = 'Labels Created and Attached to Warehouse Shipments!',
-                                    RUS = 'Бирки созданы и прикреплены к Отгрузкам!';
+        lblLabelsCreated: TextConst ENU = 'Labels Created and Attached to Sales Order %1',
+                                    RUS = 'Бирки созданы и прикреплены к Заказу на продажу %1';
         lblLabelsVoided: TextConst ENU = 'Labels Voided!',
                                     RUS = 'Бирки отменены!';
         errNoBoxesFoundForCreatingLabels: TextConst ENU = 'No boxes found for creating labels.',

@@ -35,6 +35,8 @@ codeunit 50050 "Package Box Mgt."
                                                                    RUS = 'Нельзя удалить строку %2 Отгрузки %1 пока Товар %3 запакован в Коробку %4.';
         errPackageMustBeUnregister: TextConst ENU = 'Package %1 must be unregister!',
                                               RUS = 'Упаковка %1 должна быть не зарегистрирована';
+        errPackageMustBeRegister: TextConst ENU = 'Package %1 must be register!',
+                                              RUS = 'Упаковка %1 должна быть зарегистрирована';
         errOpenBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be open because the tracking number %2  is exist.',
                                                     RUS = 'Документ коробки %1 открыть нельзя, потому что заполнен номер отслеживания %2.';
         errDeleteBoxNotAllowedTrackginNoExist: TextConst ENU = 'Box document %1 cannot be delete because the tracking number %2  is exist.',
@@ -350,13 +352,17 @@ codeunit 50050 "Package Box Mgt."
     procedure CalcItemPickedQuantityByShipment(WhseShipmentNo: Code[20]; ItemNo: Code[20]; LineNo: Integer): Decimal
     var
         WhseShipmentLine: Record "Warehouse Shipment Line";
+        locLocation: Record Location;
     begin
         WhseShipmentLine.SetCurrentKey("Item No.");
         WhseShipmentLine.SetRange("No.", WhseShipmentNo);
         WhseShipmentLine.SetRange("Line No.", LineNo);
         WhseShipmentLine.SetRange("Item No.", ItemNo);
-        WhseShipmentLine.CalcSums("Qty. Picked");
-        exit(WhseShipmentLine."Qty. Picked");
+        WhseShipmentLine.CalcSums("Qty. Picked", "Qty. to Ship", "Qty. Shipped");
+        if locLocation.RequirePicking(WhseShipmentLine."Location Code") then
+            exit(WhseShipmentLine."Qty. Picked");
+
+        exit(WhseShipmentLine."Qty. to Ship");
     end;
 
     procedure CalcItemQuantityInBoxesByOrder(SalesOrderNo: Code[20]; ItemNo: Code[20]): Decimal
@@ -678,7 +684,7 @@ codeunit 50050 "Package Box Mgt."
         BoxHeader: Record "Box Header";
     begin
         if PackageUnRegistered(PackageNo) then
-            Error(errPackageMustBeUnregister, PackageNo);
+            Error(errPackageMustBeRegistered, PackageNo);
 
         BoxHeader.SetRange("Package No.", PackageNo);
         if BoxHeader.FindFirst() then

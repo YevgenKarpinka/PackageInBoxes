@@ -23,8 +23,8 @@ codeunit 50050 "Package Box Mgt."
         CompanyInfoGetted: Boolean;
         errItemPickedButNotFullyPackagedToBox: TextConst ENU = 'The Item %1 are picked to Shipment %2 but not packed %3!',
                                                               RUS = 'Товара %1 подобран в Отгрузке %2 но не упакован %3!';
-        errNotAllowUnregisterIfShipmentPosted: TextConst ENU = 'Not allow uregister Package %1 if Warehouse shipment posted!',
-                                                         RUS = 'Нельзя отменить регистрацию Упаковки %1 если Складских отгрузка учтена!';
+        errNotAllowUnregisterIfShipmentPosted: TextConst ENU = 'Not allow unregister Package %1 if Warehouse shipment posted!',
+                                                         RUS = 'Нельзя отменить регистрацию Упаковки %1 если Складская отгрузка учтена!';
         errCreatePackageBeforePostingWarehouseShipment: TextConst ENU = 'Create Package before posting Warehouse Shipment %1.',
                                                                   RUS = 'Создайте Упаковку перед учетом Складской отгрузки %1.';
         errPackageMustBeRegistered: TextConst ENU = 'Package %1 must be registered.',

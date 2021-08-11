@@ -779,6 +779,13 @@ codeunit 50050 "Package Box Mgt."
         JSObjectHeader.Add('shipTo', ShipStationMgt.jsonShipToFromSH(_SH."No."));
         JSObjectHeader.Add('items', jsonItemsFromBoxLines(BoxNo));
         JSObjectHeader.Add('weight', jsonGrossWeight(_BoxHeader."Gross Weight", Format(_BoxHeader."Unit of Measure")));
+        if (_SH."ShipStation Carrier" <> '') then begin
+            JSObjectHeader.Add('carrierCode', _SH."ShipStation Carrier");
+            if _SH."ShipStation Service" <> '' then
+                JSObjectHeader.Add('serviceCode', _SH."ShipStation Service");
+            if _SH."ShipStation Package" <> '' then
+                JSObjectHeader.Add('packageCode', _SH."ShipStation Package");
+        end;
         JSObjectHeader.WriteTo(JSText);
 
         JSText := ShipStationMgt.Connect2ShipStation(2, JSText, '');
@@ -1029,40 +1036,28 @@ codeunit 50050 "Package Box Mgt."
             or (_customer."Sales No. Shipment Cost" = '') then
             exit;
 
+        DeleteItemChargeSalesLine(salesOrderNo, _customer."Sales No. Shipment Cost");
         PackageShippingAmount := GetPackageShippingAmountFromSalesOrder(salesOrderNo);
-        if PackageShippingAmount = 0 then begin
-            DeleteItemChargeSalesLine(salesOrderNo, _customer."Sales No. Shipment Cost");
-            exit;
-        end;
+        if PackageShippingAmount = 0 then exit;
 
-        _salesLineLast.SetRange("Document Type", _salesLineLast."Document Type"::Order);
-        _salesLineLast.SetRange("Document No.", salesOrderNo);
-        _salesLineLast.SetRange("No.", _customer."Sales No. Shipment Cost");
-        if _salesLineLast.FindFirst() then begin
-            salesLineExist := true;
-            LineNo := _salesLineLast."Line No."
-        end else begin
-            _salesLineLast.SetRange("No.");
-            if _salesLineLast.FindLast() then
-                LineNo := _salesLineLast."Line No." + 10000
-            else
-                LineNo := 10000;
-        end;
-
+        _salesHeader.Get(_salesHeader."Document Type"::Order, salesOrderNo);
         if _salesHeader.Status = _salesHeader.Status::Released then begin
             _salesHeader.Status := _salesHeader.Status::Open;
             _salesHeader.Modify();
         end;
 
-        if salesLineExist then
-            _salesLine.Get(_salesLine."Document Type"::Order, salesOrderNo, LineNo)
-        else begin
-            _salesLine.Init;
-            _salesLine."Document Type" := _salesLine."Document Type"::Order;
-            _salesLine."Document No." := salesOrderNo;
-            _salesLine."Line No." := LineNo;
-            _salesLine.Insert(true);
-        end;
+        _salesLineLast.SetRange("Document Type", _salesLineLast."Document Type"::Order);
+        _salesLineLast.SetRange("Document No.", salesOrderNo);
+        if _salesLineLast.FindLast() then
+            LineNo := _salesLineLast."Line No." + 10000
+        else
+            LineNo := 10000;
+
+        _salesLine.Init;
+        _salesLine."Document Type" := _salesLine."Document Type"::Order;
+        _salesLine."Document No." := salesOrderNo;
+        _salesLine."Line No." := LineNo;
+        _salesLine.Insert(true);
         _salesLine.Validate(Type, _customer."Posting Type Shipment Cost");
         _salesLine.Validate("No.", _customer."Sales No. Shipment Cost");
         _salesLine.Validate(Quantity, 1);
@@ -1074,6 +1069,20 @@ codeunit 50050 "Package Box Mgt."
         _salesHeader.Modify();
 
         ICExtended.CreateItemChargeAssgnt(_salesHeader."No.", _salesHeader."Sell-to Customer No.");
+    end;
+
+    // [EventSubscriber(ObjectType::Codeunit, 398, 'OnBeforeAddSalesLine', '', false, false)]
+    local procedure SaleLineOnBeforeAddSalesLine(var IsHandled: Boolean; var SalesLine: Record "Sales Line")
+    var
+        locSH: Record "Sales Header";
+        locCustomer: Record Customer;
+    begin
+        locSH.Get(SalesLine."Document Type", SalesLine."Document No.");
+        locCustomer.Get(locSH."Sell-to Customer No.");
+        if (locCustomer."Posting Type Shipment Cost" = SalesLine.Type.AsInteger())
+        and (locCustomer."Sales No. Shipment Cost" = SalesLine."No.") then begin
+            IsHandled := true;
+        end;
     end;
 
     procedure DeleteItemChargeSalesLine(salesOrderNo: Code[20]; ItemNo: Code[20])

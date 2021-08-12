@@ -927,7 +927,6 @@ codeunit 50050 "Package Box Mgt."
         UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
         JSText := ShipStationMgt.FillValuesFromOrder(JSObject, _BoxHeader."Sales Order No.", SalesHeader."Location Code");
 
-
         JSObject.ReadFrom(JSText);
         // CheckUpdateBox(JSObject, 'orderId');
         JSText := ShipStationMgt.Connect2ShipStation(3, JSText, '');

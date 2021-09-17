@@ -49,6 +49,8 @@ codeunit 50050 "Package Box Mgt."
         errorOrderNotExist: TextConst ENU = 'Sales Order %1 is Posted or Deleted!';
         errShipStationIntegrationDisable: TextConst ENU = 'ShipStation Integration Disable.',
                                          RUS = 'Интеграция с ShipStation отключена.';
+        _shippedStatus: TextConst ENU = 'Shipped', RUS = 'Отгружен';
+        _assembledStatus: TextConst ENU = 'Assembled', RUS = 'Собран';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment (Yes/No)", 'OnBeforeConfirmWhseShipmentPost', '', false, false)]
     local procedure OnRegisterPackage(var WhseShptLine: Record "Warehouse Shipment Line")
@@ -137,11 +139,9 @@ codeunit 50050 "Package Box Mgt."
         PackageHeader: Record "Package Header";
         WhseShptLine: Record "Warehouse Shipment Line";
     begin
-        // GetWhseSetup();
-        // if not PackageEnable(WarehouseShipmentLine) then exit;
-        PackageHeader.Get(PackageNo);
-        if not PackageUnRegistered(PackageHeader."No.") then exit;
+        if not PackageUnRegistered(PackageNo) then exit;
 
+        PackageHeader.Get(PackageNo);
         WhseShptLine.SetCurrentKey("Source Document", "Source No.");
         WhseShptLine.SetRange("Source Document", WhseShptLine."Source Document"::"Sales Order");
         WhseShptLine.SetRange("Source No.", PackageHeader."Sales Order No.");
@@ -675,7 +675,7 @@ codeunit 50050 "Package Box Mgt."
         DeleteEmptyLinesByPackag(PackageNo);
         CloseAllBoxes(PackageNo);
         PackageSetRegister(PackageNo);
-        UpdateDeliveryStatusByPackage(PackageNo);
+        // UpdateDeliveryStatusByPackage(PackageNo);
         OnAfterRegisterPackage(PackageNo);
     end;
 
@@ -683,12 +683,12 @@ codeunit 50050 "Package Box Mgt."
     var
         BoxHeader: Record "Box Header";
     begin
-        if PackageUnRegistered(PackageNo) then
-            Error(errPackageMustBeRegistered, PackageNo);
+        if PackageUnRegistered(PackageNo) then exit;
+        // Error(errPackageMustBeRegistered, PackageNo);
 
         BoxHeader.SetRange("Package No.", PackageNo);
-        if BoxHeader.FindFirst() then
-            ShipStationMgt.SentOrderShipmentStatusForWooComerse(BoxHeader."Sales Order No.", 0);
+        if BoxHeader.FindFirst() and (BoxHeader."ShipStation Status" <> '') then
+            SentBoxStatusForWooComerse(BoxHeader."Sales Order No.", BoxHeader."ShipStation Status");
     end;
 
     procedure DeleteBox(PackageNo: Code[20]; BoxNo: Code[20])
@@ -877,15 +877,9 @@ codeunit 50050 "Package Box Mgt."
         // Get Rate
         _BoxHeader."ShipStation Order ID" := ShipStationMgt.GetJSToken(_jsonObject, 'orderId').AsValue().AsText();
         _BoxHeader."ShipStation Order Key" := ShipStationMgt.GetJSToken(_jsonObject, 'orderKey').AsValue().AsText();
-        _BoxHeader."ShipStation Status" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'orderStatus').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."ShipStation Status"));
+        // _BoxHeader."ShipStation Status" := CopyStr(ShipStationMgt.GetJSToken(_jsonObject, 'orderStatus').AsValue().AsText(), 1, MaxStrLen(_BoxHeader."ShipStation Status"));
+        _BoxHeader.Validate("ShipStation Status", ShipStationMgt.GetJSToken(_jsonObject, 'orderStatus').AsValue().AsText());
         _BoxHeader."ShipStation Shipment Amount" := ShipStationMgt.GetJSToken(_jsonObject, 'shippingAmount').AsValue().AsDecimal();
-
-        // case "ShipStation Order Status" of
-        //     "ShipStation Order Status"::"Not Sent":
-        //         "ShipStation Order Status" := "ShipStation Order Status"::Sent;
-        //     "ShipStation Order Status"::Sent:
-        //         "ShipStation Order Status" := "ShipStation Order Status"::Updated;
-        // end;
 
         if _BoxHeader."ShipStation Status" = lblAwaitingShipment then begin
             _BoxHeader."Tracking No." := '';
@@ -947,17 +941,17 @@ codeunit 50050 "Package Box Mgt."
         // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
         // JSObject.ReadFrom(JSText);
         // UpdateBoxFromShipStation(PackageNo, BoxNo, JSObject);
-        ChangeShipStationStatusToShipped(PackageNo, BoxNo);
+        // ChangeShipStationStatusToShipped(PackageNo, BoxNo);
     end;
 
-    procedure ChangeShipStationStatusToShipped(PackageNo: Code[20]; BoxNo: Code[20]);
-    var
-        BoxHeader: Record "Box Header";
-    begin
-        BoxHeader.Get(PackageNo, BoxNo);
-        BoxHeader."ShipStation Status" := lblShipped;
-        BoxHeader.Modify();
-    end;
+    // procedure ChangeShipStationStatusToShipped(PackageNo: Code[20]; BoxNo: Code[20]);
+    // var
+    //     BoxHeader: Record "Box Header";
+    // begin
+    //     BoxHeader.Get(PackageNo, BoxNo);
+    //     BoxHeader.Validate("ShipStation Status", lblShipped);
+    //     BoxHeader.Modify();
+    // end;
 
     procedure UpdateBoxFromLabel(PackageNo: Code[20]; BoxNo: Code[20]; jsonText: Text);
     var
@@ -970,7 +964,7 @@ codeunit 50050 "Package Box Mgt."
         _BoxHeader."Shipment Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentCost').AsValue().AsDecimal();
         _BoxHeader."Tracking No." := ShipStationMgt.GetJSToken(jsLabelObject, 'trackingNumber').AsValue().AsText();
         _BoxHeader."ShipStation Shipment ID" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentId').AsValue().AsText();
-        _BoxHeader."ShipStation Status" := lblShipped;
+        _BoxHeader.Validate("ShipStation Status", lblShipped);
         _BoxHeader.Modify();
     end;
 
@@ -1121,5 +1115,61 @@ codeunit 50050 "Package Box Mgt."
     [IntegrationEvent(false, false)]
     procedure OnAfterRegisterPackage(PackageNo: Code[20])
     begin
+    end;
+
+    procedure SentBoxStatusForWooComerse(_salesOrderNo: Code[20]; _ShippedStatus: Text[50])
+    var
+        _jsonOrderShipmentStatus: JsonObject;
+        _jsonToken: JsonToken;
+        _jsonText: Text;
+        responseText: Text;
+        IsSuccessStatusCode: Boolean;
+        _captionMgt: Codeunit "Caption Mgt.";
+    begin
+        GetShipStationSetup();
+        if not glShipStationSetup."Order Status Update" then exit;
+
+        _jsonOrderShipmentStatus := CreateJsonOrderShipmentStatusForWooComerse(_salesOrderNo, _ShippedStatus);
+        if not _jsonOrderShipmentStatus.Get('id', _jsonToken) then exit;
+        _jsonOrderShipmentStatus.WriteTo(_jsonText);
+
+        IsSuccessStatusCode := true;
+        ShipStationMgt.Connector2eShop(_jsonText, IsSuccessStatusCode, responseText, 'DELIVERYSTATUS');
+        if not IsSuccessStatusCode then begin
+            _captionMgt.SaveStreamToFile(responseText, 'errorItemList.txt');
+        end;
+    end;
+
+    local procedure CreateJsonOrderShipmentStatusForWooComerse(_salesOrderNo: Code[20]; locShippedStatus: Text[50]): JsonObject
+    var
+        _jsonObject: JsonObject;
+        _jsonNullArray: JsonArray;
+    begin
+        _jsonObject.Add('id', _salesOrderNo);
+        if locShippedStatus = lblAwaitingShipment then begin
+            _jsonObject.Add('status', _assembledStatus);
+            _jsonObject.Add('trackId', _jsonNullArray);
+        end else begin
+            _jsonObject.Add('status', _shippedStatus);
+            _jsonObject.Add('trackId', GetJsonTrackIdFromBox(_salesOrderNo));
+        end;
+
+        exit(_jsonObject);
+    end;
+
+    local procedure GetJsonTrackIdFromBox(_salesOrderNo: Code[20]): JsonArray
+    var
+        _boxHeader: Record "Box Header";
+        _jsonArray: JsonArray;
+    begin
+        _boxHeader.SetCurrentKey("Sales Order No.");
+        _boxHeader.SetRange("Sales Order No.", _salesOrderNo);
+        if _boxHeader.FindSet() then
+            repeat
+                if _boxHeader."Tracking No." <> '' then
+                    _jsonArray.Add(_boxHeader."Tracking No.");
+            until _boxHeader.Next() = 0;
+
+        exit(_jsonArray);
     end;
 }

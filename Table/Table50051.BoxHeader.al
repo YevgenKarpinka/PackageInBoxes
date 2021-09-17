@@ -121,6 +121,12 @@ table 50051 "Box Header"
             DataClassification = CustomerContent;
             CaptionML = ENU = 'ShipStation Status', RUS = 'Статус ShipStation';
             Editable = false;
+
+            trigger OnValidate()
+            begin
+                if xRec."ShipStation Status" <> Rec."ShipStation Status" then
+                    PackageBoxMgt.UpdateDeliveryStatusByPackage(Rec."Package No.");
+            end;
         }
         field(19; "ShipStation Shipment Amount"; Decimal)
         {

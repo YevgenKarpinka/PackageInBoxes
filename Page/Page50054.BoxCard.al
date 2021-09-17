@@ -197,7 +197,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Send to the ShipStation of the box document.',
                                 RUS = 'Отправить в ShipStation документ коробки.';
                 Image = CreateDocuments;
-                Visible = (Rec.Status = Rec.Status::Closed) and (Rec."ShipStation Shipment ID" = '');
+                Enabled = (Rec.Status = Rec.Status::Closed) and (Rec."ShipStation Shipment ID" = '') and (Rec."ShipStation Order Key" = '');
 
                 trigger OnAction()
                 begin
@@ -221,7 +221,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Create Label to the box document.',
                                 RUS = 'Создать бирку для коробки.';
                 Image = PrintReport;
-                Visible = (Rec."ShipStation Order Key" <> '')
+                Enabled = (Rec."ShipStation Order Key" <> '')
                 and (Rec."ShipStation Shipment ID" = '')
                 and (Rec.Status = Rec.Status::Closed);
 
@@ -251,7 +251,7 @@ page 50054 "Box Card"
                 ToolTipML = ENU = 'Void Label to the box document.',
                                 RUS = 'Отменить бирку для коробоки.';
                 Image = VoidCreditCard;
-                Visible = Rec."ShipStation Shipment ID" <> '';
+                Enabled = Rec."ShipStation Shipment ID" <> '';
 
                 trigger OnAction()
                 begin

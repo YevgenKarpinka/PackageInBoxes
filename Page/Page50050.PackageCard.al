@@ -131,6 +131,7 @@ page 50050 "Package Card"
             group(Boxes)
             {
                 CaptionML = ENU = 'Boxes', RUS = 'Коробки';
+                Enabled = Rec.Status = Rec.Status::Unregistered;
 
                 action(CloseAll)
                 {
@@ -138,7 +139,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Close All', RUS = 'Закрыть Все';
                     ToolTipML = ENU = 'Close all of the box document to the next stage of processing. You must reopen the document before you can make changes to it.',
                             RUS = 'Закрытие всех документов коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                    // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = ItemLines;
 
                     trigger OnAction()
@@ -153,8 +154,8 @@ page 50050 "Package Card"
                     ApplicationArea = Warehouse;
                     CaptionML = ENU = 'Reopen All', RUS = 'Открыть Все';
                     ToolTipML = ENU = 'Reopen all the document of the box to change.',
-                            RUS = 'Повторное открытие всех документа коробки для их изменения.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                            RUS = 'Повторное открытие всех документов коробки для их изменения.';
+                    // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = RefreshLines;
 
                     trigger OnAction()
@@ -168,7 +169,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Delete Empty Boxes', RUS = 'Удалить пустые коробки';
                     ToolTipML = ENU = 'Delete empty box documents.',
                             RUS = 'Удаление пустых документов коробки.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                    // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = Delete;
 
                     trigger OnAction()
@@ -182,7 +183,7 @@ page 50050 "Package Card"
                     CaptionML = ENU = 'Delete Empty Lines', RUS = 'Удалить пустые строки';
                     ToolTipML = ENU = 'Delete blank lines in box documents.',
                             RUS = 'Удаление пустых строк в документах коробки.';
-                    Enabled = Rec.Status = Rec.Status::Unregistered;
+                    // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = DeleteRow;
 
                     trigger OnAction()
@@ -195,6 +196,7 @@ page 50050 "Package Card"
             {
                 CaptionML = ENU = 'ShipStation', RUS = 'ShipStation';
                 Image = ReleaseShipment;
+                Enabled = Rec.Status = Rec.Status::Registered;
 
                 action("Create Orders")
                 {
@@ -252,7 +254,7 @@ page 50050 "Package Card"
                                         LabelCreated := true;
                                     until BoxHeader.Next() = 0;
                                     PackageBoxMgt.CreateDeliverySalesLineFromPackage(PackageHeader."Sales Order No.");
-                                    ShipStationMgt.SentOrderShipmentStatusForWooComerse(BoxHeader."Sales Order No.", 1);
+                                    // PackageBoxMgt.UpdateDeliveryStatusByPackage(BoxHeader."Package No.");
                                 end;
                             until PackageHeader.Next() = 0;
                         if LabelCreated then

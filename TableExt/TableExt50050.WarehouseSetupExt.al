@@ -42,5 +42,10 @@ tableextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5769
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Unregister and Open Box', RUS = 'Отменить регистрацию и открыть коробку';
         }
+        field(50057; "Delete Label After Void"; Boolean)
+        {
+            DataClassification = ToBeClassified;
+            CaptionML = ENU = 'Delete Label After Void', RUS = 'Удалить бирку после отмены';
+        }
     }
 }

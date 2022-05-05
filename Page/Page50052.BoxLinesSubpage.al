@@ -21,6 +21,14 @@ page 50052 "Box Lines Subpage"
                     ToolTipML = ENU = 'Specifies the item code of warehouse shipment that lies in the box.',
                                 RUS = 'Определяет код товара складской отгрузки который лежит в коробке.';
                 }
+                // field(Description; GetItemDescription())
+                // {
+                //     CaptionML = ENU = 'Description',
+                //                 RUS = 'Описание';
+                //     ApplicationArea = Warehouse;
+                //     ToolTipML = ENU = 'Specifies the item description of warehouse shipment that lies in the box.',
+                //                 RUS = 'Определяет описание товара складской отгрузки который лежит в коробке.';
+                // }
                 field("Quantity in Box"; Rec."Quantity in Box")
                 {
                     ApplicationArea = Warehouse;
@@ -68,4 +76,14 @@ page 50052 "Box Lines Subpage"
 
     var
         PackageBoxMgt: Codeunit "Package Box Mgt.";
+
+    // local procedure GetItemDescription(): Text[150]
+    // var
+    //     locItem: Record Item;
+    // begin
+    //     if locItem.Get(Rec."Item No.") then
+    //         exit(locItem.Description + locItem."Description 2")
+    //     else
+    //         exit('');
+    // end;
 }

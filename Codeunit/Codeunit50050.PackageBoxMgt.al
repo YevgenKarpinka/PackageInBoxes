@@ -100,7 +100,8 @@ codeunit 50050 "Package Box Mgt."
         BoxLine.SetCurrentKey("Shipment No.", "Shipment Line No.");
         BoxLine.SetRange("Shipment No.", WarehouseShipmentLine."No.");
         BoxLine.SetRange("Shipment Line No.", WarehouseShipmentLine."Line No.");
-        if BoxLine.FindFirst() then
+        BoxLine.CalcSums("Quantity in Box");
+        if BoxLine."Quantity in Box" > WarehouseShipmentLine."Qty. Shipped" then
             Error(errCantDeleteShipmentLineWhileItemPackedInBoxNo, WarehouseShipmentLine."No.",
                 WarehouseShipmentLine."Line No.", BoxLine."Item No.", BoxLine."Box No.");
     end;
@@ -499,7 +500,10 @@ codeunit 50050 "Package Box Mgt."
 
     local procedure GetWhseSetup()
     begin
-        WhseSetup.Get();
+        if not WhseSetup.Get() then begin
+            WhseSetup.Init();
+            WhseSetup.Insert();
+        end;
     end;
 
     local procedure GetCompanyInfo()
@@ -850,10 +854,13 @@ codeunit 50050 "Package Box Mgt."
     var
         WhseShipment: Record "Warehouse Shipment Line";
     begin
-        if WhseShipment.Get(ShipmentNo, ShipmentLineNo) and
-           SalesLine.Get(SalesLine."Document Type"::Order, WhseShipment."Source No.", WhseShipment."Source Line No.") then
-            exit(true);
-        exit(false);
+        WhseShipment.Get(ShipmentNo, ShipmentLineNo);
+        SalesLine.Get(SalesLine."Document Type"::Order, WhseShipment."Source No.", WhseShipment."Source Line No.");
+
+        // if WhseShipment.Get(ShipmentNo, ShipmentLineNo) and
+        //    SalesLine.Get(SalesLine."Document Type"::Order, WhseShipment."Source No.", WhseShipment."Source Line No.") then
+        //     exit(true);
+        // exit(false);
     end;
 
     procedure UpdateBoxFromShipStation(PackageNo: Code[20]; BoxNo: Code[20]; _jsonObject: JsonObject): Boolean
@@ -959,6 +966,7 @@ codeunit 50050 "Package Box Mgt."
         jsLabelObject: JsonObject;
     begin
         if not _BoxHeader.Get(PackageNo, BoxNo) then exit;
+        // Message(jsonText);
         jsLabelObject.ReadFrom(jsonText);
         _BoxHeader."Other Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'insuranceCost').AsValue().AsDecimal();
         _BoxHeader."Shipment Cost" := ShipStationMgt.GetJSToken(jsLabelObject, 'shipmentCost').AsValue().AsDecimal();
@@ -992,7 +1000,11 @@ codeunit 50050 "Package Box Mgt."
 
         _txtBefore := _BoxHeader."No." + '-' + _BoxHeader."Tracking No.";
         FileName := StrSubstNo('%1-%2', _txtBefore, lblOrder);
-        ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
+        // ShipStationMgt.DeleteAttachment(WhseShipDocNo, FileName);
+        GetWhseSetup();
+        if WhseSetup."Delete Label After Void" then
+            ShipStationMgt.DeleteAttachmentFromOrder(_BoxHeader."Sales Order No.", FileName);
+
 
         // Update Box Header From ShipStation
         // JSText := ShipStationMgt.Connect2ShipStation(1, '', StrSubstNo('/%1', "ShipStation Order ID"));
@@ -1104,12 +1116,16 @@ codeunit 50050 "Package Box Mgt."
     procedure GetPackageShippingAmountFromSalesOrder(salesOrderNo: Code[20]): Decimal
     var
         boxHeader: Record "Box Header";
+        Location: Record Location;
     begin
+        GetLocationByOrder(Location, salesOrderNo);
         boxHeader.SetCurrentKey("Sales Order No.", "ShipStation Shipment ID");
         boxHeader.SetRange("Sales Order No.", salesOrderNo);
         boxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
-        boxHeader.CalcSums("Shipment Cost", "Other Cost", "ShipStation Shipment Amount");
-        exit(boxHeader."Shipment Cost" + boxHeader."Other Cost" + boxHeader."ShipStation Shipment Amount");
+        // boxHeader.CalcSums("Shipment Cost", "Other Cost", "ShipStation Shipment Amount");
+        // exit(boxHeader."Shipment Cost" + boxHeader."Other Cost" + boxHeader."ShipStation Shipment Amount");
+        boxHeader.CalcSums("Shipment Cost");
+        exit(boxHeader."Shipment Cost" + boxHeader.Count * Location."Extra Cost of the Box");
     end;
 
     [IntegrationEvent(false, false)]
@@ -1171,5 +1187,14 @@ codeunit 50050 "Package Box Mgt."
             until _boxHeader.Next() = 0;
 
         exit(_jsonArray);
+    end;
+
+    local procedure GetLocationByOrder(var Location: Record Location; salesOrderNo: Code[20])
+    var
+        locSalesLine: Record "Sales Line";
+    begin
+        locSalesLine.SetRange("Document Type", locSalesLine."Document Type"::Order);
+        locSalesLine.SetRange("Document No.", salesOrderNo);
+        if locSalesLine.FindFirst() and Location.Get(locSalesLine."Location Code") then;
     end;
 }

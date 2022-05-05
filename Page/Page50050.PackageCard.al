@@ -21,6 +21,14 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Specifies the sales order number on the basis of which the packaging document was created',
                                 RUS = 'Определяет номер заказа продажи на основании которого был создан документ упаковки.';
                 }
+                // field(CustomerName; GetCustomerName())
+                // {
+                //     CaptionML = ENU = 'Customer Name',
+                //                 RUS = 'Имя клиента';
+                //     ApplicationArea = Warehouse;
+                //     ToolTipML = ENU = 'Specifies the sales order number on the basis of which the packaging document was created',
+                //                 RUS = 'Определяет номер заказа продажи на основании которого был создан документ упаковки.';
+                // }
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Warehouse;
@@ -316,4 +324,15 @@ page 50050 "Package Card"
                                                     RUS = 'Коробок для создания бирок не найдено.';
         errNoLabelsForVoid: TextConst ENU = 'No labels found for void.',
                                     RUS = 'Бирок для аннулирования не найдено.';
+
+    // local procedure GetCustomerName(): Text[150]
+    // var
+    //     locSalesHeader: Record "Sales Header";
+    //     locCustomer: Record Customer;
+    // begin
+    //     if locSalesHeader.Get(locSalesHeader."Document Type"::Order, Rec."Sales Order No.")
+    //     and locCustomer.Get(locSalesHeader."Sell-to Customer No.") then
+    //         exit(locCustomer.Name + locCustomer."Name 2");
+    //     exit('');
+    // end;
 }

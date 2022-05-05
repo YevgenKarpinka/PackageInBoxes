@@ -51,6 +51,12 @@ pageextension 50050 "Warehouse Setup Ext." extends "Warehouse Setup" //5775
                     ToolTipML = ENU = 'Specifies the number series code to use when you assign numbers to Box.',
                                 RUS = 'Указывает код серии номеров, который будет использоваться при назначении номеров для коробки.';
                 }
+                field("Delete Label After Void"; Rec."Delete Label After Void")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Deleting attachment when you voided label in Shipstation.',
+                                RUS = 'Удаляет вложение при отмене метки в Shipstation.';
+                }
             }
         }
     }

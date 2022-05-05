@@ -2,7 +2,7 @@
   "id": "fa072300-3657-413a-a5c9-85c545dc2147",
   "name": "Fusion Box Package",
   "publisher": "TComTech",
-  "version": "18.0.0.6",
+  "version": "18.0.0.15",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -15,19 +15,19 @@
       "id": "6317e880-5065-4f48-98ff-ff40f914c170",
       "publisher": "TComTech",
       "name": "Fusion Base Extention",
-      "version": "18.0.0.0"
+      "version": "19.0.0.0"
     }
   ],
   "screenshots": [],
-  "platform": "18.0.0.0",
-  "application": "18.0.0.0",
+  "platform": "20.0.0.0",
+  "application": "20.0.0.0",
   "idRanges": [
     {
       "from": 50050,
-      "to": 50149
+      "to": 50089
     }
   ],
   "contextSensitiveHelpUrl": "https://BoxPackage.com/help/",
   "showMyCode": false,
-  "runtime": "7.0"
+  "runtime": "7.2"
 }

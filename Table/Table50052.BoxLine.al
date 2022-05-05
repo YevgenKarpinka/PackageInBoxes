@@ -80,13 +80,13 @@ table 50052 "Box Line"
                     Error(errRemainingQuantityToPacking, xRec."Quantity in Box" + RemainingItemQuantity);
             end;
         }
-        field(5; "Sales Order No."; code[20])
+        field(5; "Sales Order No."; Code[20])
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Sales Order No.', RUS = 'Заказ продажи Но.';
             Editable = false;
         }
-        field(6; "Shipment No."; code[20])
+        field(6; "Shipment No."; Code[20])
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Shipment No.', RUS = 'Отгрузка Но.';

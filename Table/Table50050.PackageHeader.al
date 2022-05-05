@@ -19,7 +19,7 @@ table 50050 "Package Header"
             CaptionML = ENU = 'Create Date', RUS = 'Дата создания';
             Editable = false;
         }
-        field(3; "Create User ID"; code[20])
+        field(3; "Create User ID"; Code[20])
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Create User ID', RUS = 'Создал Пользователь ID';
@@ -37,7 +37,7 @@ table 50050 "Package Header"
             CaptionML = ENU = 'Last Modified Date', RUS = 'Дата последнего изменение';
             Editable = false;
         }
-        field(6; "Last Modified User ID"; code[20])
+        field(6; "Last Modified User ID"; Code[20])
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Last Modified User ID', RUS = 'Последнее изменение Пользователь ID';
@@ -49,7 +49,7 @@ table 50050 "Package Header"
             CaptionML = ENU = 'Last Modified User Security ID', RUS = 'Последнее изменение Пользователь Security ID';
             Editable = false;
         }
-        field(8; "Sales Order No."; code[20])
+        field(8; "Sales Order No."; Code[20])
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Sales Order No.', RUS = 'Заказ продажи Но.';

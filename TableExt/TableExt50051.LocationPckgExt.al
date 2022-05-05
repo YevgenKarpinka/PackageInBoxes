@@ -8,5 +8,12 @@ tableextension 50051 "Location Pckg Ext." extends Location //5769
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Enable Box Packaging', RUS = 'Активировать Упаковку в Коробки';
         }
+        // CAS-03614-Q4C7
+        field(50051; "Extra Cost of the Box"; Decimal)
+        {
+            DataClassification = ToBeClassified;
+            DecimalPlaces = 0 : 5;
+            CaptionML = ENU = 'Extra Cost of the Box', RUS = 'Добавочная стоимость коробки';
+        }
     }
 }

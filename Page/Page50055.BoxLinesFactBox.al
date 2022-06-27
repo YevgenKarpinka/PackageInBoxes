@@ -2,7 +2,7 @@ page 50055 "Box Lines FactBox"
 {
     CaptionML = ENU = 'Items in Box', RUS = 'Товары в коробке';
     PageType = ListPart;
-    ApplicationArea = Warehouse;
+    // ApplicationArea = Warehouse;
     UsageCategory = History;
     SourceTable = "Box Line";
     Editable = false;

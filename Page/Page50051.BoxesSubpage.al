@@ -62,12 +62,26 @@ page 50051 "Boxes Subpage"
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the trace number of the box for delivery.',
                                 RUS = 'Определяет номер отслеживания коробки для доставки.';
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    var
+                        LinkSetup: Record "Link Setup";
+                    begin
+                        if DelChr(Rec."Tracking No.", '=', ' ') = '' then exit;
+                        Hyperlink(Rec.GetURLForBoxTrackingNo('', true));
+                    end;
                 }
                 field("ShipStation Shipment ID"; Rec."ShipStation Shipment ID")
                 {
                     ApplicationArea = Warehouse;
                     ToolTipML = ENU = 'Specifies the ShipStation shipmentID of the box.',
                                 RUS = 'Определяет ShipStation ID отгрузки коробки.';
+                }
+                field("Tracking Agent Code"; Rec."Tracking Agent Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies the Tracking Agent Code of the box.';
                 }
             }
 

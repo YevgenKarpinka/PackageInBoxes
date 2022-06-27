@@ -12,6 +12,7 @@ page 50057 "Package List"
     Editable = false;
     PageType = List;
     UsageCategory = History;
+    PromotedActionCategories = 'New,Process,Report,Package,Boxes,ShipStation';
 
     layout
     {

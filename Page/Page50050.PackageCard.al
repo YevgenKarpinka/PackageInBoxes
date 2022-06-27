@@ -6,6 +6,7 @@ page 50050 "Package Card"
     InsertAllowed = false;
     PageType = Document;
     DeleteAllowed = false;
+    PromotedActionCategories = 'New,Process,Report,Package,Boxes,ShipStation';
 
     layout
     {
@@ -89,9 +90,9 @@ page 50050 "Package Card"
     {
         area(Processing)
         {
-            group(Package)
+            group("P&ackage")
             {
-                CaptionML = ENU = 'Package', RUS = 'Упаковка';
+                CaptionML = ENU = 'P&ackage', RUS = 'Уп&аковка';
 
                 action(Register)
                 {
@@ -100,6 +101,9 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Register package document to the next stage of processing. You must unregister the document before you can make changes to it.',
                             RUS = 'Зарегистрировать документов упаковки на следующий этап обработки. Необходимо отменить регистрацию документа, чтобы в него можно было вносить изменения.';
                     Image = RegisterPick;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -114,6 +118,9 @@ page 50050 "Package Card"
                             RUS = 'Отменить регистрацию документа упаковки для изменения.';
                     Enabled = Rec.Status = Rec.Status::Registered;
                     Image = Undo;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -125,6 +132,9 @@ page 50050 "Package Card"
                     ApplicationArea = All;
                     Image = PurchaseInvoice;
                     CaptionML = ENU = 'Print Packing Slip', RUS = 'Печать упаковочного листа';
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     var
@@ -149,6 +159,9 @@ page 50050 "Package Card"
                             RUS = 'Закрытие всех документов коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
                     // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = ItemLines;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     var
@@ -165,6 +178,9 @@ page 50050 "Package Card"
                             RUS = 'Повторное открытие всех документов коробки для их изменения.';
                     // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = RefreshLines;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -179,6 +195,9 @@ page 50050 "Package Card"
                             RUS = 'Удаление пустых документов коробки.';
                     // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = Delete;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -193,6 +212,9 @@ page 50050 "Package Card"
                             RUS = 'Удаление пустых строк в документах коробки.';
                     // Enabled = Rec.Status = Rec.Status::Unregistered;
                     Image = DeleteRow;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -213,6 +235,9 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Send to the ShipStation all of the box document.',
                                 RUS = 'Отправить в ShipStation все документы коробки.';
                     Image = CreateDocuments;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     begin
@@ -241,6 +266,9 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Create Labels all of the box document.',
                                 RUS = 'Создать бирки для всех коробок.';
                     Image = PrintReport;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     var
@@ -278,6 +306,9 @@ page 50050 "Package Card"
                     ToolTipML = ENU = 'Void Labels all of the box document.',
                                 RUS = 'Отменить бирки для всех коробок.';
                     Image = VoidCreditCard;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    PromotedOnly = true;
 
                     trigger OnAction()
                     var

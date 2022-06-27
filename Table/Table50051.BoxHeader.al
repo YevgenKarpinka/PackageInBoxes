@@ -72,6 +72,18 @@ table 50051 "Box Header"
         {
             DataClassification = ToBeClassified;
             CaptionML = ENU = 'Tracking No.', RUS = 'Отслеживания Но.';
+
+            // trigger OnValidate()
+            // var
+            //     SalesHeader: Record "Sales Header";
+            // begin
+            //     SalesHeader.Get(SalesHeader."Document Type"::Order, "Sales Order No.");
+            //     if "Tracking No." = '' then
+            //         SalesHeader.DeleteLink("Link ID")
+            //     else begin
+            //         "Link ID" := SalesHeader.AddLink(GetURLForBoxTrackingNo(''), "No.")
+            //     end;
+            // end;
         }
         field(11; "Shipping Agent Code"; Text[30])
         {
@@ -139,6 +151,12 @@ table 50051 "Box Header"
             CaptionML = ENU = 'ShipStation Shipment ID', RUS = 'ID Отгрузки ShipStation';
             // Editable = false;
         }
+        field(21; "Tracking Agent Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "Link Setup".Code;
+            Caption = 'Tracking Agent Code';
+        }
     }
 
     keys
@@ -147,19 +165,9 @@ table 50051 "Box Header"
         {
             Clustered = true;
         }
-        key(SK; "Sales Order No.", "Box Code")
-        {
-
-        }
+        key(SK; "Sales Order No.", "Box Code") { }
     }
 
-    var
-        WhseSetup: Record "Warehouse Setup";
-        asdas: Record "Unit of Measure";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        PackageBoxMgt: Codeunit "Package Box Mgt.";
-        errDeleteBoxNotAllowedTrackingNoExist: TextConst ENU = 'Box document %1 cannot be deleted because the tracking number %2  is exist.',
-                                           RUS = 'Документ коробки %1 удалить нельзя, потому что заполнен номер отслеживания %2.';
 
     trigger OnInsert()
     begin
@@ -184,6 +192,16 @@ table 50051 "Box Header"
     begin
 
     end;
+
+    var
+        SalesHeader: Record "Sales Header";
+        LinkSetup: Record "Link Setup";
+        WhseSetup: Record "Warehouse Setup";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        PackageBoxMgt: Codeunit "Package Box Mgt.";
+        errDeleteBoxNotAllowedTrackingNoExist: TextConst ENU = 'Box document %1 cannot be deleted because the tracking number %2  is exist.',
+                                           RUS = 'Документ коробки %1 удалить нельзя, потому что заполнен номер отслеживания %2.';
+
 
     procedure BoxModify()
     var
@@ -214,6 +232,10 @@ table 50051 "Box Header"
         end;
 
         "Create Date" := CurrentDateTime;
+
+        if SalesOrderExist() and LinkSetupDefaultExit() then begin
+            "Tracking Agent Code" := LinkSetup.Code;
+        end;
     end;
 
     local procedure TestNoSeries()
@@ -234,6 +256,33 @@ table 50051 "Box Header"
     local procedure GetWhseSetup()
     begin
         WhseSetup.Get();
+    end;
+
+    procedure GetURLForBoxTrackingNo(LinkCode: Code[20]; LinkDefault: Boolean): Text
+    var
+        LinkSetup: Record "Link Setup";
+    begin
+        if not LinkSetup.Get(LinkCode, LinkDefault) then begin
+            LinkSetup.SetCurrentKey(Default);
+            LinkSetup.SetRange(Default, true);
+            LinkSetup.FindFirst();
+        end;
+
+        exit(StrSubstNo(LinkSetup."Format URL", LinkSetup."Prefix URL", "Tracking No.", LinkSetup."Suffix URL"));
+    end;
+
+    local procedure SalesOrderExist(): Boolean
+    begin
+        if SalesHeader.Get(SalesHeader."Document Type"::Order, "Sales Order No.") then
+            exit(true);
+        exit(false);
+    end;
+
+    local procedure LinkSetupDefaultExit(): Boolean
+    begin
+        LinkSetup.SetRange(Default, true);
+        if LinkSetup.FindFirst() then
+            exit(true);
     end;
 }
 

@@ -8,13 +8,13 @@
             "environmentType": "Sandbox",
             "environmentName": "Debug",
             // "environmentName": "Test",
-            "startupObjectId": 50057,
+            "startupObjectId": 50059,
             "startupObjectType": "Page",
             "breakOnError": true,
             "launchBrowser": true,
             "enableLongRunningSqlStatements": true,
             "enableSqlInformationDebugger": true,
-            "schemaUpdateMode": "Synchronize"
+            "schemaUpdateMode": "ForceSync"
         }
     ]
 }

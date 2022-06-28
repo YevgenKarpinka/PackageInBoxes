@@ -94,10 +94,12 @@ codeunit 50050 "Package Box Mgt."
         if not (WhseShptLine."Source Document" = WhseShptLine."Source Document"::"Sales Order") then
             exit(false);
 
-        if SalesHeader.Get(SalesHeader."Document Type"::Order, WhseShptLine."Source No.")
-            and ICPartner.Get('GLICKSHOP') then
-            if ICPartner."Customer No." = SalesHeader."Sell-to Customer No." then
+        if WhseShptLine."Destination Type" in [WhseShptLine."Destination Type"::Customer] then begin
+            ICPartner.SetCurrentKey("Customer No.");
+            ICPartner.SetRange("Customer No.", WhseShptLine."Destination No.");
+            if ICPartner.FindFirst() then
                 exit(false);
+        end;
 
         if Location.Get(WhseShptLine."Location Code") then
             exit(Location."Enable Box Packaging");

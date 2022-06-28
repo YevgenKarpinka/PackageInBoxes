@@ -7,6 +7,7 @@ page 50054 "Box Card"
     SourceTable = "Box Header";
     InsertAllowed = false;
     DeleteAllowed = true;
+    PromotedActionCategories = 'New,Process,Report,Box,ShipStation';
 
     layout
     {
@@ -52,6 +53,11 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the box code according to the directory.',
                                 RUS = 'Определяет код коробки согласно справочника.';
                 }
+                field("Tracking Agent Code"; Rec."Tracking Agent Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies the Tracking Agent Code of the box.';
+                }
                 field("Gross Weight"; Rec."Gross Weight")
                 {
                     ApplicationArea = Warehouse;
@@ -70,6 +76,12 @@ page 50054 "Box Card"
                     ToolTipML = ENU = 'Specifies the quantity of units of item that lies in the box.',
                                 RUS = 'Определяет количество единиц товара который лежит в коробке.';
                 }
+                field("Tracking No."; Rec."Tracking No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery.',
+                                RUS = 'Определяет номер отслеживания коробки для доставки.';
+                }
             }
             part(BoxLinesSubPage; "Box Lines Subpage")
             {
@@ -81,12 +93,6 @@ page 50054 "Box Card"
             group(ShipStation)
             {
                 Editable = Rec.Status = Rec.Status::Open;
-                field("Tracking No."; Rec."Tracking No.")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTipML = ENU = 'Specifies the trace number of the box for delivery.',
-                                RUS = 'Определяет номер отслеживания коробки для доставки.';
-                }
                 field("Shipping Agent"; Rec."Shipping Agent Code")
                 {
                     ApplicationArea = Warehouse;
@@ -155,6 +161,9 @@ page 50054 "Box Card"
                             RUS = 'Закрытие документа коробки на следующий этап обработки. Необходимо заново открыть документ, чтобы в него можно было вносить изменения.';
                 Enabled = Rec.Status = Rec.Status::Open;
                 Image = ItemLines;
+                Promoted = true;
+                PromotedCategory = Category4;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 begin
@@ -169,6 +178,9 @@ page 50054 "Box Card"
                             RUS = 'Повторное открытие документа коробки для его изменения.';
                 Enabled = Rec.Status = Rec.Status::Closed;
                 Image = RefreshLines;
+                Promoted = true;
+                PromotedCategory = Category4;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 begin
@@ -183,6 +195,9 @@ page 50054 "Box Card"
                             RUS = 'Собрать в коробку весь оставшийся на столе товар.';
                 Enabled = Rec.Status = Rec.Status::Open;
                 Image = GetActionMessages;
+                Promoted = true;
+                PromotedCategory = Category4;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 begin
@@ -198,6 +213,9 @@ page 50054 "Box Card"
                                 RUS = 'Отправить в ShipStation документ коробки.';
                 Image = CreateDocuments;
                 Enabled = (Rec.Status = Rec.Status::Closed) and (Rec."ShipStation Shipment ID" = '') and (Rec."ShipStation Order Key" = '');
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 begin
@@ -207,10 +225,10 @@ page 50054 "Box Card"
                     BoxHeader.SetRange(Status, BoxHeader.Status::Closed);
                     BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
                     if BoxHeader.FindSet(false, false) then
-                        repeat
-                            if PackageBoxMgt.GetQuantityInBox(BoxHeader."No.") > 0 then
-                                PackageBoxMgt.SentBoxInShipStation(BoxHeader."Package No.", BoxHeader."No.");
-                        until BoxHeader.Next() = 0;
+                            repeat
+                                if PackageBoxMgt.GetQuantityInBox(BoxHeader."No.") > 0 then
+                                    PackageBoxMgt.SentBoxInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                            until BoxHeader.Next() = 0;
                     Message(lblOrdersCreated);
                 end;
             }
@@ -224,6 +242,9 @@ page 50054 "Box Card"
                 Enabled = (Rec."ShipStation Order Key" <> '')
                 and (Rec."ShipStation Shipment ID" = '')
                 and (Rec.Status = Rec.Status::Closed);
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 begin
@@ -234,9 +255,9 @@ page 50054 "Box Card"
                     BoxHeader.SetFilter("ShipStation Order Key", '<>%1', '');
                     BoxHeader.SetFilter("ShipStation Shipment ID", '=%1', '');
                     if BoxHeader.FindSet(false, false) then begin
-                        repeat
-                            PackageBoxMgt.CreateLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
-                        until BoxHeader.Next() = 0;
+                                                                repeat
+                                                                    PackageBoxMgt.CreateLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                                                until BoxHeader.Next() = 0;
                         PackageBoxMgt.CreateDeliverySalesLineFromPackage(BoxHeader."Sales Order No.");
                         Message(lblLabelsCreated);
                     end else begin
@@ -252,6 +273,9 @@ page 50054 "Box Card"
                                 RUS = 'Отменить бирку для коробоки.';
                 Image = VoidCreditCard;
                 Enabled = Rec."ShipStation Shipment ID" <> '';
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 begin
@@ -260,9 +284,9 @@ page 50054 "Box Card"
                     BoxHeader.SetCurrentKey("ShipStation Shipment ID");
                     BoxHeader.SetFilter("ShipStation Shipment ID", '<>%1', '');
                     if BoxHeader.FindSet(false, false) then begin
-                        repeat
-                            PackageBoxMgt.VoidLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
-                        until BoxHeader.Next() = 0;
+                                                                repeat
+                                                                    PackageBoxMgt.VoidLabel2OrderInShipStation(BoxHeader."Package No.", BoxHeader."No.");
+                                                                until BoxHeader.Next() = 0;
                         PackageBoxMgt.CreateDeliverySalesLineFromPackage(BoxHeader."Sales Order No.");
                         Message(lblLabelVoided);
                     end else begin
